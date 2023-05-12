@@ -1,0 +1,591 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<helpItems schema="maml" xmlns="http://msh">
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Get-OpenAILogs</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>OpenAILogs</command:noun>
+      <maml:description>
+        <maml:para>获取OpenAI的日志</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>获取OpenAI的日志, 这个结果可以用来进一步分析，包括调用时长，消耗的token数量等</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Get-OpenAILogs</maml:name>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>all</maml:name>
+          <maml:description>
+            <maml:para>是否获取所有的日志</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>all</maml:name>
+        <maml:description>
+          <maml:para>是否获取所有的日志</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues />
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>Get-OpenAILogs</dev:code>
+        <dev:remarks>
+          <maml:para>获取当天的日志</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
+        <dev:code>Get-OpenAILogs -all</dev:code>
+        <dev:remarks>
+          <maml:para>获取所有的日志</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>Github</maml:linkText>
+        <maml:uri>https://github.com/code365opensource/code365scripts/tree/master/code365scripts.openai</maml:uri>
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>New-OpenAICompletion</command:name>
+      <command:verb>New</command:verb>
+      <command:noun>OpenAICompletion</command:noun>
+      <maml:description>
+        <maml:para>调用OpenAI 的Completion 接口并返回结果</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>同时支持OpenAI原生服务，和Azure OpenAI 服务</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>New-OpenAICompletion</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByValue)" position="1" aliases="none">
+          <maml:name>prompt</maml:name>
+          <maml:description>
+            <maml:para>你的提示文本</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>api_key</maml:name>
+          <maml:description>
+            <maml:para>OpenAI服务的密钥</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>azure</maml:name>
+          <maml:description>
+            <maml:para>是否使用Azure OpenAI服务</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>endpoint</maml:name>
+          <maml:description>
+            <maml:para>服务端点</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>engine</maml:name>
+          <maml:description>
+            <maml:para>模型名称</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>max_tokens</maml:name>
+          <maml:description>
+            <maml:para>最大token的长度，不同的模型支持不同的长度，请参考官方文档，默认值是 1024</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+          <dev:type>
+            <maml:name>Int32</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>1024</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>n</maml:name>
+          <maml:description>
+            <maml:para>返回的结果个数，默认为1</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+          <dev:type>
+            <maml:name>Int32</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>1</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>temperature</maml:name>
+          <maml:description>
+            <maml:para>该参数指定了模型的创造性指数，越接近1 的话，则表示可以返回更大创造性的结果。越接近0的话，则表示越返回稳定的结果。</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">Double</command:parameterValue>
+          <dev:type>
+            <maml:name>Double</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>1</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>api_key</maml:name>
+        <maml:description>
+          <maml:para>OpenAI服务的密钥</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>azure</maml:name>
+        <maml:description>
+          <maml:para>是否使用Azure OpenAI服务</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>endpoint</maml:name>
+        <maml:description>
+          <maml:para>服务端点</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>engine</maml:name>
+        <maml:description>
+          <maml:para>模型名称</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>max_tokens</maml:name>
+        <maml:description>
+          <maml:para>最大token的长度，不同的模型支持不同的长度，请参考官方文档，默认值是 1024</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+        <dev:type>
+          <maml:name>Int32</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>1024</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>n</maml:name>
+        <maml:description>
+          <maml:para>返回的结果个数，默认为1</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+        <dev:type>
+          <maml:name>Int32</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>1</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByValue)" position="1" aliases="none">
+        <maml:name>prompt</maml:name>
+        <maml:description>
+          <maml:para>你的提示文本</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>temperature</maml:name>
+        <maml:description>
+          <maml:para>该参数指定了模型的创造性指数，越接近1 的话，则表示可以返回更大创造性的结果。越接近0的话，则表示越返回稳定的结果。</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">Double</command:parameterValue>
+        <dev:type>
+          <maml:name>Double</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>1</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues />
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>New-OpenAICompletion -prompt "What's the capital of China"</dev:code>
+        <dev:remarks>
+          <maml:para>使用OpenAI原生服务查询中国的首都信息</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
+        <dev:code>New-OpenAICompletion "What's the capital of China"</dev:code>
+        <dev:remarks>
+          <maml:para>使用OpenAI原生服务查询中国的首都信息(直接输入内容)</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
+        <dev:code>"What's the capital of China" | New-OpenAICompletion</dev:code>
+        <dev:remarks>
+          <maml:para>使用OpenAI原生服务查询中国的首都信息，通过管道传递参数</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
+        <dev:code>noc "What's the capital of China"</dev:code>
+        <dev:remarks>
+          <maml:para>使用OpenAI原生服务查询中国的首都信息(使用缩写)</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 5 --------------------------</maml:title>
+        <dev:code>New-OpenAICompletion -prompt "What's the capital of China" -api_key "sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" -engine "text-davinci-003" -endpoint "https://api.openai.com/v1/completions"</dev:code>
+        <dev:remarks>
+          <maml:para>使用OpenAI原生服务查询中国的首都信息，通过参数指定api_key, engine, endpoint</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 6 --------------------------</maml:title>
+        <dev:code>New-OpenAICompletion -prompt "What's the capital of China" -azure</dev:code>
+        <dev:remarks>
+          <maml:para>使用Azure OpenAI服务查询中国的首都信息</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 7 --------------------------</maml:title>
+        <dev:code>New-OpenAICompletion -prompt "What's the capital of China" -azure -api_key "xxxxxxxxxxxxxxx" -engine "chenxizhang" -endpoint "https://chenxizhang.openai.azure.com/"</dev:code>
+        <dev:remarks>
+          <maml:para>使用Azure OpenAI服务查询中国的首都信息，通过参数指定api_key, engine, endpoint</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 8 --------------------------</maml:title>
+        <dev:code>"What's the capital of China","韭菜炒蛋怎么做" | noc -azure</dev:code>
+        <dev:remarks>
+          <maml:para>使用Azure OpenAI服务查询中国的首都信息,以及如何做菜，通过管道传递参数</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 9 --------------------------</maml:title>
+        <dev:code>Get-Children *.txt | Get-Content | noc -azure</dev:code>
+        <dev:remarks>
+          <maml:para>根据当前目录中的所有txt文件，使用Azure OpenAI服务查询对应的回复</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>Github</maml:linkText>
+        <maml:uri>https://github.com/code365opensource/code365scripts/tree/master/code365scripts.openai</maml:uri>
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>New-OpenAIConversation</command:name>
+      <command:verb>New</command:verb>
+      <command:noun>OpenAIConversation</command:noun>
+      <maml:description>
+        <maml:para>使用OpenAI服务进行对话</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>使用OpenAI服务进行对话, 支持单行文本，多行文本，以及从文件中读取文本</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>New-OpenAIConversation</maml:name>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+          <maml:name>api_key</maml:name>
+          <maml:description>
+            <maml:para>OpenAI服务的API Key, 如果没有设置环境变量 OPENAI_API_KEY 或 OPENAI_API_KEY_AZURE，则必须使用该参数</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+          <maml:name>engine</maml:name>
+          <maml:description>
+            <maml:para>OpenAI服务的引擎, 如果没有设置环境变量 OPENAI_ENGINE 或 OPENAI_ENGINE_AZURE，则必须使用该参数</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+          <maml:name>endpoint</maml:name>
+          <maml:description>
+            <maml:para>OpenAI服务的Endpoint, 如果没有设置环境变量 OPENAI_ENDPOINT 或 OPENAI_ENDPOINT_AZURE，则必须使用该参数</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+          <maml:name>max_tokens</maml:name>
+          <maml:description>
+            <maml:para>生成的文本最大长度, 默认为1024</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+          <dev:type>
+            <maml:name>Int32</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>1024</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="5" aliases="none">
+          <maml:name>temperature</maml:name>
+          <maml:description>
+            <maml:para>生成的文本的创造性指数, 默认为1</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="false">Double</command:parameterValue>
+          <dev:type>
+            <maml:name>Double</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>1</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>azure</maml:name>
+          <maml:description>
+            <maml:para>是否使用Azure OpenAI服务</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+        <maml:name>api_key</maml:name>
+        <maml:description>
+          <maml:para>OpenAI服务的API Key, 如果没有设置环境变量 OPENAI_API_KEY 或 OPENAI_API_KEY_AZURE，则必须使用该参数</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>azure</maml:name>
+        <maml:description>
+          <maml:para>是否使用Azure OpenAI服务</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <maml:name>endpoint</maml:name>
+        <maml:description>
+          <maml:para>OpenAI服务的Endpoint, 如果没有设置环境变量 OPENAI_ENDPOINT 或 OPENAI_ENDPOINT_AZURE，则必须使用该参数</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <maml:name>engine</maml:name>
+        <maml:description>
+          <maml:para>OpenAI服务的引擎, 如果没有设置环境变量 OPENAI_ENGINE 或 OPENAI_ENGINE_AZURE，则必须使用该参数</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <maml:name>max_tokens</maml:name>
+        <maml:description>
+          <maml:para>生成的文本最大长度, 默认为1024</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+        <dev:type>
+          <maml:name>Int32</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>1024</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="5" aliases="none">
+        <maml:name>temperature</maml:name>
+        <maml:description>
+          <maml:para>生成的文本的创造性指数, 默认为1</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">Double</command:parameterValue>
+        <dev:type>
+          <maml:name>Double</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>1</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues />
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>New-OpenAIConversation</dev:code>
+        <dev:remarks>
+          <maml:para>使用OpenAI服务进行对话，全部使用默认参数</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
+        <dev:code>New-OpenAIConversation -azure</dev:code>
+        <dev:remarks>
+          <maml:para>使用Azure OpenAI服务进行对话, 全部使用默认参数</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
+        <dev:code>gpt</dev:code>
+        <dev:remarks>
+          <maml:para>使用OpenAI服务进行对话，全部使用默认参数</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
+        <dev:code>gpt -azure</dev:code>
+        <dev:remarks>
+          <maml:para>使用Azure OpenAI服务进行对话, 全部使用默认参数</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 5 --------------------------</maml:title>
+        <dev:code>gpt -api_key $api_key -engine $engine</dev:code>
+        <dev:remarks>
+          <maml:para>使用OpenAI服务进行对话，使用指定的参数</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 6 --------------------------</maml:title>
+        <dev:code>gpt -api_key $api_key -engine $engine -endpoint $endpoint -azure</dev:code>
+        <dev:remarks>
+          <maml:para>使用Azure OpenAI服务进行对话，使用指定的参数</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 7 --------------------------</maml:title>
+        <dev:code>gpt -api_key $api_key -engine $engine -endpoint $endpoint -azure -max_tokens 1024 -temperature 1 -n 1</dev:code>
+        <dev:remarks>
+          <maml:para>使用Azure OpenAI服务进行对话，使用指定的参数</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>Github</maml:linkText>
+        <maml:uri>https://github.com/code365opensource/code365scripts/tree/master/code365scripts.openai</maml:uri>
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+</helpItems>
