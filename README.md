@@ -2,7 +2,7 @@
 <style>
   .language-plaintext {
     white-space : pre-wrap !important;
-    word-break: break-word;
+    word-break: break-word !important;
   }
 </style>
 
