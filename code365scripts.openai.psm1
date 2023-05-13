@@ -1,71 +1,12 @@
 ﻿# 导入本地化数据
 Import-LocalizedData -FileName "resources.psd1" -BindingVariable "resources"
 
-# 用当前日期生成的日志文件
-$script:folder = "$env:APPDATA\code365scripts.openai"
-if (!(Test-Path $script:folder)) {
-    New-Item -ItemType Directory -Path $script:folder
-}
-$script:logfile = "$script:folder\OpenAI_{0}.log" -f (Get-Date -Format "yyyyMMdd")
-
-# 检查版本是否需要更新
-Start-Job -ScriptBlock {
-    $folder = $args[0]
-    $file = "$folder\update.txt"
-
-    if (($env:CHECK_UPDATE_CODE365SCRIPTS -eq 0) -or (Test-Path $file)) {
-        return
-    }
-    $module = Find-Module code365scripts.openai
-    $version = $module.Version
-    $current = (Get-Module code365scripts.openai -ListAvailable | Sort-Object -Property Version -Descending | Select-Object -First 1).Version
-    if ($version -ne $current) {
-        Set-Content $file -Value $module.Description -Force
-    }
-    else {
-        if (Test-Path $file ) {
-            Remove-Item $file -Force
-        }
-    }
-
-}  -ArgumentList $script:folder
-
-# 用于记录日志
-function Write-Log([array]$message) {
-    $message = "{0}`t{1}" -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss"), ($message -join "`t")
-    Add-Content $script:logfile -Value $message
-}
-
-function Test-Update() {
-    if (($env:CHECK_UPDATE_CODE365SCRIPTS -eq 0) -or (!(Test-Path "$script:folder\update.txt"))) {
-        return
-    };
-
-    $description = Get-Content "$script:folder\update.txt"
-
-    $confirm = Read-Host ($resources.update_prompt -f $description)
-    if ($confirm -eq "y") {
-        if ($PSVersionTable['PSVersion'].Major -eq 5) {
-            Update-Module code365scripts.openai -Force
-        }
-        else {
-            Update-Module code365scripts.openai -Scope CurrentUser -Force
-        }
-        
-        Remove-Item "$script:folder\update.txt" -Force
-
-        # Import-Module code365scripts.openai
-        break
-    }
-
-}
-
 # 检查 openai.com 是否可以访问，使用iwr 的 HEAD 方法测试，如果返回 200 则可以访问
 function Test-OpenAIConnectivity {
     # 设置全局错误处理
     $ErrorActionPreference = 'SilentlyContinue'
     # 增加超时时间 5秒 
-    $response = Invoke-WebRequest -Uri "https://platform.openai.com/docs/" -Method Head -TimeoutSec 5
+    $response = Invoke-WebRequest -Uri "https://platform.openai.com/docs/" -Method Head -TimeoutSec 2
     # 恢复全局错误处理
     $ErrorActionPreference = 'Continue'
     return $response.StatusCode -eq 200
@@ -74,7 +15,52 @@ function Test-OpenAIConnectivity {
 
 function New-OpenAICompletion {
     <#
-    .EXTERNALHELP code365scripts.openai-help.xml
+    .EXTERNALHELP code365scripts.openai-help.
+    .SYNOPSIS
+        Get completion from OpenAI API
+    .DESCRIPTION
+        Get completion from OpenAI API, you can use this cmdlet to get completion from OpenAI API.The cmdlet accept pipeline input. You can also assign the prompt, api_key, engine, endpoint, max_tokens, temperature, n parameters.
+    .PARAMETER prompt
+        The prompt to get completion from OpenAI API
+    .PARAMETER api_key
+        The api_key to get completion from OpenAI API. You can also set api_key in environment variable OPENAI_API_KEY or OPENAI_API_KEY_Azure (if you want to use Azure OpenAI Service API).
+    .PARAMETER engine
+        The engine to get completion from OpenAI API. You can also set engine in environment variable OPENAI_ENGINE or OPENAI_ENGINE_Azure (if you want to use Azure OpenAI Service API).
+    .PARAMETER endpoint
+        The endpoint to get completion from OpenAI API. You can also set endpoint in environment variable OPENAI_ENDPOINT or OPENAI_ENDPOINT_Azure (if you want to use Azure OpenAI Service API).
+    .PARAMETER max_tokens
+        The max_tokens to get completion from OpenAI API. The default value is 1024.
+    .PARAMETER temperature
+        The temperature to get completion from OpenAI API. The default value is 1, which means most creatively.
+    .PARAMETER n
+        If you want to get multiple completion, you can use this parameter. The default value is 1.
+    .PARAMETER azure
+        If you want to use Azure OpenAI API, you can use this switch.
+    .EXAMPLE
+        New-OpenAICompletion -prompt "Which city is the capital of China?"
+        Use default api_key, engine, endpoint from environment varaibles
+    .EXAMPLE
+        noc "Which city is the capital of China?"
+        Use alias of the cmdlet with default api_key, engine, endpoint from environment varaibles
+    .EXAMPLE
+        "Which city is the capital of China?" | noc
+        Use pipeline input
+    .EXAMPLE
+        noc "Which city is the capital of China?" -api_key "your api key"
+        Set api_key in the command
+    .EXAMPLE
+        noc "Which city is the capital of China?" -api_key "your api key" -engine "davinci"
+        Set api_key and engine in the command
+    .EXAMPLE
+        noc "Which city is the capital of China?" -azure
+        Use Azure OpenAI API
+    .EXAMPLE
+        "string 1","string 2" | noc -azure
+        Use Azure OpenAI API with pipeline input (multiple strings)
+    .LINK
+        https://github.com/chenxizhang/openai-powershell
+    .INPUTS
+        System.String, you can pass one or more string to the cmdlet, and we will get the completion for you.
     #>
 
     [CmdletBinding()]
@@ -91,9 +77,6 @@ function New-OpenAICompletion {
     )
 
     BEGIN {
-
-        Test-Update # 检查更新
-
         if ($azure) {
             $api_key = if ($api_key) { $api_key } else { if ($env:OPENAI_API_KEY_Azure) { $env:OPENAI_API_KEY_Azure } else { $env:OPENAI_API_KEY } }
             $engine = if ($engine) { $engine } else { $env:OPENAI_ENGINE_Azure }
@@ -151,14 +134,10 @@ function New-OpenAICompletion {
             Headers     = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "Bearer $api_key" } }
             ContentType = "application/json;charset=utf-8"
         }
-        $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+
 
         try {
             $response = Invoke-RestMethod @params
-            $stopwatch.Stop()
-            $total_tokens = $response.usage.total_tokens
-            $prompt_tokens = $response.usage.prompt_tokens
-            $completion_tokens = $response.usage.completion_tokens
 
             if ($PSVersionTable['PSVersion'].Major -eq 5) {
                 $dstEncoding = [System.Text.Encoding]::GetEncoding('iso-8859-1')
@@ -169,7 +148,6 @@ function New-OpenAICompletion {
                 }
             }
         
-            Write-Log -message $stopwatch.ElapsedMilliseconds, $total_tokens, $prompt_tokens, $completion_tokens
             Write-Output $response
             
         }
@@ -180,150 +158,49 @@ function New-OpenAICompletion {
 
 }
 
-function New-OpenAIConversation {
+function New-ChatGPTConversation {
+
     <#
-    .EXTERNALHELP code365scripts.openai-help.xml
+    .SYNOPSIS
+        Create a new ChatGPT conversation
+    .DESCRIPTION
+        Create a new ChatGPT conversation, You can chat with the openai service just like chat with a human.
+    .PARAMETER api_key
+        Your OpenAI API key, you can also set it in environment variable OPENAI_API_KEY or OPENAI_API_KEY_Azure if you use Azure OpenAI API.
+    .PARAMETER engine
+        The engine to use for this request, you can also set it in environment variable OPENAI_ENGINE or OPENAI_ENGINE_Azure if you use Azure OpenAI API.
+    .PARAMETER endpoint
+        The endpoint to use for this request, you can also set it in environment variable OPENAI_ENDPOINT or OPENAI_ENDPOINT_Azure if you use Azure OpenAI API.
+    .PARAMETER azure
+        if you use Azure OpenAI API, you can use this switch.
+    .PARAMETER system
+        The system prompt, this is a string, you can use it to define the role you want it be, for example, "You are a chatbot, please answer the user's question according to the user's language."
+    .EXAMPLE
+        New-ChatGPTConversation
+        Create a new ChatGPT conversation, use openai service with all the default settings.
+    .EXAMPLE
+        New-ChatGPTConverstaion -azure
+        Create a new ChatGPT conversation, use Azure openai service with all the default settings.
+    .EXAMPLE
+        chat -azure
+        Create a new ChatGPT conversation by cmdlet's alias(chat), use Azure openai service with all the default settings.
+    .EXAMPLE
+        New-ChatGPTConversation -api_key "your api key" -engine "your engine id"
+        Create a new ChatGPT conversation, use openai service with your api key and engine id.
+    .EXAMPLE
+        New-ChatGPTConversation -api_key "your api key" -engine "your engine id" -azure
+        Create a new ChatGPT conversation, use Azure openai service with your api key and engine id.
+    .EXAMPLE
+        New-ChatGPTConversation -api_key "your api key" -engine "your engine id" -azure -system "You are a chatbot, please answer the user's question according to the user's language."
+        Create a new ChatGPT conversation, use Azure openai service with your api key and engine id, and define the system prompt.
+    .EXAMPLE
+        New-ChatGPTConversation -api_key "your api key" -engine "your engine id" -azure -system "You are a chatbot, please answer the user's question according to the user's language." -endpoint "https://api.openai.com/v1/completions"
+        Create a new ChatGPT conversation, use Azure openai service with your api key and engine id, and define the system prompt and endpoint.
+    .LINK
+        https://github.com/chenxizhang/powershell-openai
     #>
 
 
-    [CmdletBinding()]
-    [Alias("oai")][Alias("gpt")]
-    param(
-        [Parameter()][string]$api_key,
-        [Parameter()][string]$engine,
-        [Parameter()][string]$endpoint,
-        [Parameter()][int]$max_tokens = 1024,
-        [Parameter()][double]$temperature = 1,
-        [Parameter()][switch]$azure
-    )
-
-    BEGIN {
-
-        Test-Update # 检查更新
-
-
-
-        if ($azure) {
-            $api_key = if ($api_key) { $api_key } else { if ($env:OPENAI_API_KEY_Azure) { $env:OPENAI_API_KEY_Azure } else { $env:OPENAI_API_KEY } }
-            $engine = if ($engine) { $engine } else { $env:OPENAI_ENGINE_Azure }
-            $endpoint = "{0}openai/deployments/{1}/completions?api-version=2022-12-01" -f $(if ($endpoint) { $endpoint }else { $env:OPENAI_ENDPOINT_Azure }), $engine
-        }
-        else {
-            $api_key = if ($api_key) { $api_key } else { $env:OPENAI_API_KEY }
-            $engine = if ($engine) { $engine } else { if ($env:OPENAI_ENGINE) { $env:OPENAI_ENGINE }else { "text-davinci-003" } }
-            $endpoint = if ($endpoint) { $endpoint } else { if ($env:OPENAI_ENDPOINT) { $env:OPENAI_ENDPOINT }else { "https://api.openai.com/v1/completions" } }
-
-        }
-
-        $hasError = $false
-
-        if ((!$azure) -and ((Test-OpenAIConnectivity) -eq $False)) {
-            Write-Host $resources.openai_unavaliable -ForegroundColor Red
-            $hasError = $true
-        }
-
-        if (!$api_key) {
-            Write-Host $resources.error_missing_api_key -ForegroundColor Red
-            $hasError = $true
-        }
-
-        if (!$engine) {
-            Write-Host $resources.error_missing_engine -ForegroundColor Red
-            $hasError = $true
-        }
-
-        if (!$endpoint) {
-            Write-Host $resources.error_missing_endpoint -ForegroundColor Red
-            $hasError = $true
-        }
-
-        if ($hasError) {
-            break
-        }
-    }
-
-
-    PROCESS {
-        
-        $index = 1; # 用来保存问答的序号
-
-        $welcome = "`n{0}`n{1}" -f ($resources.welcome -f $(if ($azure) { " $($resources.azure_version) " } else { "" }), $engine), $resources.shortcuts
-        
-        Write-Host $welcome -ForegroundColor Yellow
-
-        while ($true) {
-            $current = $index++
-            $prompt = Read-Host -Prompt "`n[$current] $($resources.prompt)"
-            $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
-
-            if ($prompt -eq "q") {
-                break
-            }
-
-            if ($prompt -eq "m") {
-                # 这是用户想要输入多行文本
-                $prompt = Read-MultiLineInputBoxDialog -Message $resources.multi_line_prompt -WindowTitle $resources.multi_line_prompt -DefaultText ""
-                if ($null -eq $prompt) {
-                    Write-Host $resources.cancel_button_message
-                    continue
-                }
-                else {
-                    Write-Host "$($resources.multi_line_message)`n$prompt"
-                }
-            }
-
-            if ($prompt -eq "f") {
-                # 这是用户想要从文件输入
-                $file = Read-OpenFileDialog -WindowTitle $resources.file_prompt
-
-                if (!($file)) {
-                    Write-Host $resources.cancel_button_message
-                    continue
-                }
-                else {
-                    $prompt = Get-Content $file -Encoding utf8
-                    Write-Host "$($resources.multi_line_message)`n$prompt"
-                }
-            }
-
-            $params = @{
-                Uri         = $endpoint
-                Method      = "POST"
-                Body        = @{model = "$engine"; prompt = "$prompt"; max_tokens = $max_tokens; temperature = $temperature } | ConvertTo-Json
-                Headers     = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "Bearer $api_key" } }
-                ContentType = "application/json;charset=utf-8"
-            }
-
-            try {
-                $response = Invoke-RestMethod @params
-                $stopwatch.Stop()
-                $result = $response.choices[0].text
-                $total_tokens = $response.usage.total_tokens
-                $prompt_tokens = $response.usage.prompt_tokens
-                $completion_tokens = $response.usage.completion_tokens
-                if ($PSVersionTable['PSVersion'].Major -eq 5) {
-                    $dstEncoding = [System.Text.Encoding]::GetEncoding('iso-8859-1')
-                    $srcEncoding = [System.Text.Encoding]::UTF8
-                    $result = $srcEncoding.GetString([System.Text.Encoding]::Convert($srcEncoding, $dstEncoding, $srcEncoding.GetBytes($result)))
-                }
-        
-                Write-Host -ForegroundColor Red ("`n[$current] $($resources.response)" -f $total_tokens, $prompt_tokens, $completion_tokens )
-                Write-Host $result -ForegroundColor Green
-
-                Write-Log -message $stopwatch.ElapsedMilliseconds, $total_tokens, $prompt_tokens, $completion_tokens
-            }
-            catch {
-                <#Do this if a terminating exception happens#>
-                Write-Host ($_.ErrorDetails | ConvertFrom-Json).error.message -ForegroundColor Red
-            }
-
-        }
-
-    }
-}
-
-
-function New-ChatGPTConversation {
     [CmdletBinding()]
     [Alias("chatgpt")][Alias("chat")]
     param(
@@ -334,9 +211,6 @@ function New-ChatGPTConversation {
         [string]$system = "你是一个ChatGPT聊天机器人,请根据用户的语言回答。"
     )
     BEGIN {
-
-        Test-Update # 检查更新
-
         if ($azure) {
             $api_key = if ($api_key) { $api_key } else { if ($env:OPENAI_API_KEY_Azure) { $env:OPENAI_API_KEY_Azure } else { $env:OPENAI_API_KEY } }
             $engine = if ($engine) { $engine } else { if ($env:OPENAI_CHAT_ENGINE_Azure) { $env:OPENAI_CHAT_ENGINE_Azure }else { "gpt-3.5-turbo" } }
@@ -456,8 +330,6 @@ function New-ChatGPTConversation {
 
                 Write-Host -ForegroundColor Red ("`n[$current] $($resources.response)" -f $total_tokens, $prompt_tokens, $completion_tokens )
                 Write-Host $result -ForegroundColor Green
-
-                Write-Log -message $stopwatch.ElapsedMilliseconds, $total_tokens, $prompt_tokens, $completion_tokens
             }
             catch {
                 Write-Host $_.ErrorDetails -ForegroundColor Red
@@ -467,18 +339,6 @@ function New-ChatGPTConversation {
 
 }
 
-function Get-OpenAILogs([switch]$all) {
-    # .EXTERNALHELP code365scripts.openai-help.xml
-
-    Test-Update # 检查更新
-    
-    if ($all) {
-        Get-ChildItem -Path $script:folder | Get-Content | ConvertFrom-Csv -Delimiter "`t" -Header Time, Duration, TotalTokens, PromptTokens, CompletionTokens | Format-Table
-    }
-    else {
-        Get-Content $script:logfile | ConvertFrom-Csv -Delimiter "`t" -Header Time, Duration, TotalTokens, PromptTokens, CompletionTokens | Format-Table
-    }
-}
 
 function Read-OpenFileDialog([string]$WindowTitle, [string]$InitialDirectory, [string]$Filter = "All files (*.*)|*.*", [switch]$AllowMultiSelect) {
     Add-Type -AssemblyName System.Windows.Forms
