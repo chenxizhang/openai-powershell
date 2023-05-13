@@ -12,7 +12,7 @@
     RootModule           = '.\code365scripts.openai.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '1.1'
+    ModuleVersion        = '1.1.0.1'
 
     # Supported PSEditions
     CompatiblePSEditions = @("Desktop")
@@ -77,16 +77,16 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport    = @("New-OpenAIConversation", "Get-OpenAILogs", "New-OpenAICompletion", "New-ChatGPTConversation")
+    FunctionsToExport    = @("New-OpenAIConversation", "New-ChatGPTConversation")
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-    CmdletsToExport      = @("New-OpenAIConversation", "Get-OpenAILogs", "New-OpenAICompletion", "New-ChatGPTConversation")
+    CmdletsToExport      = @("New-OpenAIConversation", "New-ChatGPTConversation")
 
     # Variables to export from this module
     VariablesToExport    = '*'
 
     # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-    AliasesToExport      = @("oai", "gpt", "noc", "chatgpt", "chat")
+    AliasesToExport      = @("noc", "chatgpt", "chat")
 
     # DSC resources to export from this module
     # DscResourcesToExport = @()

@@ -15,7 +15,6 @@ function Test-OpenAIConnectivity {
 
 function New-OpenAICompletion {
     <#
-    .EXTERNALHELP code365scripts.openai-help.
     .SYNOPSIS
         Get completion from OpenAI API
     .DESCRIPTION
