@@ -196,7 +196,7 @@ function New-ChatGPTConversation {
         New-ChatGPTConversation -api_key "your api key" -engine "your engine id" -azure -system "You are a chatbot, please answer the user's question according to the user's language." -endpoint "https://api.openai.com/v1/completions"
         Create a new ChatGPT conversation, use Azure openai service with your api key and engine id, and define the system prompt and endpoint.
     .LINK
-        https://github.com/chenxizhang/powershell-openai
+        https://github.com/chenxizhang/openai-powershell
     #>
 
 
@@ -207,7 +207,7 @@ function New-ChatGPTConversation {
         [Parameter()][string]$engine,
         [string]$endpoint, # 这是openai的服务基地址，如果不指定，则使用默认地址
         [switch]$azure,
-        [string]$system = "你是一个ChatGPT聊天机器人,请根据用户的语言回答。"
+        [string]$system = "You are a chatbot, please answer the user's question according to the user's language."
     )
     BEGIN {
         if ($azure) {
