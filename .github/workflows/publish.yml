@@ -2,16 +2,15 @@
 
 name: CI
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   # release:
   #   types: [created,published]
   push:
-    branches: [ master ]
+    branches: [master]
     paths:
-      - '**.psd1'
-
+      - "**.psd1"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -32,5 +31,5 @@ jobs:
         uses: chenxizhang/publish-powershell-module-action@v35
         id: publish-openai
         with:
-          modulePath: code365scripts.openai
+          modulePath: .
           NuGetApiKey: ${{secrets.NUGETKEY}}
