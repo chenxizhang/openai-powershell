@@ -31,23 +31,26 @@ The model you will find in another page.
 Currently, we support two cmdlets, `New-OpenAICompletion` (alias: `noc`) and `New-ChatGPTConversation` (alias: `chat` or `chatgpt` ), you can find the full help by using `Get-Help noc -Full` in your terminal.
 
 ### New-OpenAICompletion
-```
-NAME
-    New-OpenAICompletion
+
+<div>
     
 SYNOPSIS
+
     Get completion from OpenAI API
     
     
 SYNTAX
+
     New-OpenAICompletion [-prompt] <String> [-api_key <String>] [-engine <String>] [-endpoint <String>] [-max_tokens <Int32>] [-temperature <Double>] [-n <Int32>] [-azure] [<CommonParameters>]
     
     
 DESCRIPTION
+
     Get completion from OpenAI API, you can use this cmdlet to get completion from OpenAI API.The cmdlet accept pipeline input. You can also assign the prompt, api_key, engine, endpoint, max_tokens, temperature, n parameters.
     
 
 PARAMETERS
+
     -prompt <String>
         The prompt to get completion from OpenAI API
         
@@ -127,6 +130,7 @@ PARAMETERS
         about_CommonParameters (https://go.microsoft.com/fwlink/?LinkID=113216). 
     
 INPUTS
+
     System.String, you can pass one or more string to the cmdlet, and we will get the completion for you.
     
     
@@ -171,7 +175,7 @@ OUTPUTS
     
 RELATED LINKS
     https://github.com/chenxizhang/openai-powershell
-```
+</div>
 
 ### New-ChatGPTConversation
 
