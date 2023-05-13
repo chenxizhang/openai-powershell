@@ -32,10 +32,8 @@ Currently, we support two cmdlets, `New-OpenAICompletion` (alias: `noc`) and `Ne
 
 ### New-OpenAICompletion
 
-<div>
-    
+```
 SYNOPSIS
-
     Get completion from OpenAI API
     
     
@@ -175,15 +173,12 @@ OUTPUTS
     
 RELATED LINKS
     https://github.com/chenxizhang/openai-powershell
-</div>
+```
 
 ### New-ChatGPTConversation
 
 
-```
-NAME
-    New-ChatGPTConversation
-    
+```    
 SYNOPSIS
     Create a new ChatGPT conversation
     
