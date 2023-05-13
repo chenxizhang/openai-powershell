@@ -39,7 +39,7 @@ Currently, we support two cmdlets, `New-OpenAICompletion` (alias: `noc`) and `Ne
 
 ### New-OpenAICompletion
 
-```text
+```
 NAME
     New-OpenAICompletion
     
