@@ -31,5 +31,5 @@ jobs:
         uses: chenxizhang/publish-powershell-module-action@v35
         id: publish-openai
         with:
-          modulePath: .
+          modulePath: /
           NuGetApiKey: ${{secrets.NUGETKEY}}
