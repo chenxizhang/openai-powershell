@@ -31,7 +31,7 @@ The model you will find in another page.
 Currently, we support two cmdlets, `New-OpenAICompletion` (alias: `noc`) and `New-ChatGPTConversation` (alias: `chat` or `chatgpt` ), you can find the full help by using `Get-Help noc -Full` in your terminal.
 
 ### New-OpenAICompletion
-
+```
 NAME
     New-OpenAICompletion
     
@@ -171,12 +171,12 @@ OUTPUTS
     
 RELATED LINKS
     https://github.com/chenxizhang/openai-powershell
-
+```
 
 ### New-ChatGPTConversation
 
 
-```text
+```
 NAME
     New-ChatGPTConversation
     
