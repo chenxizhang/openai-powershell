@@ -32,6 +32,7 @@ Currently, we support two cmdlets, `New-OpenAICompletion` (alias: `noc`) and `Ne
 
 ### New-OpenAICompletion
 
+```text
     NAME
         New-OpenAICompletion
         
@@ -171,10 +172,12 @@ Currently, we support two cmdlets, `New-OpenAICompletion` (alias: `noc`) and `Ne
         
     RELATED LINKS
         https://github.com/chenxizhang/openai-powershell
+```
 
 ### New-ChatGPTConversation
 
 
+```text
     NAME
         New-ChatGPTConversation
         
@@ -287,9 +290,7 @@ Currently, we support two cmdlets, `New-OpenAICompletion` (alias: `noc`) and `Ne
     RELATED LINKS
         https://github.com/chenxizhang/openai-powershell
 
-
-
-
+```
 
 
 ## Uninstall the Module
