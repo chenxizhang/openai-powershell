@@ -1,13 +1,10 @@
-﻿# 导入本地化数据
+﻿# import the localized resources
 Import-LocalizedData -FileName "resources.psd1" -BindingVariable "resources"
 
-# 检查 openai.com 是否可以访问，使用iwr 的 HEAD 方法测试，如果返回 200 则可以访问
+# check if the openai.com is avaliable, if so, return true, otherwise return false
 function Test-OpenAIConnectivity {
-    # 设置全局错误处理
     $ErrorActionPreference = 'SilentlyContinue'
-    # 增加超时时间 5秒 
     $response = Invoke-WebRequest -Uri "https://platform.openai.com/docs/" -Method Head -TimeoutSec 2
-    # 恢复全局错误处理
     $ErrorActionPreference = 'Continue'
     return $response.StatusCode -eq 200
 }
@@ -91,7 +88,6 @@ function New-OpenAICompletion {
 
         $hasError = $false
 
-        # 如果不是azure，并且 openai.com 无法访问，则报错
         if ((!$azure) -and ((Test-OpenAIConnectivity) -eq $False)) {
             Write-Host $resources.openai_unavaliable -ForegroundColor Red
             $hasError = $true
@@ -205,7 +201,7 @@ function New-ChatGPTConversation {
     param(
         [Parameter()][string]$api_key,
         [Parameter()][string]$engine,
-        [string]$endpoint, # 这是openai的服务基地址，如果不指定，则使用默认地址
+        [string]$endpoint, 
         [switch]$azure,
         [string]$system = "You are a chatbot, please answer the user's question according to the user's language."
     )
@@ -245,7 +241,7 @@ function New-ChatGPTConversation {
     }
 
     PROCESS {
-        $index = 1; # 用来保存问答的序号
+        $index = 1; 
         $welcome = "`n{0}`n{1}" -f ($resources.welcome_chatgpt -f $(if ($azure) { " $($resources.azure_version) " } else { "" }), $engine), $resources.shortcuts
 
         Write-Host $welcome -ForegroundColor Yellow
@@ -268,7 +264,7 @@ function New-ChatGPTConversation {
             }
 
             if ($prompt -eq "m") {
-                # 这是用户想要输入多行文本
+
                 $prompt = Read-MultiLineInputBoxDialog -Message $resources.multi_line_prompt -WindowTitle $resources.multi_line_prompt -DefaultText ""
                 if ($null -eq $prompt) {
                     Write-Host $resources.cancel_button_message
@@ -280,7 +276,7 @@ function New-ChatGPTConversation {
             }
 
             if ($prompt -eq "f") {
-                # 这是用户想要从文件输入
+
                 $file = Read-OpenFileDialog -WindowTitle $resources.file_prompt
 
                 if (!($file)) {
