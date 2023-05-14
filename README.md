@@ -1,6 +1,5 @@
 ---
 title: Unleash your infinite potential in your favorite terminal
-layout: default
 ---
 
 # OpenAI Powershell Module
