@@ -1,7 +1,3 @@
----
-title: Unleash your infinite potential in your favorite terminal
----
-
 # OpenAI Powershell Module
 
 This is a unofficial PowerShell Module for OpenAI, you can use the module to get completions for your input, or start the chat experience in PowerShell directly. The module can install in PowerShell 5.1 and above version, if you use PowerShell core (6.x+), you can even use it in all the platform, including Windows, MacOS and Linux.
