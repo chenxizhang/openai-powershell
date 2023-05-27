@@ -143,7 +143,12 @@ function New-OpenAICompletion {
                 }
             }
         
+            # parse the response to plain text
+            $response = $response.choices.text
+
+            # write the response to console
             Write-Output $response
+            # write the response to clipboard
             Set-Clipboard $response
             
         }
