@@ -252,6 +252,8 @@ function New-ChatGPTConversation {
 
         Write-Host $welcome -ForegroundColor Yellow
 
+        Write-Host $system -ForegroundColor Cyan
+
         $messages = @()
         $systemPrompt = @(
             [PSCustomObject]@{
