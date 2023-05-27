@@ -144,6 +144,7 @@ function New-OpenAICompletion {
             }
         
             Write-Output $response
+            Set-Clipboard $response
             
         }
         catch {
@@ -324,6 +325,7 @@ function New-ChatGPTConversation {
         
 
                 Write-Host -ForegroundColor Red ("`n[$current] $($resources.response)" -f $total_tokens, $prompt_tokens, $completion_tokens )
+                Set-Clipboard $result
                 Write-Host $result -ForegroundColor Green
             }
             catch {
