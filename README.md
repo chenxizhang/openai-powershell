@@ -30,6 +30,8 @@ The model you will find in another page.
 
 Currently, we support two cmdlets, `New-OpenAICompletion` (alias: `noc`) and `New-ChatGPTConversation` (alias: `chat` or `chatgpt` ), you can find the full help by using `Get-Help noc -Full` in your terminal.
 
+From 1.1.0.3, the result will copy to Clipboard automatically, so that you can paste it into anywhere accordingly.
+
 ### New-OpenAICompletion
 
 ```
