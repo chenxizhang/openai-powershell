@@ -209,7 +209,7 @@ function New-ChatGPTConversation {
         if ($azure) {
             $api_key = if ($api_key) { $api_key } else { if ($env:OPENAI_API_KEY_Azure) { $env:OPENAI_API_KEY_Azure } else { $env:OPENAI_API_KEY } }
             $engine = if ($engine) { $engine } else { if ($env:OPENAI_CHAT_ENGINE_Azure) { $env:OPENAI_CHAT_ENGINE_Azure }else { "gpt-3.5-turbo" } }
-            $endpoint = if ($endpoint) { $endpoint } else { "{0}openai/deployments/$engine/chat/completions?api-version=2023-03-15-preview" -f $env:OPENAI_ENDPOINT_AZURE }
+            $endpoint = if ($endpoint) { $endpoint } else { "{0}openai/deployments/$engine/chat/completions?api-version=2023-03-15-preview" -f $env:OPENAI_ENDPOINT_Azure }
         }
         else {
             $api_key = if ($api_key) { $api_key } else { $env:OPENAI_API_KEY }
