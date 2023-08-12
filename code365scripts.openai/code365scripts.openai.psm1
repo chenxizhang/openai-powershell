@@ -176,12 +176,17 @@ function New-ChatGPTConversation {
         if you use Azure OpenAI API, you can use this switch.
     .PARAMETER system
         The system prompt, this is a string, you can use it to define the role you want it be, for example, "You are a chatbot, please answer the user's question according to the user's language."
+    .PARAMETER stream
+        If you want to stream the response, you can use this switch. Please note, we only support this feature in new Powershell (6.0+).
     .EXAMPLE
         New-ChatGPTConversation
         Create a new ChatGPT conversation, use openai service with all the default settings.
     .EXAMPLE
         New-ChatGPTConverstaion -azure
         Create a new ChatGPT conversation, use Azure openai service with all the default settings.
+    .EXAMPLE
+        New-ChatGPTConverstaion -azure -stream
+        Create a new ChatGPT conversation, use Azure openai service and stream the response, with all the default settings.
     .EXAMPLE
         chat -azure
         Create a new ChatGPT conversation by cmdlet's alias(chat), use Azure openai service with all the default settings.
@@ -209,7 +214,8 @@ function New-ChatGPTConversation {
         [Parameter()][string]$engine,
         [string]$endpoint, 
         [switch]$azure,
-        [string]$system = "You are a chatbot, please answer the user's question according to the user's language."
+        [string]$system = "You are a chatbot, please answer the user's question according to the user's language.",
+        [switch]$stream
     )
     BEGIN {
         if ($azure) {
@@ -238,6 +244,12 @@ function New-ChatGPTConversation {
 
         if (!$engine) {
             Write-Host $resources.error_missing_engine -ForegroundColor Red
+            $hasError = $true
+        }
+
+        if (($PSVersionTable['PSVersion'].Major -le 5) -and $stream) {
+            # only new powershell support stream
+            Write-Host $resources.powershell_version_unsupported -ForegroundColor Red
             $hasError = $true
         }
 
@@ -305,35 +317,98 @@ function New-ChatGPTConversation {
             $params = @{
                 Uri         = $endpoint
                 Method      = "POST"
-                Body        = @{model = "$engine"; messages = ($systemPrompt + $messages[-5..-1]) } | ConvertTo-Json
+                Body        = @{model = "$engine"; messages = ($systemPrompt + $messages[-5..-1]); stream = if ($stream) { $true }else { $false } } | ConvertTo-Json
                 Headers     = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "Bearer $api_key" } }
                 ContentType = "application/json;charset=utf-8"
             }
 
             try {
-                $response = Invoke-RestMethod @params
-                $stopwatch.Stop()
-                $result = $response.choices[0].message.content
-                $total_tokens = $response.usage.total_tokens
-                $prompt_tokens = $response.usage.prompt_tokens
-                $completion_tokens = $response.usage.completion_tokens
 
+                if ($stream) {
+                    $stopwatch.Stop()
+                    Write-Verbose "Stopped watcher"
 
-                if ($PSVersionTable['PSVersion'].Major -eq 5) {
-                    $dstEncoding = [System.Text.Encoding]::GetEncoding('iso-8859-1')
-                    $srcEncoding = [System.Text.Encoding]::UTF8
-                    $result = $srcEncoding.GetString([System.Text.Encoding]::Convert($srcEncoding, $dstEncoding, $srcEncoding.GetBytes($result)))
+                    $client = New-Object System.Net.Http.HttpClient
+                    $body = $params.Body
+
+                    Write-Verbose $body
+
+                    $request = [System.Net.Http.HttpRequestMessage]::new()
+                    $request.Method = "POST"
+                    $request.RequestUri = $params.Uri
+                    $request.Content = [System.Net.Http.StringContent]::new(($body), [System.Text.Encoding]::UTF8)
+                    $request.Content.Headers.Clear()
+                    if ($azure) {
+                        $request.Content.Headers.Add("api-key", $api_key)
+                    }
+                    else {
+                        $request.Content.Headers.Add("Authorization", "Bearer $api_key")
+                    }
+                    $request.Content.Headers.Add("Content-Type", "application/json;charset=utf-8")
+                    
+                    Write-Verbose "Prepared the client"
+                                        
+                    $task = $client.Send($request)
+                    Write-Verbose "Got task result: $task"
+
+                    $response = $task.Content.ReadAsStream()
+                    $reader = [System.IO.StreamReader]::new($response)
+
+                    Write-Verbose "Got task stream"
+
+                    $result = "" # message from the api
+                    Write-Host -ForegroundColor Red "`n[$current] " -NoNewline
+
+                    while ($true) {
+                        $line = $reader.ReadLine()
+                        Write-Verbose $line
+
+                        if (($line -eq $null) -or ($line -eq "data: [DONE]")) { break }
+
+                        $chunk = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta.content
+                        Write-Host $chunk -NoNewline -ForegroundColor Green
+                        $result += $chunk
+
+                        Start-Sleep -Milliseconds 50
+                    }
+                    $reader.Close()
+                    $reader.Dispose()
+                    $stream.Close()
+
+                    $messages += [PSCustomObject]@{
+                        role    = "assistant"
+                        content = $result
+                    }
+
+                    Set-Clipboard $result
+                    Write-Host ""
+
                 }
-
-                $messages += [PSCustomObject]@{
-                    role    = "assistant"
-                    content = $result
+                else {
+                    $response = Invoke-RestMethod @params
+                    $stopwatch.Stop()
+                    $result = $response.choices[0].message.content
+                    $total_tokens = $response.usage.total_tokens
+                    $prompt_tokens = $response.usage.prompt_tokens
+                    $completion_tokens = $response.usage.completion_tokens
+    
+    
+                    if ($PSVersionTable['PSVersion'].Major -le 5) {
+                        $dstEncoding = [System.Text.Encoding]::GetEncoding('iso-8859-1')
+                        $srcEncoding = [System.Text.Encoding]::UTF8
+                        $result = $srcEncoding.GetString([System.Text.Encoding]::Convert($srcEncoding, $dstEncoding, $srcEncoding.GetBytes($result)))
+                    }
+    
+                    $messages += [PSCustomObject]@{
+                        role    = "assistant"
+                        content = $result
+                    }
+            
+    
+                    Write-Host -ForegroundColor Red ("`n[$current] $($resources.response)" -f $total_tokens, $prompt_tokens, $completion_tokens )
+                    Set-Clipboard $result
+                    Write-Host $result -ForegroundColor Green
                 }
-        
-
-                Write-Host -ForegroundColor Red ("`n[$current] $($resources.response)" -f $total_tokens, $prompt_tokens, $completion_tokens )
-                Set-Clipboard $result
-                Write-Host $result -ForegroundColor Green
             }
             catch {
                 Write-Host $_.ErrorDetails -ForegroundColor Red

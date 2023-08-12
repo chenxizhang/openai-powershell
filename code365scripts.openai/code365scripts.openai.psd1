@@ -12,7 +12,7 @@
     RootModule           = '.\code365scripts.openai.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '1.1.0.3'
+    ModuleVersion        = '1.1.0.4'
 
     # Supported PSEditions
     CompatiblePSEditions = @("Desktop")
@@ -33,11 +33,12 @@
     Description          = 'The non-official OpenAI PowerShell module. This module is used to interact with OpenAI API.
     
     Changelogs:
+    - 2023-08-12    v1.1.0.4    Added stream support for chat
     - 2021-05-13    v1.1.0.3    Small enhancements (save result to clipboard, print the system prompt, etc.)
     - 2021-05-13    v1.1.0.0    Simplify the module structure
-    - 2023-05-07    v1.0.4.12    Fixed the network connectivity test logic
-    - 2023-05-07    v1.0.4.11    Added azure OpenAI supporrt for New-ChatGPTConversation function
-    - 2023-05-07    v1.0.4.10    Added network connectivity test logic
+    - 2023-05-07    v1.0.4.12   Fixed the network connectivity test logic
+    - 2023-05-07    v1.0.4.11   Added azure OpenAI supporrt for New-ChatGPTConversation function
+    - 2023-05-07    v1.0.4.10   Added network connectivity test logic
     - 2023-03-09    v1.0.4.9    Added change logs in the description.
     - 2023-03-08    v1.0.4.8    Added error handling.'
 
@@ -107,10 +108,10 @@
             Tags       = @("code365", "community", "china", "chenxizhang", "openai")
 
             # A URL to the license for this module.
-            LicenseUri = 'https://github.com/code365opensource/code365scripts'
+            LicenseUri = 'https://github.com/chenxizhang/openai-powershell/blob/master/LICENSE'
 
             # A URL to the main website for this project.
-            ProjectUri = 'https://github.com/code365opensource/code365scripts/tree/master/code365scripts.openai'
+            ProjectUri = 'https://github.com/chenxizhang/openai-powershell/'
 
             # A URL to an icon representing this module.
             # IconUri = ''
@@ -132,7 +133,7 @@
     } # End of PrivateData hashtable
 
     # HelpInfo URI of this module
-    HelpInfoURI          = 'https://github.com/code365opensource/code365scripts/tree/master/code365scripts.openai'
+    HelpInfoURI          = 'https://xizhang.com/openai-powershell/'
 
     # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
     # DefaultCommandPrefix = ''

@@ -17,5 +17,5 @@ ConvertFrom-StringData -StringData @'
     update_success=Update successfully, please restart your PowerShell session.
     welcome_chatgpt = Welcome to ChatGPT {0}'s world, The model you are currently using is: {1}, Please start with your prompt.
     openai_unavaliable = You can't connect to openai service now, please check your network connection.
-
+    powershell_version_unsupported = Only the Powershell core supports the stream parameter.
 '@
