@@ -181,117 +181,187 @@ RELATED LINKS
 ### New-ChatGPTConversation
 
 ```
+
+NAME
+    New-ChatGPTConversation
+    
 SYNOPSIS
     Create a new ChatGPT conversation
-
-
+    
+    
 SYNTAX
-    New-ChatGPTConversation [[-api_key] <String>] [[-engine] <String>] [[-endpoint] <String>] [-azure] [[-system] <String>] [<CommonParameters>]
-
-
+    New-ChatGPTConversation [[-api_key] <String>] [[-engine] <String>] [[-endpoint] <String>] [-azure] [[-system] <String>] [-stream] [<CommonParameters>]
+    
+    
 DESCRIPTION
     Create a new ChatGPT conversation, You can chat with the openai service just like chat with a human.
-
+    
 
 PARAMETERS
     -api_key <String>
         Your OpenAI API key, you can also set it in environment variable OPENAI_API_KEY or OPENAI_API_KEY_Azure if you use Azure OpenAI API.
-
+        
         Required?                    false
         Position?                    1
-        Default value
+        Default value                
         Accept pipeline input?       false
         Accept wildcard characters?  false
-
+        
     -engine <String>
         The engine to use for this request, you can also set it in environment variable OPENAI_ENGINE or OPENAI_ENGINE_Azure if you use Azure OpenAI API.
-
+        
         Required?                    false
         Position?                    2
-        Default value
+        Default value                
         Accept pipeline input?       false
         Accept wildcard characters?  false
-
+        
     -endpoint <String>
         The endpoint to use for this request, you can also set it in environment variable OPENAI_ENDPOINT or OPENAI_ENDPOINT_Azure if you use Azure OpenAI API.
-
+        
         Required?                    false
         Position?                    3
-        Default value
+        Default value                
         Accept pipeline input?       false
         Accept wildcard characters?  false
-
+        
     -azure [<SwitchParameter>]
         if you use Azure OpenAI API, you can use this switch.
-
+        
         Required?                    false
         Position?                    named
         Default value                False
         Accept pipeline input?       false
         Accept wildcard characters?  false
-
+        
     -system <String>
         The system prompt, this is a string, you can use it to define the role you want it be, for example, "You are a chatbot, please answer the user's question according to the user's language."
-
+        
         Required?                    false
         Position?                    4
         Default value                You are a chatbot, please answer the user's question according to the user's language.
         Accept pipeline input?       false
         Accept wildcard characters?  false
-
+        
+    -stream [<SwitchParameter>]
+        If you want to stream the response, you can use this switch. Please note, we only support this feature in new Powershell (6.0+).
+        
+        Required?                    false
+        Position?                    named
+        Default value                False
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+        
     <CommonParameters>
         This cmdlet supports the common parameters: Verbose, Debug,
         ErrorAction, ErrorVariable, WarningAction, WarningVariable,
         OutBuffer, PipelineVariable, and OutVariable. For more information, see
-        about_CommonParameters (https://go.microsoft.com/fwlink/?LinkID=113216).
-
+        about_CommonParameters (https://go.microsoft.com/fwlink/?LinkID=113216). 
+    
 INPUTS
-
+    
 OUTPUTS
-
+    
     -------------------------- EXAMPLE 1 --------------------------
-
+    
     PS > New-ChatGPTConversation
     Create a new ChatGPT conversation, use openai service with all the default settings.
-
-
+    
+    
+    
+    
+    
+    
     -------------------------- EXAMPLE 2 --------------------------
-
+    
     PS > New-ChatGPTConverstaion -azure
     Create a new ChatGPT conversation, use Azure openai service with all the default settings.
-
-
+    
+    
+    
+    
+    
+    
     -------------------------- EXAMPLE 3 --------------------------
-
+    
+    PS > New-ChatGPTConverstaion -azure -stream
+    Create a new ChatGPT conversation, use Azure openai service and stream the response, with all the default settings.
+    
+    
+    
+    
+    
+    
+    -------------------------- EXAMPLE 4 --------------------------
+    
     PS > chat -azure
     Create a new ChatGPT conversation by cmdlet's alias(chat), use Azure openai service with all the default settings.
-
-
-    -------------------------- EXAMPLE 4 --------------------------
-
+    
+    
+    
+    
+    
+    
+    -------------------------- EXAMPLE 5 --------------------------
+    
     PS > New-ChatGPTConversation -api_key "your api key" -engine "your engine id"
     Create a new ChatGPT conversation, use openai service with your api key and engine id.
-
-    -------------------------- EXAMPLE 5 --------------------------
-
+    
+    
+    
+    
+    
+    
+    -------------------------- EXAMPLE 6 --------------------------
+    
     PS > New-ChatGPTConversation -api_key "your api key" -engine "your engine id" -azure
     Create a new ChatGPT conversation, use Azure openai service with your api key and engine id.
-
-    -------------------------- EXAMPLE 6 --------------------------
-
+    
+    
+    
+    
+    
+    
+    -------------------------- EXAMPLE 7 --------------------------
+    
     PS > New-ChatGPTConversation -api_key "your api key" -engine "your engine id" -azure -system "You are a chatbot, please answer the user's question according to the user's language."
     Create a new ChatGPT conversation, use Azure openai service with your api key and engine id, and define the system prompt.
-
-    -------------------------- EXAMPLE 7 --------------------------
-
+    
+    
+    
+    
+    
+    
+    -------------------------- EXAMPLE 8 --------------------------
+    
     PS > New-ChatGPTConversation -api_key "your api key" -engine "your engine id" -azure -system "You are a chatbot, please answer the user's question according to the user's language." -endpoint "https://api.openai.com/v1/completions"
     Create a new ChatGPT conversation, use Azure openai service with your api key and engine id, and define the system prompt and endpoint.
-
+    
+    
+    
+    
+    
+    
+    
 RELATED LINKS
     https://github.com/chenxizhang/openai-powershell
+
+
+
 
 ```
 
 ## Uninstall the Module
 
 > UnInstall-Module -Name code365scripts.openai
+
+## Change logs
+
+- 2023-08-12    v1.1.0.4    Added stream support for chat
+- 2021-05-13    v1.1.0.3    Small enhancements (save result to clipboard, print the system prompt, etc.)
+- 2021-05-13    v1.1.0.0    Simplify the module structure
+- 2023-05-07    v1.0.4.12   Fixed the network connectivity test logic
+- 2023-05-07    v1.0.4.11   Added azure OpenAI supporrt for New-ChatGPTConversation function
+- 2023-05-07    v1.0.4.10   Added network connectivity test logic
+- 2023-03-09    v1.0.4.9    Added change logs in the description.
+- 2023-03-08    v1.0.4.8    Added error handling.

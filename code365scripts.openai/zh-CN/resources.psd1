@@ -17,4 +17,5 @@ ConvertFrom-StringData -StringData @'
     update_success=更新已完成，你需要重新执行命令.
     welcome_chatgpt =欢迎来到 ChatGPT{0}的世界, 当前使用的模型是: {1}, 请开始对话吧.
     openai_unavaliable = 当前OpenAI服务无法访问，请检查网络链接.
+    powershell_version_unsupported = 只有在新版本的PowerShell（6.0以上）才支持stream参数.
 '@
