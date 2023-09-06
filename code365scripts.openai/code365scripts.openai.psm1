@@ -285,7 +285,7 @@ function New-ChatGPTConversation {
 
             $response = Invoke-RestMethod @params
             $result = $response.choices[0].message.content
-            Write-Host $result 
+            Write-Output $result 
 
         }
         else {
