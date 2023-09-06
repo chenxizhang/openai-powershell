@@ -182,6 +182,7 @@ RELATED LINKS
 
 ```
 
+
 NAME
     New-ChatGPTConversation
     
@@ -190,7 +191,7 @@ SYNOPSIS
     
     
 SYNTAX
-    New-ChatGPTConversation [[-api_key] <String>] [[-engine] <String>] [[-endpoint] <String>] [-azure] [[-system] <String>] [-stream] [<CommonParameters>]
+    New-ChatGPTConversation [[-api_key] <String>] [[-engine] <String>] [[-endpoint] <String>] [-azure] [[-system] <String>] [[-prompt] <String>] [-stream] [<CommonParameters>]
     
     
 DESCRIPTION
@@ -240,6 +241,15 @@ PARAMETERS
         Required?                    false
         Position?                    4
         Default value                You are a chatbot, please answer the user's question according to the user's language.
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+        
+    -prompt <String>
+        If you want to get result immediately, you can use this parameter to define the prompt. It will not start the chat conversation.
+        
+        Required?                    false
+        Position?                    5
+        Default value                
         Accept pipeline input?       false
         Accept wildcard characters?  false
         
@@ -349,6 +359,9 @@ RELATED LINKS
 
 
 
+
+
+
 ```
 
 ## Uninstall the Module
@@ -357,6 +370,7 @@ RELATED LINKS
 
 ## Change logs
 
+- 2023-09-06    v1.1.0.5    Added chat completion support.
 - 2023-08-12    v1.1.0.4    Added stream support for chat
 - 2021-05-13    v1.1.0.3    Small enhancements (save result to clipboard, print the system prompt, etc.)
 - 2021-05-13    v1.1.0.0    Simplify the module structure

@@ -178,6 +178,8 @@ function New-ChatGPTConversation {
         The system prompt, this is a string, you can use it to define the role you want it be, for example, "You are a chatbot, please answer the user's question according to the user's language."
     .PARAMETER stream
         If you want to stream the response, you can use this switch. Please note, we only support this feature in new Powershell (6.0+).
+    .PARAMETER prompt
+        If you want to get result immediately, you can use this parameter to define the prompt. It will not start the chat conversation.
     .EXAMPLE
         New-ChatGPTConversation
         Create a new ChatGPT conversation, use openai service with all the default settings.
@@ -215,6 +217,7 @@ function New-ChatGPTConversation {
         [string]$endpoint, 
         [switch]$azure,
         [string]$system = "You are a chatbot, please answer the user's question according to the user's language.",
+        [string]$prompt = "",
         [switch]$stream
     )
     BEGIN {
@@ -259,161 +262,191 @@ function New-ChatGPTConversation {
     }
 
     PROCESS {
-        $index = 1; 
-        $welcome = "`n{0}`n{1}" -f ($resources.welcome_chatgpt -f $(if ($azure) { " $($resources.azure_version) " } else { "" }), $engine), $resources.shortcuts
 
-        Write-Host $welcome -ForegroundColor Yellow
-
-        Write-Host $system -ForegroundColor Cyan
-
-        $messages = @()
-        $systemPrompt = @(
-            [PSCustomObject]@{
-                role    = "system"
-                content = $system
-            }
-        )
-        
-        while ($true) {
-            $current = $index++
-            $prompt = Read-Host -Prompt "`n[$current] $($resources.prompt)"
-            $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
-
-            if ($prompt -eq "q") {
-                break
-            }
-
-            if ($prompt -eq "m") {
-
-                $prompt = Read-MultiLineInputBoxDialog -Message $resources.multi_line_prompt -WindowTitle $resources.multi_line_prompt -DefaultText ""
-                if ($null -eq $prompt) {
-                    Write-Host $resources.cancel_button_message
-                    continue
+        if ($prompt.Length -gt 0) {
+            $messages = @(
+                @{
+                    role    = "system"
+                    content = $system
+                },
+                @{
+                    role    = "user"
+                    content = $prompt
                 }
-                else {
-                    Write-Host "$($resources.multi_line_message)`n$prompt"
-                }
-            }
-
-            if ($prompt -eq "f") {
-
-                $file = Read-OpenFileDialog -WindowTitle $resources.file_prompt
-
-                if (!($file)) {
-                    Write-Host $resources.cancel_button_message
-                    continue
-                }
-                else {
-                    $prompt = Get-Content $file -Encoding utf8
-                    Write-Host "$($resources.multi_line_message)`n$prompt"
-                }
-            }
-
-            $messages += [PSCustomObject]@{
-                role    = "user"
-                content = $prompt
-            }
+            )
 
             $params = @{
                 Uri         = $endpoint
                 Method      = "POST"
-                Body        = @{model = "$engine"; messages = ($systemPrompt + $messages[-5..-1]); stream = if ($stream) { $true }else { $false } } | ConvertTo-Json
+                Body        = @{model = "$engine"; messages = $messages } | ConvertTo-Json
                 Headers     = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "Bearer $api_key" } }
                 ContentType = "application/json;charset=utf-8"
             }
 
-            try {
+            $response = Invoke-RestMethod @params
+            $result = $response.choices[0].message.content
+            Write-Host $result 
 
-                if ($stream) {
-                    $stopwatch.Stop()
-                    Write-Verbose "Stopped watcher"
-
-                    $client = New-Object System.Net.Http.HttpClient
-                    $body = $params.Body
-
-                    Write-Verbose $body
-
-                    $request = [System.Net.Http.HttpRequestMessage]::new()
-                    $request.Method = "POST"
-                    $request.RequestUri = $params.Uri
-                    $request.Content = [System.Net.Http.StringContent]::new(($body), [System.Text.Encoding]::UTF8)
-                    $request.Content.Headers.Clear()
-                    if ($azure) {
-                        $request.Content.Headers.Add("api-key", $api_key)
+        }
+        else {
+            $index = 1; 
+            $welcome = "`n{0}`n{1}" -f ($resources.welcome_chatgpt -f $(if ($azure) { " $($resources.azure_version) " } else { "" }), $engine), $resources.shortcuts
+    
+            Write-Host $welcome -ForegroundColor Yellow
+    
+            Write-Host $system -ForegroundColor Cyan
+    
+            $messages = @()
+            $systemPrompt = @(
+                [PSCustomObject]@{
+                    role    = "system"
+                    content = $system
+                }
+            )
+            
+            while ($true) {
+                $current = $index++
+                $prompt = Read-Host -Prompt "`n[$current] $($resources.prompt)"
+                $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+    
+                if ($prompt -eq "q") {
+                    break
+                }
+    
+                if ($prompt -eq "m") {
+    
+                    $prompt = Read-MultiLineInputBoxDialog -Message $resources.multi_line_prompt -WindowTitle $resources.multi_line_prompt -DefaultText ""
+                    if ($null -eq $prompt) {
+                        Write-Host $resources.cancel_button_message
+                        continue
                     }
                     else {
-                        $request.Content.Headers.Add("Authorization", "Bearer $api_key")
+                        Write-Host "$($resources.multi_line_message)`n$prompt"
                     }
-                    $request.Content.Headers.Add("Content-Type", "application/json;charset=utf-8")
-                    
-                    Write-Verbose "Prepared the client"
-                                        
-                    $task = $client.Send($request)
-                    Write-Verbose "Got task result: $task"
-
-                    $response = $task.Content.ReadAsStream()
-                    $reader = [System.IO.StreamReader]::new($response)
-
-                    Write-Verbose "Got task stream"
-
-                    $result = "" # message from the api
-                    Write-Host -ForegroundColor Red "`n[$current] " -NoNewline
-
-                    while ($true) {
-                        $line = $reader.ReadLine()
-                        Write-Verbose $line
-
-                        if (($line -eq $null) -or ($line -eq "data: [DONE]")) { break }
-
-                        $chunk = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta.content
-                        Write-Host $chunk -NoNewline -ForegroundColor Green
-                        $result += $chunk
-
-                        Start-Sleep -Milliseconds 50
-                    }
-                    $reader.Close()
-                    $reader.Dispose()
-                    $stream.Close()
-
-                    $messages += [PSCustomObject]@{
-                        role    = "assistant"
-                        content = $result
-                    }
-
-                    Set-Clipboard $result
-                    Write-Host ""
-
                 }
-                else {
-                    $response = Invoke-RestMethod @params
-                    $stopwatch.Stop()
-                    $result = $response.choices[0].message.content
-                    $total_tokens = $response.usage.total_tokens
-                    $prompt_tokens = $response.usage.prompt_tokens
-                    $completion_tokens = $response.usage.completion_tokens
     
+                if ($prompt -eq "f") {
     
-                    if ($PSVersionTable['PSVersion'].Major -le 5) {
-                        $dstEncoding = [System.Text.Encoding]::GetEncoding('iso-8859-1')
-                        $srcEncoding = [System.Text.Encoding]::UTF8
-                        $result = $srcEncoding.GetString([System.Text.Encoding]::Convert($srcEncoding, $dstEncoding, $srcEncoding.GetBytes($result)))
+                    $file = Read-OpenFileDialog -WindowTitle $resources.file_prompt
+    
+                    if (!($file)) {
+                        Write-Host $resources.cancel_button_message
+                        continue
                     }
-    
-                    $messages += [PSCustomObject]@{
-                        role    = "assistant"
-                        content = $result
+                    else {
+                        $prompt = Get-Content $file -Encoding utf8
+                        Write-Host "$($resources.multi_line_message)`n$prompt"
                     }
-            
-    
-                    Write-Host -ForegroundColor Red ("`n[$current] $($resources.response)" -f $total_tokens, $prompt_tokens, $completion_tokens )
-                    Set-Clipboard $result
-                    Write-Host $result -ForegroundColor Green
                 }
-            }
-            catch {
-                Write-Host $_.ErrorDetails -ForegroundColor Red
+    
+                $messages += [PSCustomObject]@{
+                    role    = "user"
+                    content = $prompt
+                }
+    
+                $params = @{
+                    Uri         = $endpoint
+                    Method      = "POST"
+                    Body        = @{model = "$engine"; messages = ($systemPrompt + $messages[-5..-1]); stream = if ($stream) { $true }else { $false } } | ConvertTo-Json
+                    Headers     = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "Bearer $api_key" } }
+                    ContentType = "application/json;charset=utf-8"
+                }
+    
+                try {
+    
+                    if ($stream) {
+                        $stopwatch.Stop()
+                        Write-Verbose "Stopped watcher"
+    
+                        $client = New-Object System.Net.Http.HttpClient
+                        $body = $params.Body
+    
+                        Write-Verbose $body
+    
+                        $request = [System.Net.Http.HttpRequestMessage]::new()
+                        $request.Method = "POST"
+                        $request.RequestUri = $params.Uri
+                        $request.Content = [System.Net.Http.StringContent]::new(($body), [System.Text.Encoding]::UTF8)
+                        $request.Content.Headers.Clear()
+                        if ($azure) {
+                            $request.Content.Headers.Add("api-key", $api_key)
+                        }
+                        else {
+                            $request.Content.Headers.Add("Authorization", "Bearer $api_key")
+                        }
+                        $request.Content.Headers.Add("Content-Type", "application/json;charset=utf-8")
+                        
+                        Write-Verbose "Prepared the client"
+                                            
+                        $task = $client.Send($request)
+                        Write-Verbose "Got task result: $task"
+    
+                        $response = $task.Content.ReadAsStream()
+                        $reader = [System.IO.StreamReader]::new($response)
+    
+                        Write-Verbose "Got task stream"
+    
+                        $result = "" # message from the api
+                        Write-Host -ForegroundColor Red "`n[$current] " -NoNewline
+    
+                        while ($true) {
+                            $line = $reader.ReadLine()
+                            Write-Verbose $line
+    
+                            if (($line -eq $null) -or ($line -eq "data: [DONE]")) { break }
+    
+                            $chunk = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta.content
+                            Write-Host $chunk -NoNewline -ForegroundColor Green
+                            $result += $chunk
+    
+                            Start-Sleep -Milliseconds 50
+                        }
+                        $reader.Close()
+                        $reader.Dispose()
+                        $stream.Close()
+    
+                        $messages += [PSCustomObject]@{
+                            role    = "assistant"
+                            content = $result
+                        }
+    
+                        Set-Clipboard $result
+                        Write-Host ""
+    
+                    }
+                    else {
+                        $response = Invoke-RestMethod @params
+                        $stopwatch.Stop()
+                        $result = $response.choices[0].message.content
+                        $total_tokens = $response.usage.total_tokens
+                        $prompt_tokens = $response.usage.prompt_tokens
+                        $completion_tokens = $response.usage.completion_tokens
+        
+        
+                        if ($PSVersionTable['PSVersion'].Major -le 5) {
+                            $dstEncoding = [System.Text.Encoding]::GetEncoding('iso-8859-1')
+                            $srcEncoding = [System.Text.Encoding]::UTF8
+                            $result = $srcEncoding.GetString([System.Text.Encoding]::Convert($srcEncoding, $dstEncoding, $srcEncoding.GetBytes($result)))
+                        }
+        
+                        $messages += [PSCustomObject]@{
+                            role    = "assistant"
+                            content = $result
+                        }
+                
+        
+                        Write-Host -ForegroundColor Red ("`n[$current] $($resources.response)" -f $total_tokens, $prompt_tokens, $completion_tokens )
+                        Set-Clipboard $result
+                        Write-Host $result -ForegroundColor Green
+                    }
+                }
+                catch {
+                    Write-Host $_.ErrorDetails -ForegroundColor Red
+                }
             }
         }
+
+
     }
 
 }
