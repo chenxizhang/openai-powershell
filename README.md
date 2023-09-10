@@ -209,7 +209,7 @@ PARAMETERS
         Accept wildcard characters?  false
         
     -engine <String>
-        The engine to use for this request, you can also set it in environment variable OPENAI_ENGINE or OPENAI_ENGINE_Azure if you use Azure OpenAI API.
+        The engine to use for this request, you can also set it in environment variable OPENAI_CHAT_ENGINE or OPENAI_CHAT_ENGINE_Azure if you use Azure OpenAI API.
         
         Required?                    false
         Position?                    2
@@ -370,6 +370,8 @@ RELATED LINKS
 
 ## Change logs
 
+- 2023-09-10    v1.1.0.7    Fix the help doc for New-ChatGPTConversation
+- 2023-09-06    v1.1.0.6    Bug fix
 - 2023-09-06    v1.1.0.5    Added chat completion support.
 - 2023-08-12    v1.1.0.4    Added stream support for chat
 - 2021-05-13    v1.1.0.3    Small enhancements (save result to clipboard, print the system prompt, etc.)

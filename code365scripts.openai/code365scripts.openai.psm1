@@ -169,7 +169,7 @@ function New-ChatGPTConversation {
     .PARAMETER api_key
         Your OpenAI API key, you can also set it in environment variable OPENAI_API_KEY or OPENAI_API_KEY_Azure if you use Azure OpenAI API.
     .PARAMETER engine
-        The engine to use for this request, you can also set it in environment variable OPENAI_ENGINE or OPENAI_ENGINE_Azure if you use Azure OpenAI API.
+        The engine to use for this request, you can also set it in environment variable OPENAI_CHAT_ENGINE or OPENAI_CHAT_ENGINE_Azure if you use Azure OpenAI API.
     .PARAMETER endpoint
         The endpoint to use for this request, you can also set it in environment variable OPENAI_ENDPOINT or OPENAI_ENDPOINT_Azure if you use Azure OpenAI API.
     .PARAMETER azure

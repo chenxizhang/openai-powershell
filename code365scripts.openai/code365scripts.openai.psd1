@@ -12,7 +12,7 @@
     RootModule           = '.\code365scripts.openai.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '1.1.0.6'
+    ModuleVersion        = '1.1.0.7'
 
     # Supported PSEditions
     CompatiblePSEditions = @("Desktop")
@@ -33,6 +33,7 @@
     Description          = 'The non-official OpenAI PowerShell module. This module is used to interact with OpenAI API.
     
     Changelogs:
+    - 2023-09-10    v1.1.0.7    Fix the help doc for New-ChatGPTConversation
     - 2023-09-06    v1.1.0.6    Bug fix
     - 2023-09-06    v1.1.0.5    Added chat completion support.
     - 2023-08-12    v1.1.0.4    Added stream support for chat
