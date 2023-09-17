@@ -370,6 +370,7 @@ RELATED LINKS
 
 ## Change logs
 
+- 2023-09-17    v1.1.0.8    Add verbose support
 - 2023-09-10    v1.1.0.7    Fix the help doc for New-ChatGPTConversation
 - 2023-09-06    v1.1.0.6    Bug fix
 - 2023-09-06    v1.1.0.5    Added chat completion support.
