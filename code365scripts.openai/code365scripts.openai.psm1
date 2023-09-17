@@ -3,8 +3,10 @@ Import-LocalizedData -FileName "resources.psd1" -BindingVariable "resources"
 
 # check if the openai.com is avaliable, if so, return true, otherwise return false
 function Test-OpenAIConnectivity {
+    Write-Verbose "Test-OpenAIConnectivity"
     $ErrorActionPreference = 'SilentlyContinue'
     $response = Invoke-WebRequest -Uri "https://platform.openai.com/docs/" -Method Head -TimeoutSec 2
+    Write-Verbose "Response: $($response|ConvertTo-Json)"
     $ErrorActionPreference = 'Continue'
     return $response.StatusCode -eq 200
 }
@@ -73,6 +75,11 @@ function New-OpenAICompletion {
     )
 
     BEGIN {
+
+        Write-Verbose "Parameter received. prompt: $prompt, api_key: $api_key, engine: $engine, endpoint: $endpoint, max_tokens: $max_tokens, temperature: $temperature, n: $n, azure: $azure"
+
+        Write-Verbose "Environment variable detected. OPENAI_API_KEY: $env:OPENAI_API_KEY, OPENAI_API_KEY_Azure: $env:OPENAI_API_KEY_Azure, OPENAI_ENGINE: $env:OPENAI_ENGINE, OPENAI_ENGINE_Azure: $env:OPENAI_ENGINE_Azure, OPENAI_ENDPOINT: $env:OPENAI_ENDPOINT, OPENAI_ENDPOINT_Azure: $env:OPENAI_ENDPOINT_Azure"
+
         if ($azure) {
             $api_key = if ($api_key) { $api_key } else { if ($env:OPENAI_API_KEY_Azure) { $env:OPENAI_API_KEY_Azure } else { $env:OPENAI_API_KEY } }
             $engine = if ($engine) { $engine } else { $env:OPENAI_ENGINE_Azure }
@@ -84,7 +91,7 @@ function New-OpenAICompletion {
             $endpoint = if ($endpoint) { $endpoint } else { if ($env:OPENAI_ENDPOINT) { $env:OPENAI_ENDPOINT }else { "https://api.openai.com/v1/completions" } }
         }
 
-        
+        Write-Verbose "Parameter parsed, api_key: $api_key, engine: $engine, endpoint: $endpoint"
 
         $hasError = $false
 
@@ -130,26 +137,36 @@ function New-OpenAICompletion {
             ContentType = "application/json;charset=utf-8"
         }
 
+        Write-Verbose "Prepare the params for Invoke-WebRequest: $($params | ConvertTo-Json) "
+
 
         try {
             $response = Invoke-RestMethod @params
 
+            Write-Verbose "Response received: $($response| ConvertTo-Json)"
+
             if ($PSVersionTable['PSVersion'].Major -eq 5) {
+                Write-Verbose "Powershell 5.0 detected, convert the response to UTF8"
+
                 $dstEncoding = [System.Text.Encoding]::GetEncoding('iso-8859-1')
                 $srcEncoding = [System.Text.Encoding]::UTF8
 
                 $response.choices | ForEach-Object {
                     $_.text = $srcEncoding.GetString([System.Text.Encoding]::Convert($srcEncoding, $dstEncoding, $srcEncoding.GetBytes($_.text)))
                 }
+
+                Write-Verbose "Response converted to UTF8: $($response | ConvertTo-Json)"
             }
         
             # parse the response to plain text
             $response = $response.choices.text
+            Write-Verbose "Response parsed to plain text: $response"
 
             # write the response to console
             Write-Output $response
             # write the response to clipboard
             Set-Clipboard $response
+            Write-Verbose "Response copied to clipboard: $response"
             
         }
         catch {
@@ -221,6 +238,11 @@ function New-ChatGPTConversation {
         [switch]$stream
     )
     BEGIN {
+
+        Write-Verbose "Parameter received. api_key: $api_key, engine: $engine, endpoint: $endpoint, azure: $azure, system: $system, prompt: $prompt, stream: $stream"
+
+        Write-Verbose "Enviornment variable detected. OPENAI_API_KEY: $env:OPENAI_API_KEY, OPENAI_API_KEY_Azure: $env:OPENAI_API_KEY_Azure, OPENAI_ENGINE: $env:OPENAI_ENGINE, OPENAI_ENGINE_Azure: $env:OPENAI_ENGINE_Azure, OPENAI_ENDPOINT: $env:OPENAI_ENDPOINT, OPENAI_ENDPOINT_Azure: $env:OPENAI_ENDPOINT_Azure"
+
         if ($azure) {
             $api_key = if ($api_key) { $api_key } else { if ($env:OPENAI_API_KEY_Azure) { $env:OPENAI_API_KEY_Azure } else { $env:OPENAI_API_KEY } }
             $engine = if ($engine) { $engine } else { if ($env:OPENAI_CHAT_ENGINE_Azure) { $env:OPENAI_CHAT_ENGINE_Azure }else { "gpt-3.5-turbo" } }
@@ -231,6 +253,8 @@ function New-ChatGPTConversation {
             $engine = if ($engine) { $engine } else { if ($env:OPENAI_CHAT_ENGINE) { $env:OPENAI_CHAT_ENGINE }else { "gpt-3.5-turbo" } }
             $endpoint = if ($endpoint) { $endpoint } else { "https://api.openai.com/v1/chat/completions" }
         }
+
+        Write-Verbose "Parameter parsed. api_key: $api_key, engine: $engine, endpoint: $endpoint"
 
         $hasError = $false
 
@@ -264,6 +288,7 @@ function New-ChatGPTConversation {
     PROCESS {
 
         if ($prompt.Length -gt 0) {
+            Write-Verbose "Prompt received: $prompt, so it is in prompt mode, not in chat mode."
             $messages = @(
                 @{
                     role    = "system"
@@ -283,12 +308,18 @@ function New-ChatGPTConversation {
                 ContentType = "application/json;charset=utf-8"
             }
 
+            Write-Verbose "Prepare the params for Invoke-WebRequest: $($params|ConvertTo-Json)"
+
             $response = Invoke-RestMethod @params
+            Write-Verbose "Response received: $($response|ConvertTo-Json)"
             $result = $response.choices[0].message.content
+            Write-Verbose "Response parsed to plain text: $result"
             Write-Output $result 
 
         }
         else {
+            Write-Verbose "Prompt not received, so it is in chat mode."
+
             $index = 1; 
             $welcome = "`n{0}`n{1}" -f ($resources.welcome_chatgpt -f $(if ($azure) { " $($resources.azure_version) " } else { "" }), $engine), $resources.shortcuts
     
@@ -303,19 +334,30 @@ function New-ChatGPTConversation {
                     content = $system
                 }
             )
+
+            Write-Verbose "Prepare the system prompt: $($systemPrompt|ConvertTo-Json)"
             
             while ($true) {
+                Write-Verbose "Start a new loop - let's chat!"
+
                 $current = $index++
                 $prompt = Read-Host -Prompt "`n[$current] $($resources.prompt)"
+                Write-Verbose "Prompt received: $prompt"
+
                 $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
     
                 if ($prompt -eq "q") {
+                    Write-Verbose "User pressed q, so we will quit the chat."
                     break
                 }
     
                 if ($prompt -eq "m") {
-    
+                    Write-Verbose "User pressed m, so we will prompt a window to collect user input in multi-lines mode."
+
                     $prompt = Read-MultiLineInputBoxDialog -Message $resources.multi_line_prompt -WindowTitle $resources.multi_line_prompt -DefaultText ""
+
+                    Write-Verbose "Prompt received: $prompt"
+
                     if ($null -eq $prompt) {
                         Write-Host $resources.cancel_button_message
                         continue
@@ -326,8 +368,12 @@ function New-ChatGPTConversation {
                 }
     
                 if ($prompt -eq "f") {
+
+                    Write-Verbose "User pressed f, so we will prompt a window to collect user input from a file."
     
                     $file = Read-OpenFileDialog -WindowTitle $resources.file_prompt
+
+                    Write-Verbose "File received: $file"
     
                     if (!($file)) {
                         Write-Host $resources.cancel_button_message
@@ -343,6 +389,8 @@ function New-ChatGPTConversation {
                     role    = "user"
                     content = $prompt
                 }
+
+                Write-Verbose "Prepare the messages: $($messages|ConvertTo-Json)"
     
                 $params = @{
                     Uri         = $endpoint
@@ -351,17 +399,21 @@ function New-ChatGPTConversation {
                     Headers     = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "Bearer $api_key" } }
                     ContentType = "application/json;charset=utf-8"
                 }
+
+                Write-Verbose "Prepare the params for Invoke-WebRequest: $($params|ConvertTo-Json)"
     
                 try {
     
                     if ($stream) {
+                        Write-Verbose "Stream mode detected, so we will use Invoke-WebRequest to stream the response."
+
                         $stopwatch.Stop()
                         Write-Verbose "Stopped watcher"
     
                         $client = New-Object System.Net.Http.HttpClient
                         $body = $params.Body
     
-                        Write-Verbose $body
+                        Write-Verbose "body: $body"
     
                         $request = [System.Net.Http.HttpRequestMessage]::new()
                         $request.Method = "POST"
@@ -384,19 +436,20 @@ function New-ChatGPTConversation {
                         $response = $task.Content.ReadAsStream()
                         $reader = [System.IO.StreamReader]::new($response)
     
-                        Write-Verbose "Got task stream"
+                        Write-Verbose "Got task stream response and reader: $response, $reader"
     
                         $result = "" # message from the api
                         Write-Host -ForegroundColor Red "`n[$current] " -NoNewline
     
                         while ($true) {
                             $line = $reader.ReadLine()
-                            Write-Verbose $line
+                            Write-Verbose "Read line from stream: $line"
     
                             if (($line -eq $null) -or ($line -eq "data: [DONE]")) { break }
     
                             $chunk = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta.content
                             Write-Host $chunk -NoNewline -ForegroundColor Green
+                            Write-Verbose "Chunk received: $chunk"
                             $result += $chunk
     
                             Start-Sleep -Milliseconds 50
@@ -409,30 +462,45 @@ function New-ChatGPTConversation {
                             role    = "assistant"
                             content = $result
                         }
+
+                        Write-Verbose "Message combined. $($messages|ConvertTo-Json)"
     
                         Set-Clipboard $result
                         Write-Host ""
     
                     }
                     else {
+
+                        Write-Verbose "It is not in stream mode."
+
                         $response = Invoke-RestMethod @params
+                        Write-Verbose "Response received: $($response| ConvertTo-Json)"
+
                         $stopwatch.Stop()
                         $result = $response.choices[0].message.content
                         $total_tokens = $response.usage.total_tokens
                         $prompt_tokens = $response.usage.prompt_tokens
                         $completion_tokens = $response.usage.completion_tokens
         
+                        Write-Verbose "Response parsed to plain text: $result, total_tokens: $total_tokens, prompt_tokens: $prompt_tokens, completion_tokens: $completion_tokens"
         
                         if ($PSVersionTable['PSVersion'].Major -le 5) {
+
+                            Write-Verbose "Powershell 5.0 detected, convert the response to UTF8"
+
                             $dstEncoding = [System.Text.Encoding]::GetEncoding('iso-8859-1')
                             $srcEncoding = [System.Text.Encoding]::UTF8
                             $result = $srcEncoding.GetString([System.Text.Encoding]::Convert($srcEncoding, $dstEncoding, $srcEncoding.GetBytes($result)))
+
+                            Write-Verbose "Response converted to UTF8: $result"
                         }
         
                         $messages += [PSCustomObject]@{
                             role    = "assistant"
                             content = $result
                         }
+
+                        Write-Verbose "Message combined. $($messages|ConvertTo-Json)"
                 
         
                         Write-Host -ForegroundColor Red ("`n[$current] $($resources.response)" -f $total_tokens, $prompt_tokens, $completion_tokens )
