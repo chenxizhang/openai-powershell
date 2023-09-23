@@ -197,6 +197,8 @@ function New-ChatGPTConversation {
         If you want to stream the response, you can use this switch. Please note, we only support this feature in new Powershell (6.0+).
     .PARAMETER prompt
         If you want to get result immediately, you can use this parameter to define the prompt. It will not start the chat conversation.
+    .PARAMETER config
+        The dynamic settings for the API call, it can meet all the requirement for each model. please pass a custom object to this parameter, like @{temperature=1;max_tokens=1024}
     .EXAMPLE
         New-ChatGPTConversation
         Create a new ChatGPT conversation, use openai service with all the default settings.
@@ -235,7 +237,8 @@ function New-ChatGPTConversation {
         [switch]$azure,
         [string]$system = "You are a chatbot, please answer the user's question according to the user's language.",
         [string]$prompt = "",
-        [switch]$stream
+        [switch]$stream,
+        [PSCustomObject]$config
     )
     BEGIN {
 
@@ -298,15 +301,22 @@ function New-ChatGPTConversation {
                     role    = "user"
                     content = $prompt
                 }
-            )
+            ) 
 
             $params = @{
                 Uri         = $endpoint
                 Method      = "POST"
-                Body        = @{model = "$engine"; messages = $messages } | ConvertTo-Json
+                Body        = @{model = "$engine"; messages = $messages }
                 Headers     = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "Bearer $api_key" } }
                 ContentType = "application/json;charset=utf-8"
             }
+
+
+            if ($config) {
+                Merge-Hashtable -table1 $params.Body -table2 $config
+            }
+
+            $params.Body = ($params.Body | ConvertTo-Json)
 
             Write-Verbose "Prepare the params for Invoke-WebRequest: $($params|ConvertTo-Json)"
 
@@ -395,10 +405,16 @@ function New-ChatGPTConversation {
                 $params = @{
                     Uri         = $endpoint
                     Method      = "POST"
-                    Body        = @{model = "$engine"; messages = ($systemPrompt + $messages[-5..-1]); stream = if ($stream) { $true }else { $false } } | ConvertTo-Json
+                    Body        = @{model = "$engine"; messages = ($systemPrompt + $messages[-5..-1]); stream = if ($stream) { $true }else { $false } } 
                     Headers     = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "Bearer $api_key" } }
                     ContentType = "application/json;charset=utf-8"
                 }
+
+                if ($config) {
+                    Merge-Hashtable -table1 $params.Body -table2 $config
+                }
+                $params.Body = ($params.Body | ConvertTo-Json)
+
 
                 Write-Verbose "Prepare the params for Invoke-WebRequest: $($params|ConvertTo-Json)"
     
@@ -641,4 +657,15 @@ function Read-MultiLineInputBoxDialog([string]$Message, [string]$WindowTitle, [s
 
     # Return the text that the user entered.
     return $form.Tag
+}
+
+function Merge-Hashtable($table1, $table2) {
+    foreach ($key in $table2.Keys) {
+        if ($table1.ContainsKey($key)) {
+            $table1[$key] = $table2[$key]  # 用第二个hashtable的值覆盖第一个hashtable的值
+        }
+        else {
+            $table1.Add($key, $table2[$key])
+        }
+    }
 }
