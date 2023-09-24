@@ -536,6 +536,127 @@ function New-ChatGPTConversation {
 }
 
 
+function New-ImageGeneration {
+    [CmdletBinding()]
+    [Alias("dall")][Alias("image")]
+    param(
+        [parameter(Mandatory = $true)][string]$prompt,
+        [string]$api_key,
+        [string]$endpoint, 
+        [switch]$azure,
+        [int]$n = 1, #for azure, the n can be 1-5, for openai, the n can be 1-10
+        [ImageSize]$size = 2,
+        [string]$outfolder = "."
+    )
+
+   
+    BEGIN {
+        Write-Verbose "Parameter received. api_key: $api_key, endpoint: $endpoint, azure: $azure, n: $n, size: $size"
+
+        Write-Verbose "Enviornment variable detected. OPENAI_API_KEY: $env:OPENAI_API_KEY, OPENAI_API_KEY_Azure: $env:OPENAI_API_KEY_Azure,  OPENAI_ENDPOINT: $env:OPENAI_ENDPOINT, OPENAI_ENDPOINT_Azure: $env:OPENAI_ENDPOINT_Azure"
+
+        if ($azure) {
+            $api_key = if ($api_key) { $api_key } else { if ($env:OPENAI_API_KEY_Azure) { $env:OPENAI_API_KEY_Azure } else { $env:OPENAI_API_KEY } }
+            $endpoint = if ($endpoint) { $endpoint } else { "{0}openai/images/generations:submit?api-version=2023-06-01-preview" -f $env:OPENAI_ENDPOINT_Azure }
+        }
+        else {
+            $api_key = if ($api_key) { $api_key } else { $env:OPENAI_API_KEY }
+            $endpoint = if ($endpoint) { $endpoint } else { "https://api.openai.com/v1/images/generations" }
+        }
+
+        Write-Verbose "Parameter parsed. api_key: $api_key, endpoint: $endpoint"
+
+        $hasError = $false
+
+        if ((!$azure) -and ((Test-OpenAIConnectivity) -eq $False)) {
+            Write-Host $resources.openai_unavaliable -ForegroundColor Red
+            $hasError = $true
+        }
+
+
+        if (!$api_key) {
+            Write-Host $resources.error_missing_api_key -ForegroundColor Red
+            $hasError = $true
+        }
+
+        if (!$endpoint) {
+            Write-Host $resources.error_missing_endpoint -ForegroundColor Red
+            $hasError = $true
+        }
+
+        if ($hasError) {
+            break
+        }
+    }
+
+    PROCESS {
+
+        $body = @{
+            prompt = $prompt
+            n      = $n
+            size   = if ($size -eq 0) { "1024x1024" }elseif ($size -eq 1) { "512x512" }else { "256x256" }
+        } | ConvertTo-Json
+
+
+        $headers = @{
+            "Content-Type" = "application/json"
+        }
+
+        if ($azure) {
+            $headers.Add("api-key",$api_key)
+
+            $request = Invoke-WebRequest -Method Post -Uri $endpoint -Headers $headers -Body $body
+            $location = $request.Headers['operation-location'][0]
+            Write-Verbose "Location received: $location"
+            while ($true) {
+                $query = Invoke-RestMethod -Uri $location -Headers $headers
+                if ($query.status -eq 'succeeded') {
+                    $query.result.data | Select-Object -ExpandProperty url | ForEach-Object {
+                        $filename = [System.Guid]::NewGuid().ToString() + ".png"
+                        $file = [System.IO.Path]::Join($outfolder, $filename)
+                        Write-Verbose "Downloading file: $file"
+                        Invoke-WebRequest -Uri $_ -OutFile $file
+                    }
+
+                    Write-Host "Download completed, please check the folder: $outfolder"
+                    break
+                }
+                else {
+                    Start-Sleep -Seconds 1
+                }
+
+            }
+        }
+        else {
+            # call openai api to generate image
+            $headers.Add("Authorization","Bearer $api_key")
+            $request = Invoke-WebRequest -Method Post -Uri $endpoint -Headers $headers -Body $body
+            ($request | ConvertTo-Json).data | Select-Object -ExpandProperty url | ForEach-Object {
+                $filename = [System.Guid]::NewGuid().ToString() + ".png"
+                $file = [System.IO.Path]::Join($outfolder, $filename)
+                Write-Verbose "Downloading file: $file"
+                Invoke-WebRequest -Uri $_ -OutFile $file
+            }
+
+            Write-Host "Download completed, please check the folder: $outfolder"
+
+
+        }
+    }
+
+    END {
+
+    }
+}
+
+
+# define a enum that contain 1024x1204, 512x512,256x256
+enum ImageSize {
+    Large = 0
+    Middle = 1
+    Small = 2
+}
+
 function Read-OpenFileDialog([string]$WindowTitle, [string]$InitialDirectory, [string]$Filter = "All files (*.*)|*.*", [switch]$AllowMultiSelect) {
     Add-Type -AssemblyName System.Windows.Forms
     $openFileDialog = New-Object System.Windows.Forms.OpenFileDialog
