@@ -630,8 +630,8 @@ function New-ImageGeneration {
         else {
             # call openai api to generate image
             $headers.Add("Authorization","Bearer $api_key")
-            $request = Invoke-WebRequest -Method Post -Uri $endpoint -Headers $headers -Body $body
-            ($request | ConvertTo-Json).data | Select-Object -ExpandProperty url | ForEach-Object {
+            $request = Invoke-RestMethod -Method Post -Uri $endpoint -Headers $headers -Body $body
+            $request.data | Select-Object -ExpandProperty url | ForEach-Object {
                 $filename = [System.Guid]::NewGuid().ToString() + ".png"
                 $file = [System.IO.Path]::Join($outfolder, $filename)
                 Write-Verbose "Downloading file: $file"
