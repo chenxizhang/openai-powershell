@@ -6,7 +6,7 @@ function Test-OpenAIConnectivity {
     Write-Verbose "Test-OpenAIConnectivity"
     $ErrorActionPreference = 'SilentlyContinue'
     $response = Invoke-WebRequest -Uri "https://platform.openai.com/docs/" -Method Head -TimeoutSec 2
-    Write-Verbose "Response: $($response|ConvertTo-Json)"
+    Write-Verbose "Response: $($response|ConvertTo-Json -Depth 10)"
     $ErrorActionPreference = 'Continue'
     return $response.StatusCode -eq 200
 }
@@ -132,18 +132,18 @@ function New-OpenAICompletion {
                 max_tokens  = $max_tokens
                 temperature = $temperature
                 n           = $n
-            } | ConvertTo-Json
+            } | ConvertTo-Json -Depth 10
             Headers     = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "Bearer $api_key" } }
             ContentType = "application/json;charset=utf-8"
         }
 
-        Write-Verbose "Prepare the params for Invoke-WebRequest: $($params | ConvertTo-Json) "
+        Write-Verbose "Prepare the params for Invoke-WebRequest: $($params | ConvertTo-Json -Depth 10) "
 
 
         try {
             $response = Invoke-RestMethod @params
 
-            Write-Verbose "Response received: $($response| ConvertTo-Json)"
+            Write-Verbose "Response received: $($response| ConvertTo-Json -Depth 10)"
 
             if ($PSVersionTable['PSVersion'].Major -eq 5) {
                 Write-Verbose "Powershell 5.0 detected, convert the response to UTF8"
@@ -155,7 +155,7 @@ function New-OpenAICompletion {
                     $_.text = $srcEncoding.GetString([System.Text.Encoding]::Convert($srcEncoding, $dstEncoding, $srcEncoding.GetBytes($_.text)))
                 }
 
-                Write-Verbose "Response converted to UTF8: $($response | ConvertTo-Json)"
+                Write-Verbose "Response converted to UTF8: $($response | ConvertTo-Json -Depth 10)"
             }
         
             # parse the response to plain text
@@ -316,12 +316,12 @@ function New-ChatGPTConversation {
                 Merge-Hashtable -table1 $params.Body -table2 $config
             }
 
-            $params.Body = ($params.Body | ConvertTo-Json)
+            $params.Body = ($params.Body | ConvertTo-Json -Depth 10)
 
-            Write-Verbose "Prepare the params for Invoke-WebRequest: $($params|ConvertTo-Json)"
+            Write-Verbose "Prepare the params for Invoke-WebRequest: $($params|ConvertTo-Json -Depth 10)"
 
             $response = Invoke-RestMethod @params
-            Write-Verbose "Response received: $($response|ConvertTo-Json)"
+            Write-Verbose "Response received: $($response|ConvertTo-Json -Depth 10)"
             $result = $response.choices[0].message.content
             Write-Verbose "Response parsed to plain text: $result"
             Write-Output $result 
@@ -345,7 +345,7 @@ function New-ChatGPTConversation {
                 }
             )
 
-            Write-Verbose "Prepare the system prompt: $($systemPrompt|ConvertTo-Json)"
+            Write-Verbose "Prepare the system prompt: $($systemPrompt|ConvertTo-Json -Depth 10)"
             
             while ($true) {
                 Write-Verbose "Start a new loop - let's chat!"
@@ -400,7 +400,7 @@ function New-ChatGPTConversation {
                     content = $prompt
                 }
 
-                Write-Verbose "Prepare the messages: $($messages|ConvertTo-Json)"
+                Write-Verbose "Prepare the messages: $($messages|ConvertTo-Json -Depth 10)"
     
                 $params = @{
                     Uri         = $endpoint
@@ -413,10 +413,10 @@ function New-ChatGPTConversation {
                 if ($config) {
                     Merge-Hashtable -table1 $params.Body -table2 $config
                 }
-                $params.Body = ($params.Body | ConvertTo-Json)
+                $params.Body = ($params.Body | ConvertTo-Json -Depth 10)
 
 
-                Write-Verbose "Prepare the params for Invoke-WebRequest: $($params|ConvertTo-Json)"
+                Write-Verbose "Prepare the params for Invoke-WebRequest: $($params|ConvertTo-Json -Depth 10)"
     
                 try {
     
@@ -479,7 +479,7 @@ function New-ChatGPTConversation {
                             content = $result
                         }
 
-                        Write-Verbose "Message combined. $($messages|ConvertTo-Json)"
+                        Write-Verbose "Message combined. $($messages|ConvertTo-Json -Depth 10)"
     
                         Set-Clipboard $result
                         Write-Host ""
@@ -490,7 +490,7 @@ function New-ChatGPTConversation {
                         Write-Verbose "It is not in stream mode."
 
                         $response = Invoke-RestMethod @params
-                        Write-Verbose "Response received: $($response| ConvertTo-Json)"
+                        Write-Verbose "Response received: $($response| ConvertTo-Json -Depth 10)"
 
                         $stopwatch.Stop()
                         $result = $response.choices[0].message.content
@@ -516,7 +516,7 @@ function New-ChatGPTConversation {
                             content = $result
                         }
 
-                        Write-Verbose "Message combined. $($messages|ConvertTo-Json)"
+                        Write-Verbose "Message combined. $($messages|ConvertTo-Json -Depth 10)"
                 
         
                         Write-Host -ForegroundColor Red ("`n[$current] $($resources.response)" -f $total_tokens, $prompt_tokens, $completion_tokens )
@@ -595,7 +595,7 @@ function New-ImageGeneration {
             prompt = $prompt
             n      = $n
             size   = if ($size -eq 0) { "1024x1024" }elseif ($size -eq 1) { "512x512" }else { "256x256" }
-        } | ConvertTo-Json
+        } | ConvertTo-Json -Depth 10
 
 
         $headers = @{
@@ -603,7 +603,7 @@ function New-ImageGeneration {
         }
 
         if ($azure) {
-            $headers.Add("api-key",$api_key)
+            $headers.Add("api-key", $api_key)
 
             $request = Invoke-WebRequest -Method Post -Uri $endpoint -Headers $headers -Body $body
             $location = $request.Headers['operation-location'][0]
@@ -629,7 +629,7 @@ function New-ImageGeneration {
         }
         else {
             # call openai api to generate image
-            $headers.Add("Authorization","Bearer $api_key")
+            $headers.Add("Authorization", "Bearer $api_key")
             $request = Invoke-RestMethod -Method Post -Uri $endpoint -Headers $headers -Body $body
             $request.data | Select-Object -ExpandProperty url | ForEach-Object {
                 $filename = [System.Guid]::NewGuid().ToString() + ".png"
