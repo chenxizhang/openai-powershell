@@ -21,11 +21,11 @@ function New-OpenAICompletion {
     .PARAMETER prompt
         The prompt to get completion from OpenAI API
     .PARAMETER api_key
-        The api_key to get completion from OpenAI API. You can also set api_key in environment variable OPENAI_API_KEY or OPENAI_API_KEY_Azure (if you want to use Azure OpenAI Service API).
+        The api_key to get completion from OpenAI API. You can also set api_key in environment variable OPENAI_API_KEY or OPENAI_API_KEY_AZURE (if you want to use Azure OpenAI Service API).
     .PARAMETER engine
-        The engine to get completion from OpenAI API. You can also set engine in environment variable OPENAI_ENGINE or OPENAI_ENGINE_Azure (if you want to use Azure OpenAI Service API).
+        The engine to get completion from OpenAI API. You can also set engine in environment variable OPENAI_ENGINE or OPENAI_ENGINE_AZURE (if you want to use Azure OpenAI Service API).
     .PARAMETER endpoint
-        The endpoint to get completion from OpenAI API. You can also set endpoint in environment variable OPENAI_ENDPOINT or OPENAI_ENDPOINT_Azure (if you want to use Azure OpenAI Service API).
+        The endpoint to get completion from OpenAI API. You can also set endpoint in environment variable OPENAI_ENDPOINT or OPENAI_ENDPOINT_AZURE (if you want to use Azure OpenAI Service API).
     .PARAMETER max_tokens
         The max_tokens to get completion from OpenAI API. The default value is 1024.
     .PARAMETER temperature
@@ -79,7 +79,7 @@ function New-OpenAICompletion {
 
         Write-Verbose "Parameter received. prompt: $prompt, api_key: $api_key, engine: $engine, endpoint: $endpoint, max_tokens: $max_tokens, temperature: $temperature, n: $n, azure: $azure"
 
-        Write-Verbose "Environment variable detected. OPENAI_API_KEY: $env:OPENAI_API_KEY, OPENAI_API_KEY_Azure: $env:OPENAI_API_KEY_Azure, OPENAI_ENGINE: $env:OPENAI_ENGINE, OPENAI_ENGINE_Azure: $env:OPENAI_ENGINE_Azure, OPENAI_ENDPOINT: $env:OPENAI_ENDPOINT, OPENAI_ENDPOINT_Azure: $env:OPENAI_ENDPOINT_Azure"
+        Write-Verbose "Environment variable detected. OPENAI_API_KEY: $env:OPENAI_API_KEY, OPENAI_API_KEY_AZURE: $env:OPENAI_API_KEY_AZURE, OPENAI_ENGINE: $env:OPENAI_ENGINE, OPENAI_ENGINE_AZURE: $env:OPENAI_ENGINE_AZURE, OPENAI_ENDPOINT: $env:OPENAI_ENDPOINT, OPENAI_ENDPOINT_AZURE: $env:OPENAI_ENDPOINT_AZURE"
 
         if ($azure) {
             $api_key = if ($api_key) { $api_key } else { Get-FirstNonNullItemInArray("OPENAI_API_KEY_AZURE_$environment", "OPENAI_API_KEY_AZURE") }
@@ -185,11 +185,11 @@ function New-ChatGPTConversation {
     .DESCRIPTION
         Create a new ChatGPT conversation, You can chat with the openai service just like chat with a human.
     .PARAMETER api_key
-        Your OpenAI API key, you can also set it in environment variable OPENAI_API_KEY or OPENAI_API_KEY_Azure if you use Azure OpenAI API.
+        Your OpenAI API key, you can also set it in environment variable OPENAI_API_KEY or OPENAI_API_KEY_AZURE if you use Azure OpenAI API.
     .PARAMETER engine
-        The engine to use for this request, you can also set it in environment variable OPENAI_CHAT_ENGINE or OPENAI_CHAT_ENGINE_Azure if you use Azure OpenAI API.
+        The engine to use for this request, you can also set it in environment variable OPENAI_CHAT_ENGINE or OPENAI_CHAT_ENGINE_AZURE if you use Azure OpenAI API.
     .PARAMETER endpoint
-        The endpoint to use for this request, you can also set it in environment variable OPENAI_ENDPOINT or OPENAI_ENDPOINT_Azure if you use Azure OpenAI API.
+        The endpoint to use for this request, you can also set it in environment variable OPENAI_ENDPOINT or OPENAI_ENDPOINT_AZURE if you use Azure OpenAI API.
     .PARAMETER azure
         if you use Azure OpenAI API, you can use this switch.
     .PARAMETER system
@@ -246,7 +246,7 @@ function New-ChatGPTConversation {
 
         Write-Verbose "Parameter received. api_key: $api_key, engine: $engine, endpoint: $endpoint, azure: $azure, system: $system, prompt: $prompt, stream: $stream"
 
-        Write-Verbose "Enviornment variable detected. OPENAI_API_KEY: $env:OPENAI_API_KEY, OPENAI_API_KEY_Azure: $env:OPENAI_API_KEY_Azure, OPENAI_ENGINE: $env:OPENAI_ENGINE, OPENAI_ENGINE_Azure: $env:OPENAI_ENGINE_Azure, OPENAI_ENDPOINT: $env:OPENAI_ENDPOINT, OPENAI_ENDPOINT_Azure: $env:OPENAI_ENDPOINT_Azure"
+        Write-Verbose "Enviornment variable detected. OPENAI_API_KEY: $env:OPENAI_API_KEY, OPENAI_API_KEY_AZURE: $env:OPENAI_API_KEY_AZURE, OPENAI_ENGINE: $env:OPENAI_ENGINE, OPENAI_ENGINE_AZURE: $env:OPENAI_ENGINE_AZURE, OPENAI_ENDPOINT: $env:OPENAI_ENDPOINT, OPENAI_ENDPOINT_AZURE: $env:OPENAI_ENDPOINT_AZURE"
 
         if ($azure) {
             $api_key = if ($api_key) { $api_key } else { Get-FirstNonNullItemInArray("OPENAI_API_KEY_AZURE_$environment", "OPENAI_API_KEY_AZURE") }
@@ -557,7 +557,7 @@ function New-ImageGeneration {
     BEGIN {
         Write-Verbose "Parameter received. api_key: $api_key, endpoint: $endpoint, azure: $azure, n: $n, size: $size"
 
-        Write-Verbose "Enviornment variable detected. OPENAI_API_KEY: $env:OPENAI_API_KEY, OPENAI_API_KEY_Azure: $env:OPENAI_API_KEY_Azure,  OPENAI_ENDPOINT: $env:OPENAI_ENDPOINT, OPENAI_ENDPOINT_Azure: $env:OPENAI_ENDPOINT_Azure"
+        Write-Verbose "Enviornment variable detected. OPENAI_API_KEY: $env:OPENAI_API_KEY, OPENAI_API_KEY_AZURE: $env:OPENAI_API_KEY_AZURE,  OPENAI_ENDPOINT: $env:OPENAI_ENDPOINT, OPENAI_ENDPOINT_AZURE: $env:OPENAI_ENDPOINT_AZURE"
 
         if ($azure) {
             $api_key = if ($api_key) { $api_key } else { Get-FirstNonNullItemInArray("OPENAI_API_KEY_AZURE_$environment", "OPENAI_API_KEY_AZURE") }
