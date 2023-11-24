@@ -545,7 +545,7 @@ function New-ImageGeneration {
         [parameter(Mandatory = $true)][string]$prompt,
         [string]$api_key,
         [string]$endpoint, 
-        [Parameter(ParameterSetName="Azure")][switch]$azure,
+        [Parameter(ParameterSetName = "Azure")][switch]$azure,
         [int]$n = 1, #for azure, the n can be 1-5, for openai, the n can be 1-10
         [ImageSize]$size = 2,
         [string]$outfolder = ".",
@@ -559,7 +559,7 @@ function New-ImageGeneration {
         Write-Verbose "Enviornment variable detected. OPENAI_API_KEY: $env:OPENAI_API_KEY, OPENAI_API_KEY_Azure: $env:OPENAI_API_KEY_Azure,  OPENAI_ENDPOINT: $env:OPENAI_ENDPOINT, OPENAI_ENDPOINT_Azure: $env:OPENAI_ENDPOINT_Azure"
 
         if ($azure) {
-            $api_key = if ($api_key) { $api_key } else { Get-FirstNonNullItemInArray("OPENAI_API_KEY_AZURE_$environment","OPENAI_API_KEY_AZURE") }
+            $api_key = if ($api_key) { $api_key } else { Get-FirstNonNullItemInArray("OPENAI_API_KEY_AZURE_$environment", "OPENAI_API_KEY_AZURE") }
             $endpoint = if ($endpoint) { $endpoint } else { "{0}openai/images/generations:submit?api-version=2023-06-01-preview" -f (Get-FirstNonNullItemInArray("OPENAI_ENDPOINT_AZURE_$environment", "OPENAI_ENDPOINT_AZURE")) }
         }
         else {
@@ -610,6 +610,10 @@ function New-ImageGeneration {
 
             $request = Invoke-WebRequest -Method Post -Uri $endpoint -Headers $headers -Body $body
             $location = $request.Headers['operation-location'][0]
+            if ($null -eq $location) {
+                Write-Host "Generate fail " -ForegroundColor Red
+                return
+            }
             Write-Verbose "Location received: $location"
             while ($true) {
                 $query = Invoke-RestMethod -Uri $location -Headers $headers
