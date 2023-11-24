@@ -71,7 +71,8 @@ function New-OpenAICompletion {
         [Parameter()][int]$max_tokens = 1024,
         [Parameter()][double]$temperature = 1,
         [Parameter()][int]$n = 1,
-        [Parameter()][switch]$azure
+        [Parameter( ParameterSetName = “Azure”)][switch]$azure,
+        [Parameter( ParameterSetName = “Azure”)][string]$environment
     )
 
     BEGIN {
@@ -81,9 +82,9 @@ function New-OpenAICompletion {
         Write-Verbose "Environment variable detected. OPENAI_API_KEY: $env:OPENAI_API_KEY, OPENAI_API_KEY_Azure: $env:OPENAI_API_KEY_Azure, OPENAI_ENGINE: $env:OPENAI_ENGINE, OPENAI_ENGINE_Azure: $env:OPENAI_ENGINE_Azure, OPENAI_ENDPOINT: $env:OPENAI_ENDPOINT, OPENAI_ENDPOINT_Azure: $env:OPENAI_ENDPOINT_Azure"
 
         if ($azure) {
-            $api_key = if ($api_key) { $api_key } else { if ($env:OPENAI_API_KEY_Azure) { $env:OPENAI_API_KEY_Azure } else { $env:OPENAI_API_KEY } }
-            $engine = if ($engine) { $engine } else { $env:OPENAI_ENGINE_Azure }
-            $endpoint = "{0}openai/deployments/{1}/completions?api-version=2022-12-01" -f $(if ($endpoint) { $endpoint }else { $env:OPENAI_ENDPOINT_Azure }), $engine
+            $api_key = if ($api_key) { $api_key } else { Get-FirstNonNullItemInArray("OPENAI_API_KEY_AZURE_$environment", "OPENAI_API_KEY_AZURE") }
+            $engine = if ($engine) { $engine } else { Get-FirstNonNullItemInArray("OPENAI_ENGINE_AZURE_$environment", "OPENAI_ENGINE_AZURE") }
+            $endpoint = "{0}openai/deployments/{1}/completions?api-version=2022-12-01" -f $(if ($endpoint) { $endpoint }else { Get-FirstNonNullItemInArray("OPENAI_ENDPOINT_AZURE_$environment", "OPENAI_ENDPOINT_AZURE") }), $engine
         }
         else {
             $api_key = if ($api_key) { $api_key } else { $env:OPENAI_API_KEY }
@@ -234,11 +235,12 @@ function New-ChatGPTConversation {
         [Parameter()][string]$api_key,
         [Parameter()][string]$engine,
         [string]$endpoint, 
-        [switch]$azure,
+        [Parameter(ParameterSetName = "Azure")][switch]$azure,
         [string]$system = "You are a chatbot, please answer the user's question according to the user's language.",
         [string]$prompt = "",
         [switch]$stream,
-        [PSCustomObject]$config
+        [PSCustomObject]$config,
+        [Parameter( ParameterSetName = “Azure”)][string]$environment
     )
     BEGIN {
 
@@ -247,9 +249,9 @@ function New-ChatGPTConversation {
         Write-Verbose "Enviornment variable detected. OPENAI_API_KEY: $env:OPENAI_API_KEY, OPENAI_API_KEY_Azure: $env:OPENAI_API_KEY_Azure, OPENAI_ENGINE: $env:OPENAI_ENGINE, OPENAI_ENGINE_Azure: $env:OPENAI_ENGINE_Azure, OPENAI_ENDPOINT: $env:OPENAI_ENDPOINT, OPENAI_ENDPOINT_Azure: $env:OPENAI_ENDPOINT_Azure"
 
         if ($azure) {
-            $api_key = if ($api_key) { $api_key } else { if ($env:OPENAI_API_KEY_Azure) { $env:OPENAI_API_KEY_Azure } else { $env:OPENAI_API_KEY } }
-            $engine = if ($engine) { $engine } else { if ($env:OPENAI_CHAT_ENGINE_Azure) { $env:OPENAI_CHAT_ENGINE_Azure }else { "gpt-3.5-turbo" } }
-            $endpoint = if ($endpoint) { $endpoint } else { "{0}openai/deployments/$engine/chat/completions?api-version=2023-03-15-preview" -f $env:OPENAI_ENDPOINT_Azure }
+            $api_key = if ($api_key) { $api_key } else { Get-FirstNonNullItemInArray("OPENAI_API_KEY_AZURE_$environment", "OPENAI_API_KEY_AZURE") }
+            $engine = if ($engine) { $engine } else { Get-FirstNonNullItemInArray("OPENAI_CHAT_ENGINE_AZURE_$environment", "OPENAI_CHAT_ENGINE_AZURE") }
+            $endpoint = if ($endpoint) { $endpoint } else { "{0}openai/deployments/$engine/chat/completions?api-version=2023-03-15-preview" -f (Get-FirstNonNullItemInArray("OPENAI_ENDPOINT_AZURE_$environment", "OPENAI_ENDPOINT_AZURE")) }
         }
         else {
             $api_key = if ($api_key) { $api_key } else { $env:OPENAI_API_KEY }
@@ -543,10 +545,11 @@ function New-ImageGeneration {
         [parameter(Mandatory = $true)][string]$prompt,
         [string]$api_key,
         [string]$endpoint, 
-        [switch]$azure,
+        [Parameter(ParameterSetName="Azure")][switch]$azure,
         [int]$n = 1, #for azure, the n can be 1-5, for openai, the n can be 1-10
         [ImageSize]$size = 2,
-        [string]$outfolder = "."
+        [string]$outfolder = ".",
+        [Parameter( ParameterSetName = “Azure”)][string]$environment
     )
 
    
@@ -556,8 +559,8 @@ function New-ImageGeneration {
         Write-Verbose "Enviornment variable detected. OPENAI_API_KEY: $env:OPENAI_API_KEY, OPENAI_API_KEY_Azure: $env:OPENAI_API_KEY_Azure,  OPENAI_ENDPOINT: $env:OPENAI_ENDPOINT, OPENAI_ENDPOINT_Azure: $env:OPENAI_ENDPOINT_Azure"
 
         if ($azure) {
-            $api_key = if ($api_key) { $api_key } else { if ($env:OPENAI_API_KEY_Azure) { $env:OPENAI_API_KEY_Azure } else { $env:OPENAI_API_KEY } }
-            $endpoint = if ($endpoint) { $endpoint } else { "{0}openai/images/generations:submit?api-version=2023-06-01-preview" -f $env:OPENAI_ENDPOINT_Azure }
+            $api_key = if ($api_key) { $api_key } else { Get-FirstNonNullItemInArray("OPENAI_API_KEY_AZURE_$environment","OPENAI_API_KEY_AZURE") }
+            $endpoint = if ($endpoint) { $endpoint } else { "{0}openai/images/generations:submit?api-version=2023-06-01-preview" -f (Get-FirstNonNullItemInArray("OPENAI_ENDPOINT_AZURE_$environment", "OPENAI_ENDPOINT_AZURE")) }
         }
         else {
             $api_key = if ($api_key) { $api_key } else { $env:OPENAI_API_KEY }
@@ -789,4 +792,15 @@ function Merge-Hashtable($table1, $table2) {
             $table1.Add($key, $table2[$key])
         }
     }
+}
+
+
+function Get-FirstNonNullItemInArray($array) {
+    foreach ($item in $array) {
+        $value = [System.Environment]::GetEnvironmentVariable($item)
+        if ($value) {
+            return $value
+        }
+    }
+    return $null
 }
