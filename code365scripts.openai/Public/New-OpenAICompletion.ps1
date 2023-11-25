@@ -104,7 +104,7 @@ function New-OpenAICompletion {
         }
 
         if ($hasError) {
-            break
+            return
         }
     }
 
@@ -150,14 +150,14 @@ function New-OpenAICompletion {
             Write-Verbose "Response parsed to plain text: $response"
 
             # write the response to console
-            Write-Output $response
+            return $response
             # write the response to clipboard
             Set-Clipboard $response
             Write-Verbose "Response copied to clipboard: $response"
             
         }
         catch {
-            Write-Host ($_.ErrorDetails | ConvertFrom-Json).error.message -ForegroundColor Red
+            Write-Host $_.ErrorDetails -ForegroundColor Red
         }
     }
 
