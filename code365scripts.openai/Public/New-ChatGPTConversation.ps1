@@ -107,7 +107,7 @@ function New-ChatGPTConversation {
         }
 
         if ($hasError) {
-            break
+            return
         }
     }
 

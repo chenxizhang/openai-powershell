@@ -49,7 +49,7 @@ function New-ImageGeneration {
         }
 
         if ($hasError) {
-            break
+            return
         }
     }
 
