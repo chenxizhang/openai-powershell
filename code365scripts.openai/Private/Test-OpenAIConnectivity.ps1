@@ -2,7 +2,7 @@
 function Test-OpenAIConnectivity {
     Write-Verbose "Test-OpenAIConnectivity"
     $ErrorActionPreference = 'SilentlyContinue'
-    $response = Invoke-WebRequest -Uri "https://www.openai.com" -Method Head -ConnectionTimeoutSeconds 5
+    $response = Invoke-WebRequest -Uri "https://www.openai.com" -Method Head
     Write-Verbose "Response: $($response|ConvertTo-Json -Depth 10)"
     $ErrorActionPreference = 'Continue'
     Write-Output ($response.StatusCode -eq 200)

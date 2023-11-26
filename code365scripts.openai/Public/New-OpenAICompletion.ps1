@@ -47,18 +47,18 @@ function New-OpenAICompletion {
         System.String, you can pass one or more string to the cmdlet, and we will get the completion for you.
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = "Default")]
     [Alias("noc")]
     param(
-        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)][string]$prompt,
-        [Parameter()][string]$api_key,
-        [Parameter()][string]$engine,
-        [Parameter()][string]$endpoint,
-        [Parameter()][int]$max_tokens = 1024,
-        [Parameter()][double]$temperature = 1,
-        [Parameter()][int]$n = 1,
-        [Parameter( ParameterSetName = “Azure”)][switch]$azure,
-        [Parameter( ParameterSetName = “Azure”)][string]$environment
+        [Parameter(ParameterSetName = “Azure”)][Parameter(ParameterSetName = "Default")][Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)][string]$prompt,
+        [Parameter(ParameterSetName = “Azure”)][Parameter(ParameterSetName = "Default")][string]$api_key,
+        [Parameter(ParameterSetName = “Azure”)][Parameter(ParameterSetName = "Default")][Parameter()][string]$engine,
+        [Parameter(ParameterSetName = “Azure”)][Parameter(ParameterSetName = "Default")][Parameter()][string]$endpoint,
+        [Parameter(ParameterSetName = “Azure”)][Parameter(ParameterSetName = "Default")][Parameter()][int]$max_tokens = 1024,
+        [Parameter(ParameterSetName = “Azure”)][Parameter(ParameterSetName = "Default")][Parameter()][double]$temperature = 1,
+        [Parameter(ParameterSetName = “Azure”)][Parameter(ParameterSetName = "Default")][Parameter()][int]$n = 1,
+        [Parameter(ParameterSetName = “Azure”)][switch]$azure,
+        [Parameter(ParameterSetName = “Azure”)][string]$environment
     )
 
     BEGIN {

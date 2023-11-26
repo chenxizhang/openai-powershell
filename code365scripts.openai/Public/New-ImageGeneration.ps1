@@ -1,16 +1,16 @@
 function New-ImageGeneration {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = "Default")]
     [Alias("dall")][Alias("image")]
     param(
-        [parameter(Mandatory = $true)][string]$prompt,
-        [string]$api_key,
-        [string]$endpoint, 
+        [parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][Parameter(Mandatory=$true)][string]$prompt,
+        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$api_key,
+        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$endpoint, 
         [Parameter(ParameterSetName = "Azure")][switch]$azure,
-        [int]$n = 1, #for azure, the n can be 1-5, for openai, the n can be 1-10, for dall3, it always be 1
-        [int]$size = 2,
-        [string]$outfolder = ".",
+        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][int]$n = 1, #for azure, the n can be 1-5, for openai, the n can be 1-10, for dall3, it always be 1
+        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][int]$size = 2,
+        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$outfolder = ".",
         [Parameter( ParameterSetName = “Azure”)][string]$environment,
-        [switch]$dall3
+        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][switch]$dall3
     )
 
    
