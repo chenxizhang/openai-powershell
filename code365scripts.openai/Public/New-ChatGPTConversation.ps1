@@ -84,24 +84,24 @@ function New-ChatGPTConversation {
         $hasError = $false
 
         if ((!$azure) -and ((Test-OpenAIConnectivity) -eq $False)) {
-            Write-Host $resources.openai_unavaliable -ForegroundColor Red
+            Write-Error $resources.openai_unavaliable
             $hasError = $true
         }
 
 
         if (!$api_key) {
-            Write-Host $resources.error_missing_api_key -ForegroundColor Red
+            Write-Error $resources.error_missing_api_key
             $hasError = $true
         }
 
         if (!$engine) {
-            Write-Host $resources.error_missing_engine -ForegroundColor Red
+            Write-Error $resources.error_missing_engine
             $hasError = $true
         }
 
         if (($PSVersionTable['PSVersion'].Major -le 5) -and $stream) {
             # only new powershell support stream
-            Write-Host $resources.powershell_version_unsupported -ForegroundColor Red
+            Write-Error $resources.powershell_version_unsupported
             $hasError = $true
         }
 
@@ -156,7 +156,6 @@ function New-ChatGPTConversation {
             $welcome = "`n{0}`n{1}" -f ($resources.welcome_chatgpt -f $(if ($azure) { " $($resources.azure_version) " } else { "" }), $engine), $resources.shortcuts
     
             Write-Host $welcome -ForegroundColor Yellow
-    
             Write-Host $system -ForegroundColor Cyan
     
             $messages = @()
@@ -303,7 +302,7 @@ function New-ChatGPTConversation {
 
                         Write-Verbose "Message combined. $($messages|ConvertTo-Json -Depth 10)"
     
-                        Set-Clipboard $result
+                        
                         Write-Host ""
     
                     }
@@ -342,7 +341,7 @@ function New-ChatGPTConversation {
                 
         
                         Write-Host -ForegroundColor Red ("`n[$current] $($resources.response)" -f $total_tokens, $prompt_tokens, $completion_tokens )
-                        Set-Clipboard $result
+                        
                         Write-Host $result -ForegroundColor Green
                     }
                 }

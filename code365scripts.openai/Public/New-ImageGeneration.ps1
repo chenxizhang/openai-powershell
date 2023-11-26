@@ -32,18 +32,18 @@ function New-ImageGeneration {
         $hasError = $false
 
         if ((!$azure) -and ((Test-OpenAIConnectivity) -eq $False)) {
-            Write-Host $resources.openai_unavaliable -ForegroundColor Red
+            Write-Error $resources.openai_unavaliable
             $hasError = $true
         }
 
 
         if (!$api_key) {
-            Write-Host $resources.error_missing_api_key -ForegroundColor Red
+            Write-Error $resources.error_missing_api_key
             $hasError = $true
         }
 
         if (!$endpoint) {
-            Write-Host $resources.error_missing_endpoint -ForegroundColor Red
+            Write-Error $resources.error_missing_endpoint
             $hasError = $true
         }
 
@@ -84,14 +84,14 @@ function New-ImageGeneration {
                 $filename = [System.Guid]::NewGuid().ToString() + ".png"
                 $file = [System.IO.Path]::Join($outfolder, $filename)
                 Invoke-WebRequest -Uri $url -OutFile $file
-                Write-Host "Download completed, please check the folder: $outfolder"
-
+                Write-Verbose "Download completed, please check the folder: $outfolder"
+                Write-Output $file # return the file path
             }
             else {
                 <# Action when all if and elseif conditions are false #>
                 $location = $request.Headers['operation-location'][0]
                 if ($null -eq $location) {
-                    Write-Host "Generate fail " -ForegroundColor Red
+                    Write-Error "Generate fail "
                     return
                 }
                 Write-Verbose "Location received: $location"
@@ -103,9 +103,10 @@ function New-ImageGeneration {
                             $file = [System.IO.Path]::Join($outfolder, $filename)
                             Write-Verbose "Downloading file: $file"
                             Invoke-WebRequest -Uri $_ -OutFile $file
+                            Write-Output $file # return the file path
                         }
 
-                        Write-Host "Download completed, please check the folder: $outfolder"
+                        Write-Verbose "Download completed, please check the folder: $outfolder"
                         break
                     }
                     else {
@@ -125,9 +126,10 @@ function New-ImageGeneration {
                 $file = [System.IO.Path]::Join($outfolder, $filename)
                 Write-Verbose "Downloading file: $file"
                 Invoke-WebRequest -Uri $_ -OutFile $file
+                Write-Output $file # return the file path
             }
 
-            Write-Host "Download completed, please check the folder: $outfolder"
+            Write-Verbose "Download completed, please check the folder: $outfolder"
 
 
         }
