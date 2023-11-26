@@ -2,15 +2,15 @@ function New-ChatGPTConversation {
 
     <#
     .SYNOPSIS
-        Create a new ChatGPT conversation
+        Create a new ChatGPT conversation or get a Chat Completion result.(if you specify the prompt parameter)
     .DESCRIPTION
-        Create a new ChatGPT conversation, You can chat with the openai service just like chat with a human.
+        Create a new ChatGPT conversation, You can chat with the openai service just like chat with a human. You can also get the chat completion result if you specify the prompt parameter.
     .PARAMETER api_key
-        Your OpenAI API key, you can also set it in environment variable OPENAI_API_KEY or OPENAI_API_KEY_AZURE if you use Azure OpenAI API.
+        Your OpenAI API key, you can also set it in environment variable OPENAI_API_KEY or OPENAI_API_KEY_AZURE if you use Azure OpenAI API. If you use multiple environments, you can use OPENAI_API_KEY_AZURE_$environment to define the api key for each environment.
     .PARAMETER engine
-        The engine to use for this request, you can also set it in environment variable OPENAI_CHAT_ENGINE or OPENAI_CHAT_ENGINE_AZURE if you use Azure OpenAI API.
+        The engine to use for this request, you can also set it in environment variable OPENAI_CHAT_ENGINE or OPENAI_CHAT_ENGINE_AZURE if you use Azure OpenAI API. If you use multiple environments, you can use OPENAI_CHAT_ENGINE_AZURE_$environment to define the engine for each environment.
     .PARAMETER endpoint
-        The endpoint to use for this request, you can also set it in environment variable OPENAI_ENDPOINT or OPENAI_ENDPOINT_AZURE if you use Azure OpenAI API.
+        The endpoint to use for this request, you can also set it in environment variable OPENAI_ENDPOINT or OPENAI_ENDPOINT_AZURE if you use Azure OpenAI API. If you use multiple environments, you can use OPENAI_ENDPOINT_AZURE_$environment to define the endpoint for each environment.
     .PARAMETER azure
         if you use Azure OpenAI API, you can use this switch.
     .PARAMETER system
@@ -21,6 +21,10 @@ function New-ChatGPTConversation {
         If you want to get result immediately, you can use this parameter to define the prompt. It will not start the chat conversation.
     .PARAMETER config
         The dynamic settings for the API call, it can meet all the requirement for each model. please pass a custom object to this parameter, like @{temperature=1;max_tokens=1024}
+    .PARAMETER environment
+        The environment name, if you use Azure OpenAI API, you can use this parameter to define the environment name, it will be used to get the api key, engine and endpoint from environment variable. If the environment is not exist, it will use the default environment.
+    .PARAMETER api_version
+        The api version, if you use Azure OpenAI API, you can use this parameter to define the api version, the default value is 2023-09-01-preview.
     .EXAMPLE
         New-ChatGPTConversation
         Create a new ChatGPT conversation, use openai service with all the default settings.
@@ -45,6 +49,14 @@ function New-ChatGPTConversation {
     .EXAMPLE
         New-ChatGPTConversation -api_key "your api key" -engine "your engine id" -azure -system "You are a chatbot, please answer the user's question according to the user's language." -endpoint "https://api.openai.com/v1/completions"
         Create a new ChatGPT conversation, use Azure openai service with your api key and engine id, and define the system prompt and endpoint.
+    .EXAMPLE
+        chat -azure -system "You are a chatbot, please answer the user's question according to the user's language." -environment "sweden"
+        Create a new ChatGPT conversation by cmdlet's alias(chat), use Azure openai service with the api key, engine and endpoint defined in environment variable OPENAI_API_KEY_AZURE_SWEDEN, OPENAI_CHAT_ENGINE_AZURE_SWEDEN and OPENAI_ENDPOINT_AZURE_SWEDEN.
+    .EXAMPLE
+        chat -azure -api_version "2021-09-01-preview"
+        Create a new ChatGPT conversation by cmdlet's alias(chat), use Azure openai service with the api version 2021-09-01-preview.
+    .OUTPUTS
+        System.String, the completion result. If you use stream mode, it will not return anything. 
     .LINK
         https://github.com/chenxizhang/openai-powershell
     #>

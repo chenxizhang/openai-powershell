@@ -9,7 +9,7 @@ function New-OpenAICompletion {
     .PARAMETER api_key
         The api_key to get completion from OpenAI API. You can also set api_key in environment variable OPENAI_API_KEY or OPENAI_API_KEY_AZURE (if you want to use Azure OpenAI Service API).
     .PARAMETER engine
-        The engine to get completion from OpenAI API. You can also set engine in environment variable OPENAI_ENGINE or OPENAI_ENGINE_AZURE (if you want to use Azure OpenAI Service API).
+        The engine to get completion from OpenAI API. You can also set engine in environment variable OPENAI_ENGINE or OPENAI_ENGINE_AZURE (if you want to use Azure OpenAI Service API). The default value is text-davinci-003, but now we recommend you to use gpt-3.5-turbo-instruct.
     .PARAMETER endpoint
         The endpoint to get completion from OpenAI API. You can also set endpoint in environment variable OPENAI_ENDPOINT or OPENAI_ENDPOINT_AZURE (if you want to use Azure OpenAI Service API).
     .PARAMETER max_tokens
@@ -20,6 +20,10 @@ function New-OpenAICompletion {
         If you want to get multiple completion, you can use this parameter. The default value is 1.
     .PARAMETER azure
         If you want to use Azure OpenAI API, you can use this switch.
+    .PARAMETER environment
+        If you want to use Azure OpenAI API, you can use this parameter to set the environment. We will read environment variable OPENAI_API_KEY_AZURE_$environment, OPENAI_ENGINE_AZURE_$environment, OPENAI_ENDPOINT_AZURE_$environment. if you don't set this parameter (or the environment doesn't exist), we will read environment variable OPENAI_API_KEY_AZURE, OPENAI_ENGINE_AZURE, OPENAI_ENDPOINT_AZURE.
+    .PARAMETER api_version
+        If you want to use Azure OpenAI API, you can use this parameter to set the api_version. The default value is 2023-09-01-preview.
     .EXAMPLE
         New-OpenAICompletion -prompt "Which city is the capital of China?"
         Use default api_key, engine, endpoint from environment varaibles
@@ -41,10 +45,18 @@ function New-OpenAICompletion {
     .EXAMPLE
         "string 1","string 2" | noc -azure
         Use Azure OpenAI API with pipeline input (multiple strings)
+    .EXAMPLE
+        noc "Which city is the capital of China?" -azure -environment "dev"
+        Use Azure OpenAI API with environment variable OPENAI_API_KEY_AZURE_dev, OPENAI_ENGINE_AZURE_dev, OPENAI_ENDPOINT_AZURE_dev
+    .EXAMPLE
+        noc "Which city is the capital of China?" -azure -environment "dev" -api_version "2023-09-01-preview"
+        Use Azure OpenAI API with environment variable OPENAI_API_KEY_AZURE_dev, OPENAI_ENGINE_AZURE_dev, OPENAI_ENDPOINT_AZURE_dev and api_version 2023-09-01-preview
     .LINK
         https://github.com/chenxizhang/openai-powershell
     .INPUTS
         System.String, you can pass one or more string to the cmdlet, and we will get the completion for you.
+    .OUTPUTS
+        System.String, the completion result.
     #>
 
     [CmdletBinding(DefaultParameterSetName = "Default")]
