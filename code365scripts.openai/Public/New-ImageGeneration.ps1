@@ -1,8 +1,54 @@
 function New-ImageGeneration {
+    <#
+    .SYNOPSIS
+    Generate image from prompt
+    .DESCRIPTION
+    Generate image from prompt, use dall-e-2 model by default, dall-e-3 model can be used by specify -dall3 switch
+    .OUTPUTS
+    System.String[], the file(s) path of the generated image.
+    .PARAMETER prompt
+    The prompt to generate image, this is required.
+    .PARAMETER api_key
+    The api key to access openai api, if not specified, the api key will be read from environment variable OPENAI_API_KEY. if you use azure openai service, you can specify the api key by environment variable OPENAI_API_KEY_AZURE or OPENAI_API_KEY_AZURE_<environment>, the <environment> can be any names you want, for example, OPENAI_API_KEY_AZURE_DEV, OPENAI_API_KEY_AZURE_PROD, OPENAI_API_KEY_AZURE_TEST, etc. 
+    .PARAMETER endpoint
+    The endpoint to access openai api, if not specified, the endpoint will be read from environment variable OPENAI_ENDPOINT. if you use azure openai service, you can specify the endpoint by environment variable OPENAI_ENDPOINT_AZURE or OPENAI_ENDPOINT_AZURE_<environment>, the <environment> can be any names you want, for example, OPENAI_ENDPOINT_AZURE_DEV, OPENAI_ENDPOINT_AZURE_PROD, OPENAI_ENDPOINT_AZURE_TEST, etc.
+    .PARAMETER n
+    The number of images to generate, default is 1. For dall-e-3 model, the n can only be 1. For dall-e-2 model, the n can be 1-10(openai), 1-5(azure).
+    .PARAMETER size
+    The size of the image to generate, default is 2, which means 1024x1024. For dall-e-3 model, the size can only be 2-4, which means 1024x1024, 1792x1024, 1024x1792. For dall-e-2 model, the size can be 0-2 for 256x256, 512x512, 1024x1024.
+    .PARAMETER outfolder
+    The folder to save the generated image, default is current folder.
+    .PARAMETER environment
+    The environment name, if you use azure openai service, you can specify the environment by this parameter, the environment name can be any names you want, for example, dev, prod, test, etc, the environment name will be used to read the api key and endpoint from environment variable, for example, OPENAI_API_KEY_AZURE_DEV, OPENAI_ENDPOINT_AZURE_DEV, etc.
+    .PARAMETER azure
+    Use azure openai service, if specified, the api key and endpoint will be read from environment variable OPENAI_API_KEY_AZURE or OPENAI_API_KEY_AZURE_<environment>, the <environment> can be any names you want, for example, OPENAI_API_KEY_AZURE_DEV, OPENAI_API_KEY_AZURE_PROD, OPENAI_API_KEY_AZURE_TEST, etc. and OPENAI_ENDPOINT_AZURE or OPENAI_ENDPOINT_AZURE_<environment>, the <environment> can be any names you want, for example, OPENAI_ENDPOINT_AZURE_DEV, OPENAI_ENDPOINT_AZURE_PROD, OPENAI_ENDPOINT_AZURE_TEST, etc.
+    .PARAMETER dall3
+    Use dall-e-3 model if specified, otherwise, use dall-e-2 model. dall-e-3 model can only generate 1024x1024, 1792x1024, 1024x1792 image, dall-e-2 model can generate 256x256, 512x512, 1024x1024 image.
+    .EXAMPLE
+    New-ImageGeneration -prompt "A painting of a cat sitting on a chair" -n 1 -size 2 -outfolder "c:\temp"
+    Use dall-e-2 model to generate image, the image size is 1024x1024, the generated image will be saved to c:\temp folder.
+    .EXAMPLE
+    New-ImageGeneration -prompt "A painting of a cat sitting on a chair" -n 1 -size 2 -outfolder "c:\temp" -api_key "your api key" -endpoint "your endpoint"
+    Use dall-e-2 model to generate image, the image size is 1024x1024, the generated image will be saved to c:\temp folder, use your own api key and endpoint.
+    .EXAMPLE
+    image -n 3 -prompt "A painting of a cat sitting on a chair"
+    Use dall-e-2 model to generate image, the image size is 1024x1024, the generated image will be saved to current folder, generate 3 images.
+    .EXAMPLE
+    New-ImageGeneration -prompt "A painting of a cat sitting on a chair" -n 1 -size 2 -outfolder "c:\temp" -azure
+    Use dall-e-2 model to generate image, the image size is 1024x1024, the generated image will be saved to c:\temp folder, use azure openai service.
+    .EXAMPLE
+    New-ImageGeneration -prompt "A painting of a cat sitting on a chair" -n 1 -size 2 -outfolder "c:\temp" -azure -environment "dev"
+    Use dall-e-2 model to generate image, the image size is 1024x1024, the generated image will be saved to c:\temp folder, use azure openai service, read api key and endpoint from environment variable OPENAI_API_KEY_AZURE_DEV and OPENAI_ENDPOINT_AZURE_DEV.
+    .EXAMPLE
+    New-ImageGeneration -prompt "A painting of a cat sitting on a chair" -n 1 -size 2 -outfolder "c:\temp" -azure -environment "dev" -dall3
+    Use dall-e-3 model to generate image, the image size is 1024x1024, the generated image will be saved to c:\temp folder, use azure openai service, read api key and endpoint from environment variable OPENAI_API_KEY_AZURE_DEV and OPENAI_ENDPOINT_AZURE_DEV.
+    .LINK
+    https://github.com/chenxizhang/openai-powershell
+    #>
     [CmdletBinding(DefaultParameterSetName = "Default")]
     [Alias("dall")][Alias("image")]
     param(
-        [parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][Parameter(Mandatory=$true)][string]$prompt,
+        [parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][Parameter(Mandatory = $true)][string]$prompt,
         [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$api_key,
         [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$endpoint, 
         [Parameter(ParameterSetName = "Azure")][switch]$azure,
