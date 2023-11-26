@@ -1,7 +1,7 @@
 Import-Module ".\code365scripts.openai\code365scripts.openai.psd1" -Force
 
-$prompt = "what is the capital of China?"
-$imageprompt = "A photo of a cat sitting on a couch."
+New-Variable -Name "prompt" -Value "Which city is the capital of China?" -Option ReadOnly -Scope Script -Force
+New-Variable -Name "imageprompt" -Value "A photo of a cat sitting on a couch." -Option ReadOnly -Scope Script -Force
 
 $cmds = @'
     noc "$prompt"
