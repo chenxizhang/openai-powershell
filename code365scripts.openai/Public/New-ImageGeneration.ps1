@@ -93,12 +93,13 @@ function New-ImageGeneration {
             $hasError = $true
         }
 
-        if ($hasError) {
-            return
-        }
+
     }
 
     PROCESS {
+        if ($hasError) {
+            return
+        }
 
         $sizes = @("256x256", "512x512", "1024x1024", "1792x1024", "1024x1792")
 
@@ -115,7 +116,7 @@ function New-ImageGeneration {
 
 
         $headers = @{
-            "Content-Type" = "application/json"
+            "Content-Type" = "application/json;charset=utf-8"
         }
 
         if ($azure) {
@@ -128,14 +129,15 @@ function New-ImageGeneration {
             if ($dall3) {
                 $url = ($request | ConvertFrom-Json).data[0].url
                 $filename = [System.Guid]::NewGuid().ToString() + ".png"
-                $file = [System.IO.Path]::Join($outfolder, $filename)
+                $file = [System.IO.Path]::Combine($outfolder, $filename)
                 Invoke-WebRequest -Uri $url -OutFile $file
                 Write-Verbose "Download completed, please check the folder: $outfolder"
                 Write-Output $file # return the file path
             }
             else {
                 <# Action when all if and elseif conditions are false #>
-                $location = $request.Headers['operation-location'][0]
+                Write-Verbose ($request.Headers | Out-String)
+                $location = if ($PSVersionTable['PSVersion'].Major -le 5) { $request.Headers['operation-location'] } else { $request.Headers['operation-location'][0] }
                 if ($null -eq $location) {
                     Write-Error "Generate fail "
                     return
@@ -146,7 +148,7 @@ function New-ImageGeneration {
                     if ($query.status -eq 'succeeded') {
                         $query.result.data | Select-Object -ExpandProperty url | ForEach-Object {
                             $filename = [System.Guid]::NewGuid().ToString() + ".png"
-                            $file = [System.IO.Path]::Join($outfolder, $filename)
+                            $file = [System.IO.Path]::Combine($outfolder, $filename)
                             Write-Verbose "Downloading file: $file"
                             Invoke-WebRequest -Uri $_ -OutFile $file
                             Write-Output $file # return the file path
@@ -169,7 +171,7 @@ function New-ImageGeneration {
             $request = Invoke-RestMethod -Method Post -Uri $endpoint -Headers $headers -Body $body
             $request.data | Select-Object -ExpandProperty url | ForEach-Object {
                 $filename = [System.Guid]::NewGuid().ToString() + ".png"
-                $file = [System.IO.Path]::Join($outfolder, $filename)
+                $file = [System.IO.Path]::Combine($outfolder, $filename)
                 Write-Verbose "Downloading file: $file"
                 Invoke-WebRequest -Uri $_ -OutFile $file
                 Write-Output $file # return the file path

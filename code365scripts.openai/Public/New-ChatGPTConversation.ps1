@@ -118,12 +118,14 @@ function New-ChatGPTConversation {
             $hasError = $true
         }
 
-        if ($hasError) {
-            return
-        }
+
     }
 
     PROCESS {
+
+        if ($hasError) {
+            return
+        }
 
         if ($prompt.Length -gt 0) {
             Write-Verbose "Prompt received: $prompt, so it is in prompt mode, not in chat mode."
@@ -156,7 +158,20 @@ function New-ChatGPTConversation {
             Write-Verbose "Prepare the params for Invoke-WebRequest: $($params|ConvertTo-Json -Depth 10)"
 
             $response = Invoke-RestMethod @params
-            Write-Verbose "Response received: $($response|ConvertTo-Json -Depth 10)"
+
+            if ($PSVersionTable['PSVersion'].Major -eq 5) {
+                Write-Verbose "Powershell 5.0 detected, convert the response to UTF8"
+
+                $dstEncoding = [System.Text.Encoding]::GetEncoding('iso-8859-1')
+                $srcEncoding = [System.Text.Encoding]::UTF8
+
+                $response.choices | ForEach-Object {
+                    $_.message.content = $srcEncoding.GetString([System.Text.Encoding]::Convert($srcEncoding, $dstEncoding, $srcEncoding.GetBytes($_.message.content)))
+                }
+
+            }
+            Write-Verbose "Response converted to UTF8: $($response | ConvertTo-Json -Depth 10)"
+
             $result = $response.choices[0].message.content
             Write-Verbose "Response parsed to plain text: $result"
             Write-Output $result 
@@ -272,15 +287,7 @@ function New-ChatGPTConversation {
                         else {
                             $request.Headers.Add("Authorization", "Bearer $api_key")
                         }
-                        # $request.Content = [System.Net.Http.StringContent]::new(($body), [System.Text.Encoding]::UTF8)
-                        # $request.Content.Headers.Clear()
-                        # if ($azure) {
-                        #     $request.Content.Headers.Add("api-key", $api_key)
-                        # }
-                        # else {
-                        #     $request.Content.Headers.Add("Authorization", "Bearer $api_key")
-                        # }
-                        # $request.Content.Headers.Add("Content-Type", "application/json;charset=utf-8")
+
                         
                         Write-Verbose "Prepared the client"
                                             

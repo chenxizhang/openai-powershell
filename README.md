@@ -672,7 +672,7 @@ RELATED LINKS
 > UnInstall-Module -Name code365scripts.openai
 
 ## Change logs
-
+- 2023-11-26    v1.1.1.4    PowerShell 5.x supports.
 - 2023-11-26    v1.1.1.3    Multiple environment and DALL-E 3 support, and fix a lot of bugs.
 - 2023-10-23    v1.1.1.2    Fix a bug (ConvertTo-Json truncate the result)
 - 2023-09-25    v1.1.1.1    Fix a bug (New-ImageGeneration, or image alias)
