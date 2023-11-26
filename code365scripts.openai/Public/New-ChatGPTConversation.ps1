@@ -174,8 +174,6 @@ function New-ChatGPTConversation {
                 $current = $index++
                 $prompt = Read-Host -Prompt "`n[$current] $($resources.prompt)"
                 Write-Verbose "Prompt received: $prompt"
-
-                $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
     
                 if ($prompt -eq "q") {
                     Write-Verbose "User pressed q, so we will quit the chat."
@@ -243,27 +241,33 @@ function New-ChatGPTConversation {
     
                     if ($stream) {
                         Write-Verbose "Stream mode detected, so we will use Invoke-WebRequest to stream the response."
-
-                        $stopwatch.Stop()
-                        Write-Verbose "Stopped watcher"
-    
                         $client = New-Object System.Net.Http.HttpClient
                         $body = $params.Body
-    
                         Write-Verbose "body: $body"
     
                         $request = [System.Net.Http.HttpRequestMessage]::new()
                         $request.Method = "POST"
                         $request.RequestUri = $params.Uri
+                        $request.Headers.Clear()
                         $request.Content = [System.Net.Http.StringContent]::new(($body), [System.Text.Encoding]::UTF8)
                         $request.Content.Headers.Clear()
+                        $request.Content.Headers.Add("Content-Type", "application/json;charset=utf-8")
+
                         if ($azure) {
-                            $request.Content.Headers.Add("api-key", $api_key)
+                            $request.Headers.Add("api-key", $api_key)
                         }
                         else {
-                            $request.Content.Headers.Add("Authorization", "Bearer $api_key")
+                            $request.Headers.Add("Authorization", "Bearer $api_key")
                         }
-                        $request.Content.Headers.Add("Content-Type", "application/json;charset=utf-8")
+                        # $request.Content = [System.Net.Http.StringContent]::new(($body), [System.Text.Encoding]::UTF8)
+                        # $request.Content.Headers.Clear()
+                        # if ($azure) {
+                        #     $request.Content.Headers.Add("api-key", $api_key)
+                        # }
+                        # else {
+                        #     $request.Content.Headers.Add("Authorization", "Bearer $api_key")
+                        # }
+                        # $request.Content.Headers.Add("Content-Type", "application/json;charset=utf-8")
                         
                         Write-Verbose "Prepared the client"
                                             
@@ -293,7 +297,6 @@ function New-ChatGPTConversation {
                         }
                         $reader.Close()
                         $reader.Dispose()
-                        $stream.Close()
     
                         $messages += [PSCustomObject]@{
                             role    = "assistant"
@@ -301,15 +304,13 @@ function New-ChatGPTConversation {
                         }
 
                         Write-Verbose "Message combined. $($messages|ConvertTo-Json -Depth 10)"
-    
-                        
                         Write-Host ""
     
                     }
                     else {
 
                         Write-Verbose "It is not in stream mode."
-
+                        $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
                         $response = Invoke-RestMethod @params
                         Write-Verbose "Response received: $($response| ConvertTo-Json -Depth 10)"
 
@@ -346,7 +347,7 @@ function New-ChatGPTConversation {
                     }
                 }
                 catch {
-                    Write-Host $_.ErrorDetails -ForegroundColor Red
+                    Write-Error $_
                 }
             }
         }
