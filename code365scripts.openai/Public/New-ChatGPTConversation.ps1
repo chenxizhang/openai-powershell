@@ -50,18 +50,18 @@ function New-ChatGPTConversation {
     #>
 
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = "Default")]
     [Alias("chatgpt")][Alias("chat")]
     param(
-        [Parameter()][string]$api_key,
-        [Parameter()][string]$engine,
-        [string]$endpoint, 
+        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$api_key,
+        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$engine,
+        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$endpoint, 
         [Parameter(ParameterSetName = "Azure")][switch]$azure,
-        [string]$system = "You are a chatbot, please answer the user's question according to the user's language.",
-        [string]$prompt = "",
-        [switch]$stream,
-        [PSCustomObject]$config,
-        [Parameter( ParameterSetName = “Azure”)][string]$environment
+        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$system = "You are a chatbot, please answer the user's question according to the user's language.",
+        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$prompt = "",
+        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][switch]$stream,
+        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][PSCustomObject]$config,
+        [Parameter( ParameterSetName = "Azure")][string]$environment
     )
     BEGIN {
 
