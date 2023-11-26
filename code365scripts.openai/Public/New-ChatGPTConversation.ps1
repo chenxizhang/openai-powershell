@@ -61,7 +61,8 @@ function New-ChatGPTConversation {
         [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$prompt = "",
         [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][switch]$stream,
         [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][PSCustomObject]$config,
-        [Parameter( ParameterSetName = "Azure")][string]$environment
+        [Parameter( ParameterSetName = "Azure")][string]$environment,
+        [Parameter(ParameterSetName = “Azure”)][string]$api_version = "2023-09-01-preview"
     )
     BEGIN {
 
@@ -71,7 +72,7 @@ function New-ChatGPTConversation {
         if ($azure) {
             $api_key = if ($api_key) { $api_key } else { Get-FirstNonNullItemInArray("OPENAI_API_KEY_AZURE_$environment", "OPENAI_API_KEY_AZURE") }
             $engine = if ($engine) { $engine } else { Get-FirstNonNullItemInArray("OPENAI_CHAT_ENGINE_AZURE_$environment", "OPENAI_CHAT_ENGINE_AZURE") }
-            $endpoint = if ($endpoint) { $endpoint } else { "{0}openai/deployments/$engine/chat/completions?api-version=2023-03-15-preview" -f (Get-FirstNonNullItemInArray("OPENAI_ENDPOINT_AZURE_$environment", "OPENAI_ENDPOINT_AZURE")) }
+            $endpoint = if ($endpoint) { $endpoint } else { "{0}openai/deployments/$engine/chat/completions?api-version=$api_version" -f (Get-FirstNonNullItemInArray("OPENAI_ENDPOINT_AZURE_$environment", "OPENAI_ENDPOINT_AZURE")) }
         }
         else {
             $api_key = if ($api_key) { $api_key } else { $env:OPENAI_API_KEY }
