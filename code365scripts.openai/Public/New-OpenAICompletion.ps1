@@ -58,7 +58,8 @@ function New-OpenAICompletion {
         [Parameter(ParameterSetName = “Azure”)][Parameter(ParameterSetName = "Default")][Parameter()][double]$temperature = 1,
         [Parameter(ParameterSetName = “Azure”)][Parameter(ParameterSetName = "Default")][Parameter()][int]$n = 1,
         [Parameter(ParameterSetName = “Azure”)][switch]$azure,
-        [Parameter(ParameterSetName = “Azure”)][string]$environment
+        [Parameter(ParameterSetName = “Azure”)][string]$environment,
+        [Parameter(ParameterSetName = “Azure”)][string]$api_version="2023-09-01-preview"
     )
 
     BEGIN {
@@ -69,7 +70,7 @@ function New-OpenAICompletion {
         if ($azure) {
             $api_key = if ($api_key) { $api_key } else { Get-FirstNonNullItemInArray("OPENAI_API_KEY_AZURE_$environment", "OPENAI_API_KEY_AZURE") }
             $engine = if ($engine) { $engine } else { Get-FirstNonNullItemInArray("OPENAI_ENGINE_AZURE_$environment", "OPENAI_ENGINE_AZURE") }
-            $endpoint = "{0}openai/deployments/{1}/completions?api-version=2022-12-01" -f $(if ($endpoint) { $endpoint }else { Get-FirstNonNullItemInArray("OPENAI_ENDPOINT_AZURE_$environment", "OPENAI_ENDPOINT_AZURE") }), $engine
+            $endpoint = "{0}openai/deployments/{1}/completions?api-version=$api_version" -f $(if ($endpoint) { $endpoint }else { Get-FirstNonNullItemInArray("OPENAI_ENDPOINT_AZURE_$environment", "OPENAI_ENDPOINT_AZURE") }), $engine
         }
         else {
             $api_key = if ($api_key) { $api_key } else { $env:OPENAI_API_KEY }
