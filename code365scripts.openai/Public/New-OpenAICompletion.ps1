@@ -115,12 +115,14 @@ function New-OpenAICompletion {
             $hasError = $true
         }
 
-        if ($hasError) {
-            return
-        }
+
     }
 
     PROCESS {
+
+        if ($hasError) {
+            return
+        }
     
         $params = @{
             Uri         = $endpoint
@@ -133,7 +135,7 @@ function New-OpenAICompletion {
                 n           = $n
             } | ConvertTo-Json -Depth 10
             Headers     = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "Bearer $api_key" } }
-            ContentType = "application/json; charset=utf-8"
+            ContentType = "application/json;charset=utf-8"
         }
 
         Write-Verbose "Prepare the params for Invoke-WebRequest: $($params | ConvertTo-Json -Depth 10) "

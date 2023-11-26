@@ -12,7 +12,7 @@
     RootModule           = '.\code365scripts.openai.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '1.1.1.3'
+    ModuleVersion        = '1.1.1.4'
 
     # Supported PSEditions
     CompatiblePSEditions = @("Desktop")
@@ -33,6 +33,7 @@
     Description          = 'The non-official OpenAI PowerShell module. This module is used to interact with OpenAI API.
     
     Changelogs:
+    - 2023-11-26    v1.1.1.4    PowerShell 5.x supports.
     - 2023-11-26    v1.1.1.3    Multiple environment and DALL-E 3 support, and fix a lot of bugs.
     - 2023-10-23    v1.1.1.2    Fix a bug (ConvertTo-Json truncate the result)
     - 2023-09-25    v1.1.1.1    Fix a bug (New-ImageGeneration, or image alias)
@@ -88,16 +89,16 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport    = @("New-OpenAICompletion", "New-ChatGPTConversation","New-ImageGeneration")
+    FunctionsToExport    = @("New-OpenAICompletion", "New-ChatGPTConversation", "New-ImageGeneration")
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-    CmdletsToExport      = @("New-OpenAICompletion", "New-ChatGPTConversation","New-ImageGeneration")
+    CmdletsToExport      = @("New-OpenAICompletion", "New-ChatGPTConversation", "New-ImageGeneration")
 
     # Variables to export from this module
     VariablesToExport    = '*'
 
     # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-    AliasesToExport      = @("noc", "chatgpt", "chat","dall","image")
+    AliasesToExport      = @("noc", "chatgpt", "chat", "dall", "image")
 
     # DSC resources to export from this module
     # DscResourcesToExport = @()

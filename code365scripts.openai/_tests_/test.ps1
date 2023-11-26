@@ -1,6 +1,6 @@
 Import-Module ".\code365scripts.openai\code365scripts.openai.psd1" -Force
 
-New-Variable -Name "prompt" -Value "Which city is the capital of China?" -Option ReadOnly -Scope Script -Force
+New-Variable -Name "prompt" -Value "能否用小学生听得懂的方式讲解一下量子力学?" -Option ReadOnly -Scope Script -Force
 New-Variable -Name "imageprompt" -Value "A photo of a cat sitting on a couch." -Option ReadOnly -Scope Script -Force
 
 $cmds = @'
@@ -21,6 +21,7 @@ $cmds = @'
     chat -stream
     image -prompt "$imageprompt" -size 0 -outfolder "c:\temp"
     image -prompt "$imageprompt" -size 0 -azure -outfolder "c:\temp"
+    image -prompt "$imageprompt" -size 0 -azure -outfolder "c:\temp" -n 2
     image -prompt "$imageprompt" -size 2 -azure -dall3 -environment "SWEDEN" -outfolder "c:\temp"
 '@
 
