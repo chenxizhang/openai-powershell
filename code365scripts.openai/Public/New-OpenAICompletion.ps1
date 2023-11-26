@@ -69,7 +69,7 @@ function New-OpenAICompletion {
         if ($azure) {
             $api_key = if ($api_key) { $api_key } else { Get-FirstNonNullItemInArray("OPENAI_API_KEY_AZURE_$environment", "OPENAI_API_KEY_AZURE") }
             $engine = if ($engine) { $engine } else { Get-FirstNonNullItemInArray("OPENAI_ENGINE_AZURE_$environment", "OPENAI_ENGINE_AZURE") }
-            $endpoint = "{ 0 }openai/deployments/ { 1 }/completions?api-version=2022-12-01" -f $(if ($endpoint) { $endpoint }else { Get-FirstNonNullItemInArray("OPENAI_ENDPOINT_AZURE_$environment", "OPENAI_ENDPOINT_AZURE") }), $engine
+            $endpoint = "{0}openai/deployments/{1}/completions?api-version=2022-12-01" -f $(if ($endpoint) { $endpoint }else { Get-FirstNonNullItemInArray("OPENAI_ENDPOINT_AZURE_$environment", "OPENAI_ENDPOINT_AZURE") }), $engine
         }
         else {
             $api_key = if ($api_key) { $api_key } else { $env:OPENAI_API_KEY }
@@ -82,23 +82,23 @@ function New-OpenAICompletion {
         $hasError = $false
 
         if ((!$azure) -and ((Test-OpenAIConnectivity) -eq $False)) {
-            Write-Host $resources.openai_unavaliable -ForegroundColor Red
+            Write-Error $resources.openai_unavaliable
             $hasError = $true
         }
 
 
         if (!$api_key) {
-            Write-Host $resources.error_missing_api_key -ForegroundColor Red
+            Write-Error $resources.error_missing_api_key
             $hasError = $true
         }
 
         if (!$engine) {
-            Write-Host $resources.error_missing_engine -ForegroundColor Red
+            Write-Error $resources.error_missing_engine
             $hasError = $true
         }
 
         if (!$endpoint) {
-            Write-Host $resources.error_missing_endpoint -ForegroundColor Red
+            Write-Error $resources.error_missing_endpoint
             $hasError = $true
         }
 
@@ -149,14 +149,13 @@ function New-OpenAICompletion {
             Write-Verbose "Response parsed to plain text: $response"
 
             # write the response to console
-            return $response
-            # write the response to clipboard
-            Set-Clipboard $response
+            Write-Output $response
+
             Write-Verbose "Response copied to clipboard: $response"
             
         }
         catch {
-            Write-Host $_.ErrorDetails -ForegroundColor Red
+            Write-Error $_.ErrorDetails
         }
     }
 

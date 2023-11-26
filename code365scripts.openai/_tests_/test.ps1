@@ -15,12 +15,13 @@ $cmds = @'
     noc "$prompt" -azure -environment "xxx"
     chat -prompt "$prompt"
     chat -prompt "$prompt" -azure
+    chat -prompt "$prompt" -azure -config @{max_tokens=100; temperature=0.5}
     chat -prompt "$prompt" -azure -environment "SWEDEN"
     chat
     chat -stream
-    image -prompt "$imageprompt" -size 0
-    image -prompt "$imageprompt" -size 0 -azure
-    image -prompt "$imageprompt" -size 2 -azure -dall3 -environment "SWEDEN"
+    image -prompt "$imageprompt" -size 0 -outfolder "c:\temp"
+    image -prompt "$imageprompt" -size 0 -azure -outfolder "c:\temp"
+    image -prompt "$imageprompt" -size 2 -azure -dall3 -environment "SWEDEN" -outfolder "c:\temp"
 '@
 
 $cmds.Split("`n") | ForEach-Object { 

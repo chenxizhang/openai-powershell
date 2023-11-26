@@ -5,5 +5,5 @@ function Test-OpenAIConnectivity {
     $response = Invoke-WebRequest -Uri "https://www.openai.com" -Method Head -ConnectionTimeoutSeconds 5
     Write-Verbose "Response: $($response|ConvertTo-Json -Depth 10)"
     $ErrorActionPreference = 'Continue'
-    return $response.StatusCode -eq 200
+    Write-Output ($response.StatusCode -eq 200)
 }
