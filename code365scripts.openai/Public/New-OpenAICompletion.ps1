@@ -63,14 +63,13 @@ function New-OpenAICompletion {
 
     BEGIN {
 
-        Write-Verbose "Parameter received. prompt: $prompt, api_key: $api_key, engine: $engine, endpoint: $endpoint, max_tokens: $max_tokens, temperature: $temperature, n: $n, azure: $azure"
-
-        Write-Verbose "Environment variable detected. OPENAI_API_KEY: $env:OPENAI_API_KEY, OPENAI_API_KEY_AZURE: $env:OPENAI_API_KEY_AZURE, OPENAI_ENGINE: $env:OPENAI_ENGINE, OPENAI_ENGINE_AZURE: $env:OPENAI_ENGINE_AZURE, OPENAI_ENDPOINT: $env:OPENAI_ENDPOINT, OPENAI_ENDPOINT_AZURE: $env:OPENAI_ENDPOINT_AZURE"
+        Write-Verbose "Parameter received`n$($PSBoundParameters | Out-String)"
+        Write-Verbose "Environment variable detected.`n$(Get-ChildItem Env:OPENAI_* | Out-String)"
 
         if ($azure) {
             $api_key = if ($api_key) { $api_key } else { Get-FirstNonNullItemInArray("OPENAI_API_KEY_AZURE_$environment", "OPENAI_API_KEY_AZURE") }
             $engine = if ($engine) { $engine } else { Get-FirstNonNullItemInArray("OPENAI_ENGINE_AZURE_$environment", "OPENAI_ENGINE_AZURE") }
-            $endpoint = "{0}openai/deployments/{1}/completions?api-version=2022-12-01" -f $(if ($endpoint) { $endpoint }else { Get-FirstNonNullItemInArray("OPENAI_ENDPOINT_AZURE_$environment", "OPENAI_ENDPOINT_AZURE") }), $engine
+            $endpoint = "{ 0 }openai/deployments/ { 1 }/completions?api-version=2022-12-01" -f $(if ($endpoint) { $endpoint }else { Get-FirstNonNullItemInArray("OPENAI_ENDPOINT_AZURE_$environment", "OPENAI_ENDPOINT_AZURE") }), $engine
         }
         else {
             $api_key = if ($api_key) { $api_key } else { $env:OPENAI_API_KEY }
@@ -121,7 +120,7 @@ function New-OpenAICompletion {
                 n           = $n
             } | ConvertTo-Json -Depth 10
             Headers     = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "Bearer $api_key" } }
-            ContentType = "application/json;charset=utf-8"
+            ContentType = "application/json; charset=utf-8"
         }
 
         Write-Verbose "Prepare the params for Invoke-WebRequest: $($params | ConvertTo-Json -Depth 10) "
@@ -130,7 +129,7 @@ function New-OpenAICompletion {
         try {
             $response = Invoke-RestMethod @params
 
-            Write-Verbose "Response received: $($response| ConvertTo-Json -Depth 10)"
+            Write-Verbose "Response received: $($response | ConvertTo-Json -Depth 10)"
 
             if ($PSVersionTable['PSVersion'].Major -eq 5) {
                 Write-Verbose "Powershell 5.0 detected, convert the response to UTF8"

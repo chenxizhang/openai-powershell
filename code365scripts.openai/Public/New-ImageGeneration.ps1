@@ -15,9 +15,8 @@ function New-ImageGeneration {
 
    
     BEGIN {
-        Write-Verbose "Parameter received. api_key: $api_key, endpoint: $endpoint, azure: $azure, n: $n, size: $size"
-
-        Write-Verbose "Enviornment variable detected. OPENAI_API_KEY: $env:OPENAI_API_KEY, OPENAI_API_KEY_AZURE: $env:OPENAI_API_KEY_AZURE,  OPENAI_ENDPOINT: $env:OPENAI_ENDPOINT, OPENAI_ENDPOINT_AZURE: $env:OPENAI_ENDPOINT_AZURE"
+        Write-Verbose "Parameter received`n$($PSBoundParameters | Out-String)"
+        Write-Verbose "Environment variable detected.`n$(Get-ChildItem Env:OPENAI_* | Out-String)"
 
         if ($azure) {
             $api_key = if ($api_key) { $api_key } else { Get-FirstNonNullItemInArray("OPENAI_API_KEY_AZURE_$environment", "OPENAI_API_KEY_AZURE") }

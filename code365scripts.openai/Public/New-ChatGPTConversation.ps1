@@ -65,9 +65,8 @@ function New-ChatGPTConversation {
     )
     BEGIN {
 
-        Write-Verbose "Parameter received. api_key: $api_key, engine: $engine, endpoint: $endpoint, azure: $azure, system: $system, prompt: $prompt, stream: $stream"
-
-        Write-Verbose "Enviornment variable detected. OPENAI_API_KEY: $env:OPENAI_API_KEY, OPENAI_API_KEY_AZURE: $env:OPENAI_API_KEY_AZURE, OPENAI_ENGINE: $env:OPENAI_ENGINE, OPENAI_ENGINE_AZURE: $env:OPENAI_ENGINE_AZURE, OPENAI_ENDPOINT: $env:OPENAI_ENDPOINT, OPENAI_ENDPOINT_AZURE: $env:OPENAI_ENDPOINT_AZURE"
+        Write-Verbose "Parameter received`n$($PSBoundParameters | Out-String)"
+        Write-Verbose "Environment variable detected.`n$(Get-ChildItem Env:OPENAI_* | Out-String)"
 
         if ($azure) {
             $api_key = if ($api_key) { $api_key } else { Get-FirstNonNullItemInArray("OPENAI_API_KEY_AZURE_$environment", "OPENAI_API_KEY_AZURE") }
