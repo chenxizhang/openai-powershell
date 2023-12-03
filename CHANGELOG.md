@@ -1,0 +1,20 @@
+## Change logs
+
+- 2023-11-26    v1.1.1.4    PowerShell 5.x supports.
+- 2023-11-26    v1.1.1.3    Multiple environment and DALL-E 3 support, and fix a lot of bugs.
+- 2023-10-23    v1.1.1.2    Fix a bug (ConvertTo-Json truncate the result)
+- 2023-09-25    v1.1.1.1    Fix a bug (New-ImageGeneration, or image alias)
+- 2023-09-24    v1.1.1.0    Add image generation support (New-ImageGeneration, or image alias)
+- 2023-09-23    v1.1.0.9    Add dynamic configuration support for New-ChatGPTConversation,see -config parameter
+- 2023-09-17    v1.1.0.8    Add verbose support
+- 2023-09-10    v1.1.0.7    Fix the help doc for New-ChatGPTConversation
+- 2023-09-06    v1.1.0.6    Bug fix
+- 2023-09-06    v1.1.0.5    Added chat completion support.
+- 2023-08-12    v1.1.0.4    Added stream support for chat
+- 2021-05-13    v1.1.0.3    Small enhancements (save result to clipboard, print the system prompt, etc.)
+- 2021-05-13    v1.1.0.0    Simplify the module structure
+- 2023-05-07    v1.0.4.12   Fixed the network connectivity test logic
+- 2023-05-07    v1.0.4.11   Added azure OpenAI supporrt for New-ChatGPTConversation function
+- 2023-05-07    v1.0.4.10   Added network connectivity test logic
+- 2023-03-09    v1.0.4.9    Added change logs in the description.
+- 2023-03-08    v1.0.4.8    Added error handling.

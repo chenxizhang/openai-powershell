@@ -57,6 +57,12 @@ function New-ChatGPTConversation {
     .EXAMPLE
         chat -azure -api_version "2021-09-01-preview"
         Create a new ChatGPT conversation by cmdlet's alias(chat), use Azure openai service with the api version 2021-09-01-preview.
+    .EXAMPLE
+        chat -azure -prompt "c:\temp\prompt.txt"
+        Create a new ChatGPT conversation by cmdlet's alias(chat), use Azure openai service with the prompt from file.
+    .EXAMPLE
+        chat -azure -system "c:\temp\system.txt" -prompt "c:\temp\prompt.txt"
+        Create a new ChatGPT conversation by cmdlet's alias(chat), use Azure openai service with the system prompt and prompt from file.
     .OUTPUTS
         System.String, the completion result. If you use stream mode, it will not return anything. 
     .LINK

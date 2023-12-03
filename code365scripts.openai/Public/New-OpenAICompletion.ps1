@@ -51,6 +51,9 @@ function New-OpenAICompletion {
     .EXAMPLE
         noc "Which city is the capital of China?" -azure -environment "dev" -api_version "2023-09-01-preview"
         Use Azure OpenAI API with environment variable OPENAI_API_KEY_AZURE_dev, OPENAI_ENGINE_AZURE_dev, OPENAI_ENDPOINT_AZURE_dev and api_version 2023-09-01-preview
+    .EXAMPLE
+        noc -azure -prompt "c:\temp\prompt.txt"
+        Use Azure OpenAI API with prompt from file
     .LINK
         https://github.com/chenxizhang/openai-powershell
     .INPUTS

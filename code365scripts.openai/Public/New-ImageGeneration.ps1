@@ -42,6 +42,9 @@ function New-ImageGeneration {
     .EXAMPLE
     New-ImageGeneration -prompt "A painting of a cat sitting on a chair" -n 1 -size 2 -outfolder "c:\temp" -azure -environment "dev" -dall3
     Use dall-e-3 model to generate image, the image size is 1024x1024, the generated image will be saved to c:\temp folder, use azure openai service, read api key and endpoint from environment variable OPENAI_API_KEY_AZURE_DEV and OPENAI_ENDPOINT_AZURE_DEV.
+    .EXAMPLE
+    New-ImageGeneration -prompt "A painting of a cat sitting on a chair" -n 1 -size 2 -outfolder "c:\temp" -azure -prompt "c:\temp\prompt.txt"
+    Use dall-e-2 model to generate image, the image size is 1024x1024, the generated image will be saved to c:\temp folder, use azure openai service, and use prompt from file c:\temp\prompt.txt
     .LINK
     https://github.com/chenxizhang/openai-powershell
     #>
