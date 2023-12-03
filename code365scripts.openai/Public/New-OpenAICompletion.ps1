@@ -5,7 +5,7 @@ function New-OpenAICompletion {
     .DESCRIPTION
         Get completion from OpenAI API, you can use this cmdlet to get completion from OpenAI API.The cmdlet accept pipeline input. You can also assign the prompt, api_key, engine, endpoint, max_tokens, temperature, n parameters.
     .PARAMETER prompt
-        The prompt to get completion from OpenAI API
+        The prompt to get completion from OpenAI API. If yuo provide a file path, we will read the file as prompt. You can also set prompt in pipeline input.
     .PARAMETER api_key
         The api_key to get completion from OpenAI API. You can also set api_key in environment variable OPENAI_API_KEY or OPENAI_API_KEY_AZURE (if you want to use Azure OpenAI Service API).
     .PARAMETER engine
@@ -71,7 +71,7 @@ function New-OpenAICompletion {
         [Parameter(ParameterSetName = “Azure”)][Parameter(ParameterSetName = "Default")][Parameter()][int]$n = 1,
         [Parameter(ParameterSetName = “Azure”)][switch]$azure,
         [Parameter(ParameterSetName = “Azure”)][string]$environment,
-        [Parameter(ParameterSetName = “Azure”)][string]$api_version="2023-09-01-preview"
+        [Parameter(ParameterSetName = “Azure”)][string]$api_version = "2023-09-01-preview"
     )
 
     BEGIN {
@@ -122,6 +122,12 @@ function New-OpenAICompletion {
 
         if ($hasError) {
             return
+        }
+
+        # if prompt is a file path, and the file is exist, then read the file as the prompt
+        if (Test-Path $prompt -PathType Leaf) {
+            Write-Verbose "Prompt is a file path, read the file as prompt"
+            $prompt = Get-Content $prompt -Raw -Encoding UTF8
         }
     
         $params = @{

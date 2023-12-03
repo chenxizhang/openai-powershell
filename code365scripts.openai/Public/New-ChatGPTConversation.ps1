@@ -15,10 +15,12 @@ function New-ChatGPTConversation {
         if you use Azure OpenAI API, you can use this switch.
     .PARAMETER system
         The system prompt, this is a string, you can use it to define the role you want it be, for example, "You are a chatbot, please answer the user's question according to the user's language."
+        If you provide a file path to this parameter, we will read the file as the system prompt.
     .PARAMETER stream
         If you want to stream the response, you can use this switch. Please note, we only support this feature in new Powershell (6.0+).
     .PARAMETER prompt
         If you want to get result immediately, you can use this parameter to define the prompt. It will not start the chat conversation.
+        If you provide a file path to this parameter, we will read the file as the prompt.
     .PARAMETER config
         The dynamic settings for the API call, it can meet all the requirement for each model. please pass a custom object to this parameter, like @{temperature=1;max_tokens=1024}
     .PARAMETER environment
@@ -117,14 +119,24 @@ function New-ChatGPTConversation {
             Write-Error $resources.powershell_version_unsupported
             $hasError = $true
         }
-
-
     }
 
     PROCESS {
 
         if ($hasError) {
             return
+        }
+
+        # if prompt is not empty and it is a file, then read the file as the prompt
+        if ($prompt -and (Test-Path $prompt -PathType Leaf)) {
+            Write-Verbose "Prompt is a file path, read the file as prompt"
+            $prompt = Get-Content $prompt -Encoding utf8 -Raw
+        }
+
+        # if system is not empty and it is a file, then read the file as the system prompt
+        if ($system -and (Test-Path $system -PathType Leaf)) {
+            Write-Verbose "System is a file path, read the file as system prompt"
+            $system = Get-Content $system -Encoding utf8 -Raw
         }
 
         if ($prompt.Length -gt 0) {

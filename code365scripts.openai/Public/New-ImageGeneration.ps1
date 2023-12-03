@@ -7,7 +7,7 @@ function New-ImageGeneration {
     .OUTPUTS
     System.String[], the file(s) path of the generated image.
     .PARAMETER prompt
-    The prompt to generate image, this is required.
+    The prompt to generate image, this is required. If you want to use a file as prompt, you can specify the file path here.
     .PARAMETER api_key
     The api key to access openai api, if not specified, the api key will be read from environment variable OPENAI_API_KEY. if you use azure openai service, you can specify the api key by environment variable OPENAI_API_KEY_AZURE or OPENAI_API_KEY_AZURE_<environment>, the <environment> can be any names you want, for example, OPENAI_API_KEY_AZURE_DEV, OPENAI_API_KEY_AZURE_PROD, OPENAI_API_KEY_AZURE_TEST, etc. 
     .PARAMETER endpoint
@@ -48,7 +48,7 @@ function New-ImageGeneration {
     [CmdletBinding(DefaultParameterSetName = "Default")]
     [Alias("dall")][Alias("image")]
     param(
-        [parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][Parameter(Mandatory = $true)][string]$prompt,
+        [parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][Parameter(Mandatory = $true, ValueFromPipeline=$true)][string]$prompt,
         [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$api_key,
         [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$endpoint, 
         [Parameter(ParameterSetName = "Azure")][switch]$azure,
@@ -99,6 +99,12 @@ function New-ImageGeneration {
     PROCESS {
         if ($hasError) {
             return
+        }
+
+        # if the prompt is a file, read the content of the file
+        if (Test-Path $prompt -PathType Leaf) {
+            Write-Verbose "Prompt is a file path, read the file as prompt"
+            $prompt = Get-Content $prompt -Raw -Encoding UTF8
         }
 
         $sizes = @("256x256", "512x512", "1024x1024", "1792x1024", "1024x1792")
