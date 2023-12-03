@@ -57,6 +57,27 @@ SETEX OPENAI_ENGINE_AZURE_DEV=
 SETEX OPENAI_CHAT_ENGINE_AZURE_DEV=
 ```
 
+### How to define environment variable in Linux machine
+
+You can install PowerShell in Linux machine by following the guidance [here](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-linux?view=powershell-7.3), and enter `pwsh` in your terminal to start PowerShell, type `nano $PROFILE` to create the profile file, and then copy the below script to the file, and change the value of the variables, save it, and then type `exit` to exit PowerShell, and then type `pwsh` to start PowerShell again, you will find the environment variables are set.
+
+```powershell
+# OPENAI SERVICE default environment
+$env:OPENAI_API_KEY=
+
+# AZURE OPENAI SERVICE default environment
+$env:OPENAI_API_KEY_AZURE=
+$env:OPENAI_ENDPOINT_AZURE=
+$env:OPENAI_ENGINE_AZURE=
+$env:OPENAI_CHAT_ENGINE_AZURE=
+
+# AZURE OPENAI SERVICE dev environment
+$env:OPENAI_API_KEY_AZURE_DEV=
+$env:OPENAI_ENDPOINT_AZURE_DEV=
+$env:OPENAI_ENGINE_AZURE_DEV=
+$env:OPENAI_CHAT_ENGINE_AZURE_DEV=
+```
+
 ## How to use
 
 Currently, we support three cmdlets:
