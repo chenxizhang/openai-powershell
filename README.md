@@ -88,6 +88,12 @@ Currently, we support three cmdlets:
 
 You can find the full help by using `Get-Help **cmdlet name or alias** -Full` in your terminal.
 
+## Advance use cases
+
+You can also define the environment variable in a separate file, or define your custom functions to simplify the usage. You can find the sample in the `$home\.openai-powershell\profile.ps1` file.
+
+```powershell
+
 ## Update the module
 
 > Update-Module -Name code365scripts.openai
