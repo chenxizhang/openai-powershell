@@ -133,6 +133,9 @@ function New-ChatGPTConversation {
             return
         }
 
+        # collect the telemetry data
+        Submit-Telemetry -cmdletName $MyInvocation.MyCommand.Name -innovationName $MyInvocation.InvocationName -useAzure $azure
+
         # if prompt is not empty and it is a file, then read the file as the prompt
         if ($prompt -and (Test-Path $prompt -PathType Leaf)) {
             Write-Verbose "Prompt is a file path, read the file as prompt"

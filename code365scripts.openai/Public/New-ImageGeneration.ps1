@@ -104,6 +104,9 @@ function New-ImageGeneration {
             return
         }
 
+        # collect the telemetry data
+        Submit-Telemetry -cmdletName $MyInvocation.MyCommand.Name -innovationName $MyInvocation.InvocationName -useAzure $azure
+
         # if the prompt is a file, read the content of the file
         if (Test-Path $prompt -PathType Leaf) {
             Write-Verbose "Prompt is a file path, read the file as prompt"
