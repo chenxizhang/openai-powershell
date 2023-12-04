@@ -62,19 +62,19 @@ function New-OpenAICompletion {
         System.String, the completion result.
     #>
 
-    [CmdletBinding(DefaultParameterSetName = "Default")]
+    [CmdletBinding()]
     [Alias("noc")]
     param(
-        [Parameter(ParameterSetName = “Azure”)][Parameter(ParameterSetName = "Default")][Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)][string]$prompt,
-        [Parameter(ParameterSetName = “Azure”)][Parameter(ParameterSetName = "Default")][string]$api_key,
-        [Parameter(ParameterSetName = “Azure”)][Parameter(ParameterSetName = "Default")][Parameter()][string]$engine,
-        [Parameter(ParameterSetName = “Azure”)][Parameter(ParameterSetName = "Default")][Parameter()][string]$endpoint,
-        [Parameter(ParameterSetName = “Azure”)][Parameter(ParameterSetName = "Default")][Parameter()][int]$max_tokens = 1024,
-        [Parameter(ParameterSetName = “Azure”)][Parameter(ParameterSetName = "Default")][Parameter()][double]$temperature = 1,
-        [Parameter(ParameterSetName = “Azure”)][Parameter(ParameterSetName = "Default")][Parameter()][int]$n = 1,
-        [Parameter(ParameterSetName = “Azure”)][switch]$azure,
-        [Parameter(ParameterSetName = “Azure”)][string]$environment,
-        [Parameter(ParameterSetName = “Azure”)][string]$api_version = "2023-09-01-preview"
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)][string]$prompt,
+        [string]$api_key,
+        [Parameter()][string]$engine,
+        [Parameter()][string]$endpoint,
+        [Parameter()][int]$max_tokens = 1024,
+        [Parameter()][double]$temperature = 1,
+        [Parameter()][int]$n = 1,
+        [switch]$azure,
+        [string]$environment,
+        [string]$api_version = "2023-09-01-preview"
     )
 
     BEGIN {

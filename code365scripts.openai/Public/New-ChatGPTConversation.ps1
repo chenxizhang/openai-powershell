@@ -70,19 +70,19 @@ function New-ChatGPTConversation {
     #>
 
 
-    [CmdletBinding(DefaultParameterSetName = "Default")]
+    [CmdletBinding()]
     [Alias("chatgpt")][Alias("chat")]
     param(
-        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$api_key,
-        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$engine,
-        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$endpoint, 
-        [Parameter(ParameterSetName = "Azure")][switch]$azure,
-        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$system = "You are a chatbot, please answer the user's question according to the user's language.",
-        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$prompt = "",
-        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][switch]$stream,
-        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][PSCustomObject]$config,
-        [Parameter( ParameterSetName = "Azure")][string]$environment,
-        [Parameter(ParameterSetName = “Azure”)][string]$api_version = "2023-09-01-preview"
+        [string]$api_key,
+        [string]$engine,
+        [string]$endpoint, 
+        [switch]$azure,
+        [string]$system = "You are a chatbot, please answer the user's question according to the user's language.",
+        [string]$prompt = "",
+        [switch]$stream,
+        [PSCustomObject]$config,
+        [string]$environment,
+        [string]$api_version = "2023-09-01-preview"
     )
     BEGIN {
 
