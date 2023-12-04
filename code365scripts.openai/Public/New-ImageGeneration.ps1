@@ -48,18 +48,18 @@ function New-ImageGeneration {
     .LINK
     https://github.com/chenxizhang/openai-powershell
     #>
-    [CmdletBinding(DefaultParameterSetName = "Default")]
+    [CmdletBinding()]
     [Alias("dall")][Alias("image")]
     param(
-        [parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][Parameter(Mandatory = $true, ValueFromPipeline=$true)][string]$prompt,
-        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$api_key,
-        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$endpoint, 
-        [Parameter(ParameterSetName = "Azure")][switch]$azure,
-        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][int]$n = 1, #for azure, the n can be 1-5, for openai, the n can be 1-10, for dall3, it always be 1
-        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][int]$size = 2,
-        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][string]$outfolder = ".",
-        [Parameter( ParameterSetName = “Azure”)][string]$environment,
-        [Parameter(ParameterSetName = "Default")][Parameter(ParameterSetName = "Azure")][switch]$dall3
+        [Parameter(Mandatory = $true, ValueFromPipeline=$true)][string]$prompt,
+        [string]$api_key,
+        [string]$endpoint, 
+        [switch]$azure,
+        [int]$n = 1, #for azure, the n can be 1-5, for openai, the n can be 1-10, for dall3, it always be 1
+        [int]$size = 2,
+        [string]$outfolder = ".",
+        [string]$environment,
+        [switch]$dall3
     )
 
    
