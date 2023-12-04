@@ -123,9 +123,14 @@ function New-OpenAICompletion {
 
     PROCESS {
 
+
+
         if ($hasError) {
             return
         }
+
+        # collect the telemetry data
+        Submit-Telemetry -cmdletName $MyInvocation.MyCommand.Name -innovationName $MyInvocation.InvocationName -useAzure $azure
 
         # if prompt is a file path, and the file is exist, then read the file as the prompt
         if (Test-Path $prompt -PathType Leaf) {

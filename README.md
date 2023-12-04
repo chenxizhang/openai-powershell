@@ -23,6 +23,31 @@ The model you will find in another page. According to the newest release, you mi
 ![image](https://user-images.githubusercontent.com/1996954/218254283-0e89b3cd-e72c-4e0e-a069-ea63155ab095.png)
 
 
+
+## How to use
+
+Currently, we support three cmdlets:
+
+- `New-OpenAICompletion` (alias: `noc`)
+- `New-ChatGPTConversation` (alias: `chat` or `chatgpt` )
+- `New-ImageGeneration` (alias: `image` or `dall`)
+
+You can find the full help by using `Get-Help **cmdlet name or alias** -Full` in your terminal.
+
+## Telemetry data collection and privacy
+
+We will collect the telemetry data to help us improve the module, we just collect `command name`,`alias name`, `if you are using azure (true or false)`, `what Powershell version you are using`, You can check the source code [here](code365scripts.openai\Private\Submit-Telemetry.ps1).
+
+**There are nothing related to your privacy information and your input data.**
+
+If you don't want to send the telemetry data, you can add the environment variable `DISABLE_TELEMETRY_OPENAI_POWERSHELL` and set the value to `true`.
+
+## Advance use cases
+
+You can also define the environment variable in a separate file, or define your custom functions to simplify the usage. You can find the sample in the `$home\.openai-powershell\profile.ps1` file.
+
+
+
 ## Prepare the environment variable
 
 We recommended you to store the `api_key`, `engine` and `endpoint` in the environment variable, so you don't need to specify them in each command. You can use below command to set the environment variable.
@@ -78,21 +103,7 @@ $env:OPENAI_ENGINE_AZURE_DEV=
 $env:OPENAI_CHAT_ENGINE_AZURE_DEV=
 ```
 
-## How to use
 
-Currently, we support three cmdlets:
-
-- `New-OpenAICompletion` (alias: `noc`)
-- `New-ChatGPTConversation` (alias: `chat` or `chatgpt` )
-- `New-ImageGeneration` (alias: `image` or `dall`)
-
-You can find the full help by using `Get-Help **cmdlet name or alias** -Full` in your terminal.
-
-## Advance use cases
-
-You can also define the environment variable in a separate file, or define your custom functions to simplify the usage. You can find the sample in the `$home\.openai-powershell\profile.ps1` file.
-
-```powershell
 
 ## Update the module
 
