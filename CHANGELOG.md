@@ -1,5 +1,6 @@
 ## Change logs
 
+- 2023-12-03    v2.0.0.0    Add file input function, and custom profile support, and telemetry collection support.
 - 2023-11-26    v1.1.1.4    PowerShell 5.x supports.
 - 2023-11-26    v1.1.1.3    Multiple environment and DALL-E 3 support, and fix a lot of bugs.
 - 2023-10-23    v1.1.1.2    Fix a bug (ConvertTo-Json truncate the result)

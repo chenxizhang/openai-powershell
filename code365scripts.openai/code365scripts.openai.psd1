@@ -12,7 +12,7 @@
     RootModule           = '.\code365scripts.openai.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '1.1.1.4'
+    ModuleVersion        = '2.0.0.0'
 
     # Supported PSEditions
     CompatiblePSEditions = @("Desktop")
@@ -33,6 +33,7 @@
     Description          = 'The non-official OpenAI PowerShell module. This module is used to interact with OpenAI API.
     
     Changelogs:
+    - 2023-12-03    v2.0.0.0    Add file input function, and custom profile support, and telemetry collection support.
     - 2023-11-26    v1.1.1.4    PowerShell 5.x supports.
     - 2023-11-26    v1.1.1.3    Multiple environment and DALL-E 3 support, and fix a lot of bugs.
     - 2023-10-23    v1.1.1.2    Fix a bug (ConvertTo-Json truncate the result)
