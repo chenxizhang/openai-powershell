@@ -36,7 +36,7 @@ You can find the full help by using `Get-Help **cmdlet name or alias** -Full` in
 
 ## Telemetry data collection and privacy
 
-We will collect the telemetry data to help us improve the module, we just collect `command name`,`alias name`, `if you are using azure (true or false)`, `what Powershell version you are using`, You can check the source code [here](code365scripts.openai\Private\Submit-Telemetry.ps1).
+We will collect the telemetry data to help us improve the module, we just collect `command name`,`alias name`, `if you are using azure (true or false)`, `what Powershell version you are using`, You can check the source code [here](https://github.com/chenxizhang/openai-powershell/blob/master/code365scripts.openai/Private/Submit-Telemetry.ps1).
 
 **There are nothing related to your privacy information and your input data.**
 
@@ -45,7 +45,6 @@ If you don't want to send the telemetry data, you can add the environment variab
 ## Advance use cases
 
 You can also define the environment variable in a separate file, or define your custom functions to simplify the usage. You can find the sample in the `$home\.openai-powershell\profile.ps1` file.
-
 
 
 ## Prepare the environment variable
@@ -102,8 +101,6 @@ $env:OPENAI_ENDPOINT_AZURE_DEV=
 $env:OPENAI_ENGINE_AZURE_DEV=
 $env:OPENAI_CHAT_ENGINE_AZURE_DEV=
 ```
-
-
 
 ## Update the module
 
