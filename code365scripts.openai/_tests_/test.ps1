@@ -29,7 +29,7 @@ $cmds = @'
     noc "$prompt" -azure -environment "xxx"
     chat -prompt "$prompt"
     chat -azure -prompt $promptFile
-    chat -azure -prompt $promptFile -max_tokens 100 | Out-File -Encoding utf8 -FilePath (New-TemporaryFile).FullName
+    chat -azure -prompt $promptFile | Out-File -Encoding utf8 -FilePath (New-TemporaryFile).FullName
     chat -azure -system $systemPromptFile -prompt $promptFile
     chat -prompt "$prompt" -azure
     chat -prompt "$prompt" -azure -config @{max_tokens=100; temperature=0.5}
