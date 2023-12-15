@@ -1,12 +1,3 @@
-function Get-ImageBase64Uri($file) {
-    $image = [System.IO.File]::ReadAllBytes($file)
-    # get extension without dot
-    $type = [System.IO.Path]::GetExtension($file).TrimStart(".")
-    $base64 = [System.Convert]::ToBase64String($image)
-    $uri = "data:image/$type;base64,$base64"
-    return $uri
-}
-
 function New-VisionCompletion {
 
     <#
@@ -16,6 +7,7 @@ function New-VisionCompletion {
         Generate text from a prompt and an image by using the newest GPT-4-Vision-preview model. You can use this cmdlet to get completion from OpenAI API.The cmdlet accept pipeline input. You can also assign the prompt, api_key, engine, endpoint, max_tokens, temperature. You can input multiple images, and we will use all the images to generate the text.
     .PARAMETER prompt
         The prompt to get completion from OpenAI API. If yuo provide a file path, we will read the file as prompt. You can also set prompt in pipeline input.
+        You can also specify a url, we will read the url as prompt.
     .PARAMETER files
         The image files to get completion from OpenAI API. We support jpg, png, gif, and you can input multiple images.
     .PARAMETER api_key
@@ -146,10 +138,7 @@ function New-VisionCompletion {
         Submit-Telemetry -cmdletName $MyInvocation.MyCommand.Name -innovationName $MyInvocation.InvocationName -useAzure $azure
 
 
-        if (Test-Path $prompt -PathType Leaf) {
-            Write-Verbose "Prompt is a file path, read the file as prompt"
-            $prompt = Get-Content $prompt -Raw -Encoding UTF8
-        }
+        $prompt = Get-PromptContent $prompt
 
         $imageContent = $files | ForEach-Object {
             Write-Verbose "Processing file $_"

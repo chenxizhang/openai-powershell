@@ -8,6 +8,7 @@ function New-ImageGeneration {
     System.String[], the file(s) path of the generated image.
     .PARAMETER prompt
     The prompt to generate image, this is required. If you want to use a file as prompt, you can specify the file path here.
+    You can also specify a url as prompt, we will read the url as prompt.
     .PARAMETER api_key
     The api key to access openai api, if not specified, the api key will be read from environment variable OPENAI_API_KEY. if you use azure openai service, you can specify the api key by environment variable OPENAI_API_KEY_AZURE or OPENAI_API_KEY_AZURE_<environment>, the <environment> can be any names you want, for example, OPENAI_API_KEY_AZURE_DEV, OPENAI_API_KEY_AZURE_PROD, OPENAI_API_KEY_AZURE_TEST, etc. 
     .PARAMETER endpoint
@@ -108,10 +109,7 @@ function New-ImageGeneration {
         Submit-Telemetry -cmdletName $MyInvocation.MyCommand.Name -innovationName $MyInvocation.InvocationName -useAzure $azure
 
         # if the prompt is a file, read the content of the file
-        if (Test-Path $prompt -PathType Leaf) {
-            Write-Verbose "Prompt is a file path, read the file as prompt"
-            $prompt = Get-Content $prompt -Raw -Encoding UTF8
-        }
+        $prompt = Get-PromptContent $prompt
 
         $sizes = @("256x256", "512x512", "1024x1024", "1792x1024", "1024x1792")
 
