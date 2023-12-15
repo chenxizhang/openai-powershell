@@ -8,7 +8,7 @@ function New-ChatGPTConversation {
     .PARAMETER api_key
         Your OpenAI API key, you can also set it in environment variable OPENAI_API_KEY or OPENAI_API_KEY_AZURE if you use Azure OpenAI API. If you use multiple environments, you can use OPENAI_API_KEY_AZURE_$environment to define the api key for each environment.
     .PARAMETER engine
-        The engine to use for this request, you can also set it in environment variable OPENAI_CHAT_ENGINE or OPENAI_CHAT_ENGINE_AZURE if you use Azure OpenAI API. If you use multiple environments, you can use OPENAI_CHAT_ENGINE_AZURE_$environment to define the engine for each environment.
+        The engine to use for this request, you can also set it in environment variable OPENAI_CHAT_ENGINE or OPENAI_CHAT_ENGINE_AZURE if you use Azure OpenAI API. If you use multiple environments, you can use OPENAI_CHAT_ENGINE_AZURE_$environment to define the engine for each environment. You can use model or deployment as the alias of engine.
     .PARAMETER endpoint
         The endpoint to use for this request, you can also set it in environment variable OPENAI_ENDPOINT or OPENAI_ENDPOINT_AZURE if you use Azure OpenAI API. If you use multiple environments, you can use OPENAI_ENDPOINT_AZURE_$environment to define the endpoint for each environment.
     .PARAMETER azure
@@ -74,6 +74,7 @@ function New-ChatGPTConversation {
     [Alias("chatgpt")][Alias("chat")]
     param(
         [string]$api_key,
+        [Alias("model", "deployment")]
         [string]$engine,
         [string]$endpoint, 
         [switch]$azure,

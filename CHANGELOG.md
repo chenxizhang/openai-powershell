@@ -1,4 +1,5 @@
 ## Change logs
+- 2023-12-15    v2.0.0.3    Add alias to engine parameter (model, or deployment)
 - 2023-12-15    v2.0.0.2    Add support to gpt-4-vision to generate completion from images.
 - 2023-12-04    v2.0.0.1    Fix a bug (speical character parameter definition, caused by the PowerShell 5.x compatibility)
 - 2023-12-03    v2.0.0.0    Add file input function, and custom profile support, and telemetry collection support.
