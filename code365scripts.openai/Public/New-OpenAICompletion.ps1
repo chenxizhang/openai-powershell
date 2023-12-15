@@ -9,7 +9,7 @@ function New-OpenAICompletion {
     .PARAMETER api_key
         The api_key to get completion from OpenAI API. You can also set api_key in environment variable OPENAI_API_KEY or OPENAI_API_KEY_AZURE (if you want to use Azure OpenAI Service API).
     .PARAMETER engine
-        The engine to get completion from OpenAI API. You can also set engine in environment variable OPENAI_ENGINE or OPENAI_ENGINE_AZURE (if you want to use Azure OpenAI Service API). The default value is text-davinci-003, but now we recommend you to use gpt-3.5-turbo-instruct.
+        The engine to get completion from OpenAI API. You can also set engine in environment variable OPENAI_ENGINE or OPENAI_ENGINE_AZURE (if you want to use Azure OpenAI Service API). The default value is text-davinci-003, but now we recommend you to use gpt-3.5-turbo-instruct.You can use model or deployment as the alias of engine.
     .PARAMETER endpoint
         The endpoint to get completion from OpenAI API. You can also set endpoint in environment variable OPENAI_ENDPOINT or OPENAI_ENDPOINT_AZURE (if you want to use Azure OpenAI Service API).
     .PARAMETER max_tokens
@@ -67,7 +67,9 @@ function New-OpenAICompletion {
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)][string]$prompt,
         [string]$api_key,
-        [Parameter()][string]$engine,
+        [Parameter()]
+        [Alias("model", "deployment")]
+        [string]$engine,
         [Parameter()][string]$endpoint,
         [Parameter()][int]$max_tokens = 1024,
         [Parameter()][double]$temperature = 1,

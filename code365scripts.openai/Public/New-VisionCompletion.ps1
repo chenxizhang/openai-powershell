@@ -21,7 +21,7 @@ function New-VisionCompletion {
     .PARAMETER api_key
         The api_key to get completion from OpenAI API. You can also set api_key in environment variable OPENAI_API_KEY or OPENAI_API_KEY_AZURE (if you want to use Azure OpenAI Service API).
     .PARAMETER engine
-        The engine (refer to the deployment name if you use Azure OpenAI service) to get completion from OpenAI API. You can also set engine in environment variable OPENAI_VISION_ENGINE or OPENAI_VISION_ENGINE_AZURE (if you want to use Azure OpenAI Service API). The default value is gpt-4-vision-preview. 
+        The engine (refer to the deployment name if you use Azure OpenAI service) to get completion from OpenAI API. You can also set engine in environment variable OPENAI_VISION_ENGINE or OPENAI_VISION_ENGINE_AZURE (if you want to use Azure OpenAI Service API). The default value is gpt-4-vision-preview. You can use model or deployment as the alias of engine.
     .PARAMETER endpoint
         The endpoint to get completion from OpenAI API. You can also set endpoint in environment variable OPENAI_ENDPOINT or OPENAI_ENDPOINT_AZURE (if you want to use Azure OpenAI Service API).
     .PARAMETER max_tokens
@@ -66,7 +66,9 @@ function New-VisionCompletion {
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)][string]$prompt,
         [Parameter(Mandatory = $true)][string[]]$files,
         [string]$api_key,
-        [Parameter()][string]$engine,
+        [Parameter()]
+        [Alias("model", "deployment")]
+        [string]$engine,
         [Parameter()][string]$endpoint,
         [Parameter()][int]$max_tokens = 1024,
         [Parameter()][double]$temperature = 1,
