@@ -9,7 +9,7 @@ function New-VisionCompletion {
         The prompt to get completion from OpenAI API. If yuo provide a file path, we will read the file as prompt. You can also set prompt in pipeline input.
         You can also specify a url, we will read the url as prompt.
     .PARAMETER files
-        The image files to get completion from OpenAI API. We support jpg, png, gif, and you can input multiple images.
+        The image files to get completion from OpenAI API. We support jpg, png, gif, and you can input multiple images, and you can even mix local file path and online url.
     .PARAMETER api_key
         The api_key to get completion from OpenAI API. You can also set api_key in environment variable OPENAI_API_KEY or OPENAI_API_KEY_AZURE (if you want to use Azure OpenAI Service API).
     .PARAMETER engine
@@ -113,19 +113,12 @@ function New-VisionCompletion {
 
         # ensure all the files are valid image(jpg,png,gif)
         $files | ForEach-Object {
-            if (-not (Test-Path $_)) {
-                Write-Error "File $_ not found"
+            # if the file not startwith http/https and endwith jpg/png/gif, then we will treat it as a local file path and check if the file exists
+            if (($_ -notmatch "^https?://" -or -not (Test-Path $_)) -and $_ -notmatch "\.(jpg|png|gif)$") {
+                Write-Error "File $_ is not a url and not a valid image(jpg,png,gif), treat it as a local file path"
                 $hasError = $true
             }
-            else {
-                $ext = [System.IO.Path]::GetExtension($_).TrimStart(".")
-                if ($ext -notin @("jpg", "png", "gif")) {
-                    Write-Error "File $_ is not a valid image(jpg,png,gif)"
-                    $hasError = $true
-                }
-            }
         }
-
     }
 
     PROCESS {
@@ -150,6 +143,8 @@ function New-VisionCompletion {
             }
         }
 
+        $imageContent = @(@{type = "text"; text = $prompt }) + $imageContent
+
         $params = @{
             Uri         = $endpoint
             Method      = "POST"
@@ -158,13 +153,7 @@ function New-VisionCompletion {
                 messages    = @(
                     @{
                         role    = "user"
-                        content = @(
-                            @{
-                                type = "text"
-                                text = $prompt
-                            },
-                            $imageContent
-                        )
+                        content = $imageContent
                     }
                 )
                 max_tokens  = $max_tokens
