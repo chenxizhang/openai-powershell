@@ -12,7 +12,7 @@
     RootModule           = '.\code365scripts.openai.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '2.0.0.1'
+    ModuleVersion        = '2.0.0.2'
 
     # Supported PSEditions
     CompatiblePSEditions = @("Desktop")
@@ -33,6 +33,7 @@
     Description          = 'The non-official OpenAI PowerShell module. This module is used to interact with OpenAI API.
     
     Changelogs:
+    - 2023-12-15    v2.0.0.2    Add support to gpt-4-vision to generate completion from images.
     - 2023-12-04    v2.0.0.1    Fix a bug (speical character parameter definition, caused by the PowerShell 5.x compatibility)
     - 2023-12-03    v2.0.0.0    Add file input function, and custom profile support, and telemetry collection support.
     - 2023-11-26    v1.1.1.4    PowerShell 5.x supports.
@@ -91,16 +92,16 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport    = @("New-OpenAICompletion", "New-ChatGPTConversation", "New-ImageGeneration")
+    FunctionsToExport    = @("New-OpenAICompletion", "New-ChatGPTConversation", "New-ImageGeneration", "New-VisionCompletion")
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-    CmdletsToExport      = @("New-OpenAICompletion", "New-ChatGPTConversation", "New-ImageGeneration")
+    CmdletsToExport      = @("New-OpenAICompletion", "New-ChatGPTConversation", "New-ImageGeneration", "New-VisionCompletion")
 
     # Variables to export from this module
     VariablesToExport    = '*'
 
     # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-    AliasesToExport      = @("noc", "chatgpt", "chat", "dall", "image")
+    AliasesToExport      = @("noc", "chatgpt", "chat", "dall", "image", "vc")
 
     # DSC resources to export from this module
     # DscResourcesToExport = @()
