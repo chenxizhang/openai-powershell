@@ -27,6 +27,7 @@ function New-ChatGPTConversation {
         The dynamic settings for the API call, it can meet all the requirement for each model. please pass a custom object to this parameter, like @{temperature=1;max_tokens=1024}
     .PARAMETER environment
         The environment name, if you use Azure OpenAI API, you can use this parameter to define the environment name, it will be used to get the api key, engine and endpoint from environment variable. If the environment is not exist, it will use the default environment.
+        You can use env as the alias of this parameter.
     .PARAMETER api_version
         The api version, if you use Azure OpenAI API, you can use this parameter to define the api version, the default value is 2023-09-01-preview.
     .PARAMETER outFile
@@ -86,6 +87,7 @@ function New-ChatGPTConversation {
         [string]$prompt = "",
         [switch]$stream,
         [PSCustomObject]$config,
+        [Alias("env")]
         [string]$environment,
         [string]$api_version = "2023-09-01-preview",
         [string]$outFile
