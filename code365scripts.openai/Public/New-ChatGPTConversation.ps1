@@ -29,6 +29,8 @@ function New-ChatGPTConversation {
         The environment name, if you use Azure OpenAI API, you can use this parameter to define the environment name, it will be used to get the api key, engine and endpoint from environment variable. If the environment is not exist, it will use the default environment.
     .PARAMETER api_version
         The api version, if you use Azure OpenAI API, you can use this parameter to define the api version, the default value is 2023-09-01-preview.
+    .PARAMETER outFile
+        If you want to save the result to a file, you can use this parameter to set the file path.
     .EXAMPLE
         New-ChatGPTConversation
         Create a new ChatGPT conversation, use openai service with all the default settings.
@@ -85,7 +87,8 @@ function New-ChatGPTConversation {
         [switch]$stream,
         [PSCustomObject]$config,
         [string]$environment,
-        [string]$api_version = "2023-09-01-preview"
+        [string]$api_version = "2023-09-01-preview",
+        [string]$outFile
     )
     BEGIN {
 
@@ -192,7 +195,16 @@ function New-ChatGPTConversation {
 
             $result = $response.choices[0].message.content
             Write-Verbose "Response parsed to plain text: $result"
-            Write-Output $result 
+
+            #if user specify the outfile, write the response to the file
+            if ($outFile) {
+                Write-Verbose "Outfile specified, write the response to the file: $outFile"
+                $result | Out-File -FilePath $outFile -Encoding utf8
+            }
+            else {
+                Write-Verbose "Outfile not specified, output the response to pipeline"
+                Write-Output $result
+            }
 
         }
         else {

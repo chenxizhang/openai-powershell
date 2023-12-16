@@ -26,6 +26,8 @@ function New-VisionCompletion {
         If you want to use Azure OpenAI API, you can use this parameter to set the environment. We will read environment variable OPENAI_API_KEY_AZURE_$environment, OPENAI_VISION_ENGINE_AZURE_$environment, OPENAI_ENDPOINT_AZURE_$environment. if you don't set this parameter (or the environment doesn't exist), we will read environment variable OPENAI_API_KEY_AZURE, OPENAI_ENGINE_AZURE, OPENAI_ENDPOINT_AZURE.
     .PARAMETER api_version
         If you want to use Azure OpenAI API, you can use this parameter to set the api_version. The default value is 2023-07-01-preview.
+    .PARAMETER outFile
+        If you want to save the result to a file, you can use this parameter to set the file path.
     .EXAMPLE
         New-VisionCompletion -prompt "What's in below pictures?" -files "c:\temp\image1.jpg","c:\temp\image2.jpg"
         Use default api_key, engine, endpoint from environment varaibles
@@ -66,7 +68,8 @@ function New-VisionCompletion {
         [Parameter()][double]$temperature = 1,
         [switch]$azure,
         [string]$environment,
-        [string]$api_version = "2023-07-01-preview"
+        [string]$api_version = "2023-07-01-preview",
+        [string]$outFile
     )
 
 
@@ -183,6 +186,13 @@ function New-VisionCompletion {
 
         $result = $response.choices[0].message.content
         Write-Verbose "Response parsed to plain text: $result"
-        Write-Output $result 
+        if ($outFile) {
+            Write-Verbose "Write result to file $outFile"
+            $result | Out-File $outFile -Encoding utf8
+        }
+        else {
+            Write-Verbose "Output result to pipeline"
+            Write-Output $result 
+        }
     }
 }

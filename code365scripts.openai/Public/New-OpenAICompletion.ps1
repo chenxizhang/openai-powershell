@@ -25,6 +25,8 @@ function New-OpenAICompletion {
         If you want to use Azure OpenAI API, you can use this parameter to set the environment. We will read environment variable OPENAI_API_KEY_AZURE_$environment, OPENAI_ENGINE_AZURE_$environment, OPENAI_ENDPOINT_AZURE_$environment. if you don't set this parameter (or the environment doesn't exist), we will read environment variable OPENAI_API_KEY_AZURE, OPENAI_ENGINE_AZURE, OPENAI_ENDPOINT_AZURE.
     .PARAMETER api_version
         If you want to use Azure OpenAI API, you can use this parameter to set the api_version. The default value is 2023-09-01-preview.
+    .PARAMETER outFile
+        If you want to save the result to a file, you can use this parameter to set the file path.
     .EXAMPLE
         New-OpenAICompletion -prompt "Which city is the capital of China?"
         Use default api_key, engine, endpoint from environment varaibles
@@ -77,7 +79,8 @@ function New-OpenAICompletion {
         [Parameter()][int]$n = 1,
         [switch]$azure,
         [string]$environment,
-        [string]$api_version = "2023-09-01-preview"
+        [string]$api_version = "2023-09-01-preview",
+        [string]$outFile
     )
 
     BEGIN {
@@ -178,7 +181,14 @@ function New-OpenAICompletion {
             Write-Verbose "Response parsed to plain text: $response"
 
             # write the response to console
-            Write-Output $response
+            # if user specify the outfile, write the response to the file
+            if ($outFile) {
+                Write-Verbose "Write the response to file: $outFile"
+                $response | Out-File $outFile -Encoding utf8
+            }
+            else {
+                Write-Output $response
+            }
 
             Write-Verbose "Response copied to clipboard: $response"
             
