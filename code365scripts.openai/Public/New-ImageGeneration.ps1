@@ -21,6 +21,7 @@ function New-ImageGeneration {
     The folder to save the generated image, default is current folder.
     .PARAMETER environment
     The environment name, if you use azure openai service, you can specify the environment by this parameter, the environment name can be any names you want, for example, dev, prod, test, etc, the environment name will be used to read the api key and endpoint from environment variable, for example, OPENAI_API_KEY_AZURE_DEV, OPENAI_ENDPOINT_AZURE_DEV, etc.
+    You can use env as the alias of this parameter.
     .PARAMETER azure
     Use azure openai service, if specified, the api key and endpoint will be read from environment variable OPENAI_API_KEY_AZURE or OPENAI_API_KEY_AZURE_<environment>, the <environment> can be any names you want, for example, OPENAI_API_KEY_AZURE_DEV, OPENAI_API_KEY_AZURE_PROD, OPENAI_API_KEY_AZURE_TEST, etc. and OPENAI_ENDPOINT_AZURE or OPENAI_ENDPOINT_AZURE_<environment>, the <environment> can be any names you want, for example, OPENAI_ENDPOINT_AZURE_DEV, OPENAI_ENDPOINT_AZURE_PROD, OPENAI_ENDPOINT_AZURE_TEST, etc.
     .PARAMETER dall3
@@ -59,6 +60,7 @@ function New-ImageGeneration {
         [int]$n = 1, #for azure, the n can be 1-5, for openai, the n can be 1-10, for dall3, it always be 1
         [int]$size = 2,
         [string]$outfolder = ".",
+        [Alias("env")]
         [string]$environment,
         [switch]$dall3
     )

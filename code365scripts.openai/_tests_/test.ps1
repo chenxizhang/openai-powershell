@@ -21,6 +21,7 @@ $cmds = @'
     New-OpenAICompletion "$prompt" -max_tokens 100
     noc "$prompt" -temperature 0.5
     New-OpenAICompletion "$prompt" -azure
+    New-OpenAICompletion "$prompt" -azure -outFile (New-TemporaryFile).FullName
     noc -azure $promptFile
     noc "$prompt" -azure -max_tokens 200
     noc "$prompt" -azure -temperature 0.2
@@ -32,6 +33,7 @@ $cmds = @'
     chat -azure -prompt $promptFile | Out-File -Encoding utf8 -FilePath (New-TemporaryFile).FullName
     chat -azure -system $systemPromptFile -prompt $promptFile
     chat -prompt "$prompt" -azure
+    chat -prompt "$prompt" -azure -outFile (New-TemporaryFile).FullName
     chat -prompt "$prompt" -azure -config @{max_tokens=100; temperature=0.5}
     chat -prompt "$prompt" -azure -environment "SWEDEN"
     image -prompt "$imageprompt" -size 0 -outfolder $outputFolder
@@ -41,6 +43,8 @@ $cmds = @'
     image -prompt "$imageprompt" -size 2 -azure -dall3 -environment "SWEDEN" -outfolder $outputFolder
     chat
     chat -stream
+    New-VisionCompletion -prompt "what's in the picture?" -files "https://xizhang.com/assets/images/profile.png" -azure -env SWEDEN
+    vc -prompt "what's in the picture?" -files "https://xizhang.com/assets/images/profile.png" -azure -env SWEDEN -outFile (New-TemporaryFile).FullName
 '@
 
 

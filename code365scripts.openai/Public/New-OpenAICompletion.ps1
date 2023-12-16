@@ -23,6 +23,7 @@ function New-OpenAICompletion {
         If you want to use Azure OpenAI API, you can use this switch.
     .PARAMETER environment
         If you want to use Azure OpenAI API, you can use this parameter to set the environment. We will read environment variable OPENAI_API_KEY_AZURE_$environment, OPENAI_ENGINE_AZURE_$environment, OPENAI_ENDPOINT_AZURE_$environment. if you don't set this parameter (or the environment doesn't exist), we will read environment variable OPENAI_API_KEY_AZURE, OPENAI_ENGINE_AZURE, OPENAI_ENDPOINT_AZURE.
+        You can use env as the alias of environment.
     .PARAMETER api_version
         If you want to use Azure OpenAI API, you can use this parameter to set the api_version. The default value is 2023-09-01-preview.
     .PARAMETER outFile
@@ -78,6 +79,7 @@ function New-OpenAICompletion {
         [Parameter()][double]$temperature = 1,
         [Parameter()][int]$n = 1,
         [switch]$azure,
+        [Alias("env")]
         [string]$environment,
         [string]$api_version = "2023-09-01-preview",
         [string]$outFile
