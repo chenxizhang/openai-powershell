@@ -12,7 +12,7 @@
     RootModule           = '.\code365scripts.openai.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '2.0.0.4'
+    ModuleVersion        = '2.0.0.5'
 
     # Supported PSEditions
     CompatiblePSEditions = @("Desktop")
@@ -33,29 +33,30 @@
     Description          = 'The non-official OpenAI PowerShell module. This module is used to interact with OpenAI API.
     
     Changelogs:
-    - 2023-12-15    v2.0.0.4    Support online prompt file (system or user prompt), and online image.
-    - 2023-12-15    v2.0.0.3    Add alias to engine parameter (model, or deployment)
-    - 2023-12-15    v2.0.0.2    Add support to gpt-4-vision to generate completion from images.
-    - 2023-12-04    v2.0.0.1    Fix a bug (speical character parameter definition, caused by the PowerShell 5.x compatibility)
-    - 2023-12-03    v2.0.0.0    Add file input function, and custom profile support, and telemetry collection support.
-    - 2023-11-26    v1.1.1.4    PowerShell 5.x supports.
-    - 2023-11-26    v1.1.1.3    Multiple environment and DALL-E 3 support, and fix a lot of bugs.
-    - 2023-10-23    v1.1.1.2    Fix a bug (ConvertTo-Json truncate the result)
-    - 2023-09-25    v1.1.1.1    Fix a bug (New-ImageGeneration, or image alias)
-    - 2023-09-24    v1.1.1.0    Add image generation support (New-ImageGeneration, or image alias)
-    - 2023-09-23    v1.1.0.9    Add dynamic configuration support for New-ChatGPTConversation,see -config parameter
-    - 2023-09-17    v1.1.0.8    Add verbose support
-    - 2023-09-10    v1.1.0.7    Fix the help doc for New-ChatGPTConversation
-    - 2023-09-06    v1.1.0.6    Bug fix
-    - 2023-09-06    v1.1.0.5    Added chat completion support.
-    - 2023-08-12    v1.1.0.4    Added stream support for chat
-    - 2021-05-13    v1.1.0.3    Small enhancements (save result to clipboard, print the system prompt, etc.)
-    - 2021-05-13    v1.1.0.0    Simplify the module structure
-    - 2023-05-07    v1.0.4.12   Fixed the network connectivity test logic
-    - 2023-05-07    v1.0.4.11   Added azure OpenAI supporrt for New-ChatGPTConversation function
-    - 2023-05-07    v1.0.4.10   Added network connectivity test logic
-    - 2023-03-09    v1.0.4.9    Added change logs in the description.
-    - 2023-03-08    v1.0.4.8    Added error handling.'
+        - 2023-12-15    v2.0.0.5    Enhance support online image, add outFile parameter, add alias to environment parameter.
+        - 2023-12-15    v2.0.0.4    Support online prompt file (system or user prompt), and online image.
+        - 2023-12-15    v2.0.0.3    Add alias to engine parameter (model, or deployment)
+        - 2023-12-15    v2.0.0.2    Add support to gpt-4-vision to generate completion from images.
+        - 2023-12-04    v2.0.0.1    Fix a bug (speical character parameter definition, caused by the PowerShell 5.x compatibility)
+        - 2023-12-03    v2.0.0.0    Add file input function, and custom profile support, and telemetry collection support.
+        - 2023-11-26    v1.1.1.4    PowerShell 5.x supports.
+        - 2023-11-26    v1.1.1.3    Multiple environment and DALL-E 3 support, and fix a lot of bugs.
+        - 2023-10-23    v1.1.1.2    Fix a bug (ConvertTo-Json truncate the result)
+        - 2023-09-25    v1.1.1.1    Fix a bug (New-ImageGeneration, or image alias)
+        - 2023-09-24    v1.1.1.0    Add image generation support (New-ImageGeneration, or image alias)
+        - 2023-09-23    v1.1.0.9    Add dynamic configuration support for New-ChatGPTConversation,see -config parameter
+        - 2023-09-17    v1.1.0.8    Add verbose support
+        - 2023-09-10    v1.1.0.7    Fix the help doc for New-ChatGPTConversation
+        - 2023-09-06    v1.1.0.6    Bug fix
+        - 2023-09-06    v1.1.0.5    Added chat completion support.
+        - 2023-08-12    v1.1.0.4    Added stream support for chat
+        - 2021-05-13    v1.1.0.3    Small enhancements (save result to clipboard, print the system prompt, etc.)
+        - 2021-05-13    v1.1.0.0    Simplify the module structure
+        - 2023-05-07    v1.0.4.12   Fixed the network connectivity test logic
+        - 2023-05-07    v1.0.4.11   Added azure OpenAI supporrt for New-ChatGPTConversation function
+        - 2023-05-07    v1.0.4.10   Added network connectivity test logic
+        - 2023-03-09    v1.0.4.9    Added change logs in the description.
+        - 2023-03-08    v1.0.4.8    Added error handling.'
 
     # Minimum version of the PowerShell engine required by this module
     PowerShellVersion    = '5.1'
@@ -120,20 +121,44 @@
         PSData = @{
 
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags       = @("code365", "community", "china", "chenxizhang", "openai")
+            Tags         = @("code365", "community", "china", "chenxizhang", "openai")
 
             # A URL to the license for this module.
-            LicenseUri = 'https://github.com/chenxizhang/openai-powershell/blob/master/LICENSE'
+            LicenseUri   = 'https://github.com/chenxizhang/openai-powershell/blob/master/LICENSE'
 
             # A URL to the main website for this project.
-            ProjectUri = 'https://github.com/chenxizhang/openai-powershell/'
+            ProjectUri   = 'https://github.com/chenxizhang/openai-powershell/'
 
             # A URL to an icon representing this module.
             # IconUri = ''
 
             # ReleaseNotes of this module
-            # ReleaseNotes = ''
-
+            ReleaseNotes = @'
+                - 2023-12-15    v2.0.0.5    Enhance support online image, add outFile parameter, add alias to environment parameter.
+                - 2023-12-15    v2.0.0.4    Support online prompt file (system or user prompt), and online image.
+                - 2023-12-15    v2.0.0.3    Add alias to engine parameter (model, or deployment)
+                - 2023-12-15    v2.0.0.2    Add support to gpt-4-vision to generate completion from images.
+                - 2023-12-04    v2.0.0.1    Fix a bug (speical character parameter definition, caused by the PowerShell 5.x compatibility)
+                - 2023-12-03    v2.0.0.0    Add file input function, and custom profile support, and telemetry collection support.
+                - 2023-11-26    v1.1.1.4    PowerShell 5.x supports.
+                - 2023-11-26    v1.1.1.3    Multiple environment and DALL-E 3 support, and fix a lot of bugs.
+                - 2023-10-23    v1.1.1.2    Fix a bug (ConvertTo-Json truncate the result)
+                - 2023-09-25    v1.1.1.1    Fix a bug (New-ImageGeneration, or image alias)
+                - 2023-09-24    v1.1.1.0    Add image generation support (New-ImageGeneration, or image alias)
+                - 2023-09-23    v1.1.0.9    Add dynamic configuration support for New-ChatGPTConversation,see -config parameter
+                - 2023-09-17    v1.1.0.8    Add verbose support
+                - 2023-09-10    v1.1.0.7    Fix the help doc for New-ChatGPTConversation
+                - 2023-09-06    v1.1.0.6    Bug fix
+                - 2023-09-06    v1.1.0.5    Added chat completion support.
+                - 2023-08-12    v1.1.0.4    Added stream support for chat
+                - 2021-05-13    v1.1.0.3    Small enhancements (save result to clipboard, print the system prompt, etc.)
+                - 2021-05-13    v1.1.0.0    Simplify the module structure
+                - 2023-05-07    v1.0.4.12   Fixed the network connectivity test logic
+                - 2023-05-07    v1.0.4.11   Added azure OpenAI supporrt for New-ChatGPTConversation function
+                - 2023-05-07    v1.0.4.10   Added network connectivity test logic
+                - 2023-03-09    v1.0.4.9    Added change logs in the description.
+                - 2023-03-08    v1.0.4.8    Added error handling.
+'@
             # Prerelease string of this module
             # Prerelease = ''
 

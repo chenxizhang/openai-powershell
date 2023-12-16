@@ -1,4 +1,5 @@
 ## Change logs
+- 2023-12-15    v2.0.0.5    Enhance support online image, add outFile parameter, add alias to environment parameter.
 - 2023-12-15    v2.0.0.4    Support online prompt file (system or user prompt), and online image.
 - 2023-12-15    v2.0.0.3    Add alias to engine parameter (model, or deployment)
 - 2023-12-15    v2.0.0.2    Add support to gpt-4-vision to generate completion from images.
