@@ -1,3 +1,26 @@
+function Get-IsValidImage($path) {
+    # check if the url is a valid url for image, mediatype is jpg, png, gif
+    $valid = $false
+
+    # if the path is a local file path, then check if the file is a valid image file
+    if (Test-Path $path -PathType Leaf) {
+        $extension = [System.IO.Path]::GetExtension($path).TrimStart(".")
+        if ($extension -match "^(jpg|jpeg|png|gif)$") {
+            $valid = $true
+        }
+    }
+    elseif($path -match "^https?://") {
+        # send a head request to the url to check the header, 
+        $response = Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing
+        # if the "Content-Type" is image/jpg or image/png or image/gif, then it is a valid
+        if ($response.Headers["Content-Type"] -match "image/(jpg|jpeg|png|gif)") {
+            $valid = $true
+        }
+    }
+
+    return $valid
+
+}
 function Get-OnlineImageBase64Uri($url) {
     # Create a new WebClient instance
     $webClient = New-Object System.Net.WebClient

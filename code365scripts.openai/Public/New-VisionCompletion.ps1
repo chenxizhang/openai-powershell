@@ -119,9 +119,9 @@ function New-VisionCompletion {
         # ensure all the files are valid image(jpg,png,gif)
         $files | ForEach-Object {
             # if the file not startwith http/https and endwith jpg/png/gif, then we will treat it as a local file path and check if the file exists
-            if (($_ -notmatch "^https?://" -or -not (Test-Path $_)) -and $_ -notmatch "\.(jpg|png|gif)$") {
-                Write-Error "File $_ is not a url and not a valid image(jpg,png,gif), treat it as a local file path"
-                $hasError = $true
+            if ((Get-IsValidImage -path $_) -eq $false) {
+                Write-Error "File $_ is not a url and not a valid local image(jpg,png,gif)."
+                Set-Variable -Name "hasError" -Value $true
             }
         }
     }
