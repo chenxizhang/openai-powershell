@@ -206,6 +206,10 @@ function New-ChatGPTConversation {
             else {
                 Write-Verbose "Outfile not specified, output the response to pipeline"
                 Write-Output $result
+
+                # if user does not specify the outfile, copy the response to clipboard
+                Set-Clipboard $result
+                Write-Host "Copied the response to clipboard." -ForegroundColor Green
             }
 
         }
