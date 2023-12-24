@@ -190,6 +190,9 @@ function New-OpenAICompletion {
             }
             else {
                 Write-Output $response
+
+                Set-Clipboard $response
+                Write-Host "Copied the response to clipboard." -ForegroundColor Green
             }
 
             Write-Verbose "Response copied to clipboard: $response"

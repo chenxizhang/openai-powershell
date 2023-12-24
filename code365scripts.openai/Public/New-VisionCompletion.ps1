@@ -195,6 +195,8 @@ function New-VisionCompletion {
         else {
             Write-Verbose "Output result to pipeline"
             Write-Output $result 
+            Set-Clipboard $result
+            Write-Host "Copied the response to clipboard." -ForegroundColor Green
         }
     }
 }
