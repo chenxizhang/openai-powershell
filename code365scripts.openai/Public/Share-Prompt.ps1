@@ -25,20 +25,20 @@ function Submit-Prompt {
 
     # if the name parameter is not set, we will try to get it from environment variable
     if (-not $name) {
-        $name = Get-FirstNonNullItemInArray("openai.powersehll.user.name")
+        $name = Get-FirstNonNullItemInArray("openai.powershell.user.name")
     }
     else {
         # set the name to environment variable
-        [System.Environment]::SetEnvironmentVariable("openai.powersehll.user.name", $name, "User")
+        [System.Environment]::SetEnvironmentVariable("openai.powershell.user.name", $name, "User")
     }
 
     # if the email parameter is not set, we will try to get it from environment variable
     if (-not $email) {
-        $email = Get-FirstNonNullItemInArray("openai.powersehll.user.email")
+        $email = Get-FirstNonNullItemInArray("openai.powershell.user.email")
     }
     else {
         # set the email to environment variable
-        [System.Environment]::SetEnvironmentVariable("openai.powersehll.user.email", $email, "User")
+        [System.Environment]::SetEnvironmentVariable("openai.powershell.user.email", $email, "User")
     }
 
     # if the name or email is not set, throw an exception
