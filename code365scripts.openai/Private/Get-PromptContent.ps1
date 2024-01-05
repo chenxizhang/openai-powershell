@@ -22,7 +22,15 @@ function Get-PromptContent($prompt) {
 
 
 function Get-PromptLibraryContent($Name) {
+
+    # if environment variable OPENAI_PROMPT_LIBRARY is set to gitee, use gitee as prompt library
     $promptLibrary = "https://api.github.com/repos/code365opensource/promptlibrary/contents/final/$Name.md"
+
+    if ($env:OPENAI_PROMPT_LIBRARY -eq "gitee") {
+        Write-Verbose "Prompt library is gitee"
+        $promptLibrary = "https://gitee.com/api/v5/repos/code365opensource/promptlibrary/contents/final/$Name.md"
+    }
+
     $result = Invoke-RestMethod $promptLibrary
     if($result.content) {
         $prompt = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($result.content))
