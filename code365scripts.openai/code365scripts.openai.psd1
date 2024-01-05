@@ -69,16 +69,16 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport    = @("New-OpenAICompletion", "New-ChatGPTConversation", "New-ImageGeneration", "New-VisionCompletion")
+    FunctionsToExport    = @("New-OpenAICompletion", "New-ChatGPTConversation", "New-ImageGeneration", "New-VisionCompletion", "Submit-Prompt")
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-    CmdletsToExport      = @("New-OpenAICompletion", "New-ChatGPTConversation", "New-ImageGeneration", "New-VisionCompletion")
+    CmdletsToExport      = @("New-OpenAICompletion", "New-ChatGPTConversation", "New-ImageGeneration", "New-VisionCompletion", "Submit-Prompt")
 
     # Variables to export from this module
     VariablesToExport    = '*'
 
     # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-    AliasesToExport      = @("noc", "chatgpt", "chat", "dall", "image", "vc")
+    AliasesToExport      = @("noc", "chatgpt", "chat", "dall", "image", "vc", "submit")
 
     # DSC resources to export from this module
     # DscResourcesToExport = @()
