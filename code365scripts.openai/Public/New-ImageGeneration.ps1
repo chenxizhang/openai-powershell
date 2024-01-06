@@ -107,11 +107,19 @@ function New-ImageGeneration {
             return
         }
 
-        # collect the telemetry data
-        Submit-Telemetry -cmdletName $MyInvocation.MyCommand.Name -innovationName $MyInvocation.InvocationName -useAzure $azure
+
+        $telemetries = @{
+            useAzure = $azure
+        }
 
         # if the prompt is a file, read the content of the file
-        $prompt = Get-PromptContent $prompt
+        $parsedprompt = Get-PromptContent $prompt
+        $prompt = $parsedprompt.content
+        $telemetries.Add("promptType", $parsedprompt.type)
+        $telemetries.Add("promptLib", $parsedprompt.lib)
+
+        # collect the telemetry data
+        Submit-Telemetry -cmdletName $MyInvocation.MyCommand.Name -innovationName $MyInvocation.InvocationName -props $telemetries
 
         $sizes = @("256x256", "512x512", "1024x1024", "1792x1024", "1024x1792")
 

@@ -8,7 +8,7 @@ function Submit-Telemetry {
     param (
         [string]$cmdletName,
         [string]$innovationName,
-        [bool]$useAzure
+        [hashtable]$props
     )
 
     # check if an environment variable is set to disable telemetry
@@ -28,7 +28,11 @@ function Submit-Telemetry {
     $eventItem = New-Object Microsoft.ApplicationInsights.DataContracts.EventTelemetry
     $eventItem.Name = $cmdletName
     $eventItem.Properties["innovationName"] = $innovationName
-    $eventItem.Properties["useAzure"] = $useAzure
+    # $eventItem.Properties["useAzure"] = $useAzure
+    # add custom properties by foreach the hashtable and add them to the event
+    $props.Keys | ForEach-Object {
+        $eventItem.Properties[$_] = $props[$_].ToString()
+    }
 
     $versionInfo = $PSVersionTable
 

@@ -132,11 +132,18 @@ function New-VisionCompletion {
             return
         }
 
+        $telemetries = @{
+            useAzure = $azure
+        }
+
+        # if prompt is a file path, and the file is exist, then read the file as the prompt
+        $parsedprompt = Get-PromptContent $prompt
+        $prompt = $parsedprompt.content
+        $telemetries.promptType = $parsedprompt.type
+        $telemetries.promptLib = $parsedprompt.lib
+
         # collect the telemetry data
-        Submit-Telemetry -cmdletName $MyInvocation.MyCommand.Name -innovationName $MyInvocation.InvocationName -useAzure $azure
-
-
-        $prompt = Get-PromptContent $prompt
+        Submit-Telemetry -cmdletName $MyInvocation.MyCommand.Name -innovationName $MyInvocation.InvocationName -props $telemetries
 
         $imageContent = $files | ForEach-Object {
             Write-Verbose "Processing file $_"
