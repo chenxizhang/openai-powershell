@@ -141,14 +141,24 @@ function New-ChatGPTConversation {
             return
         }
 
-        # collect the telemetry data
-        Submit-Telemetry -cmdletName $MyInvocation.MyCommand.Name -innovationName $MyInvocation.InvocationName -useAzure $azure
+        $telemetries = @{
+            useAzure = $azure
+        }
 
         # if prompt is not empty and it is a file, then read the file as the prompt
-        $prompt = Get-PromptContent($prompt)
+        $parsedprompt = Get-PromptContent($prompt)
+        $prompt = $parsedprompt.content
+        $telemetries.Add("promptType", $parsedprompt.type)
+        $telemetries.Add("promptLib", $parsedprompt.lib)
 
         # if system is not empty and it is a file, then read the file as the system prompt
-        $system = Get-PromptContent($system)
+        $parsedsystem =  Get-PromptContent($system)
+        $system =$parsedsystem.content
+        $telemetries.Add("systemPromptType", $parsedsystem.type)
+        $telemetries.Add("systemPromptLib", $parsedsystem.lib)
+
+        # collect the telemetry data
+        Submit-Telemetry -cmdletName $MyInvocation.MyCommand.Name -innovationName $MyInvocation.InvocationName -props $telemetries
 
         if ($prompt.Length -gt 0) {
             Write-Verbose "Prompt received: $prompt, so it is in prompt mode, not in chat mode."

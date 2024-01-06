@@ -1,23 +1,45 @@
 function Get-PromptContent($prompt) {
-    # if the prompt is a file path, read the file as prompt
-    if (Test-Path $prompt -PathType Leaf) {
-        Write-Verbose "Prompt is a file path, read the file as prompt"
-        $prompt = Get-Content $prompt -Raw -Encoding UTF8
+
+    $type = "userinput"
+    $content = $prompt
+    $lib = ""
+
+    try {
+        # if the prompt is a file path, read the file as prompt
+        if (Test-Path $prompt -PathType Leaf) {
+
+            $type = "file"
+
+            Write-Verbose "Prompt is a file path, read the file as prompt"
+            $content = Get-Content $prompt -Raw -Encoding UTF8
+        }
+
+        # if the prompt is a url, start with http or https , read the url as prompt
+        if ($prompt -match "^https?://") {
+            $type = "url"
+            Write-Verbose "Prompt is a url, read the url as prompt"
+            $content = Invoke-RestMethod $prompt
+        }
+
+        # if the prompt startwith lib:, read the prompt from prompt library
+        if ($prompt -match "^lib:") {
+            $type = "promptlibrary"
+            $lib = $prompt.Replace("lib:", "")
+            Write-Verbose "Prompt is a prompt library name, read the prompt from prompt library"
+            $content = Get-PromptLibraryContent -Name $prompt.Replace("lib:", "")
+        }
+    }
+    catch {
+        <#Do this if a terminating exception happens#>
+        Write-Error $.ErrorDetails
     }
 
-    # if the prompt is a url, start with http or https , read the url as prompt
-    if ($prompt -match "^https?://") {
-        Write-Verbose "Prompt is a url, read the url as prompt"
-        $prompt = Invoke-RestMethod $prompt
-    }
-
-    # if the prompt startwith lib:, read the prompt from prompt library
-    if ($prompt -match "^lib:") {
-        Write-Verbose "Prompt is a prompt library name, read the prompt from prompt library"
-        $prompt = Get-PromptLibraryContent -Name $prompt.Replace("lib:", "")
-    }
     
-    Write-Output $prompt
+    Write-Output @{
+        type    = $type
+        content = $content
+        lib     = $lib
+    }
 }
 
 
@@ -32,7 +54,7 @@ function Get-PromptLibraryContent($Name) {
     }
 
     $result = Invoke-RestMethod $promptLibrary
-    if($result.content) {
+    if ($result.content) {
         $prompt = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($result.content))
     }
     else {

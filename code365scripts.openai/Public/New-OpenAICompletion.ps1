@@ -137,11 +137,18 @@ function New-OpenAICompletion {
             return
         }
 
-        # collect the telemetry data
-        Submit-Telemetry -cmdletName $MyInvocation.MyCommand.Name -innovationName $MyInvocation.InvocationName -useAzure $azure
+        $telemetries =@{
+            useAzure = $azure
+        }
 
         # if prompt is a file path, and the file is exist, then read the file as the prompt
-        $prompt = Get-PromptContent $prompt
+        $parsedprompt = Get-PromptContent $prompt
+        $prompt = $parsedprompt.content
+        $telemetries.promptType = $parsedprompt.type
+        $telemetries.promptLib = $parsedprompt.lib
+
+        # collect the telemetry data
+        Submit-Telemetry -cmdletName $MyInvocation.MyCommand.Name -innovationName $MyInvocation.InvocationName -props $telemetries
     
         $params = @{
             Uri         = $endpoint
