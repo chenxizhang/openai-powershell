@@ -4,35 +4,38 @@ function Get-PromptContent($prompt) {
     $content = $prompt
     $lib = ""
 
-    try {
-        # if the prompt is a file path, read the file as prompt
-        if (Test-Path $prompt -PathType Leaf) {
+    if ($prompt) {
+        try {
+            # if the prompt is a file path, read the file as prompt
+            if (Test-Path $prompt -PathType Leaf) {
 
-            $type = "file"
+                $type = "file"
 
-            Write-Verbose "Prompt is a file path, read the file as prompt"
-            $content = Get-Content $prompt -Raw -Encoding UTF8
+                Write-Verbose "Prompt is a file path, read the file as prompt"
+                $content = Get-Content $prompt -Raw -Encoding UTF8
+            }
+
+            # if the prompt is a url, start with http or https , read the url as prompt
+            if ($prompt -match "^https?://") {
+                $type = "url"
+                Write-Verbose "Prompt is a url, read the url as prompt"
+                $content = Invoke-RestMethod $prompt
+            }
+
+            # if the prompt startwith lib:, read the prompt from prompt library
+            if ($prompt -match "^lib:") {
+                $type = "promptlibrary"
+                $lib = $prompt.Replace("lib:", "")
+                Write-Verbose "Prompt is a prompt library name, read the prompt from prompt library"
+                $content = Get-PromptLibraryContent -Name $prompt.Replace("lib:", "")
+            }
         }
-
-        # if the prompt is a url, start with http or https , read the url as prompt
-        if ($prompt -match "^https?://") {
-            $type = "url"
-            Write-Verbose "Prompt is a url, read the url as prompt"
-            $content = Invoke-RestMethod $prompt
-        }
-
-        # if the prompt startwith lib:, read the prompt from prompt library
-        if ($prompt -match "^lib:") {
-            $type = "promptlibrary"
-            $lib = $prompt.Replace("lib:", "")
-            Write-Verbose "Prompt is a prompt library name, read the prompt from prompt library"
-            $content = Get-PromptLibraryContent -Name $prompt.Replace("lib:", "")
+        catch {
+            <#Do this if a terminating exception happens#>
+            Write-Error $.ErrorDetails
         }
     }
-    catch {
-        <#Do this if a terminating exception happens#>
-        Write-Error $.ErrorDetails
-    }
+
 
     
     Write-Output @{
