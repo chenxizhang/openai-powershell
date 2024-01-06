@@ -1,4 +1,28 @@
 function Submit-Prompt {
+    <#
+    .SYNOPSIS
+        Submit a prompt to the OpenAI prompt library.
+    .DESCRIPTION
+        Submit a prompt to the OpenAI prompt library.
+    .PARAMETER description
+        The description of the prompt.
+    .PARAMETER content
+        The content of the prompt. if the content is a file path, the content will be loaded from the file.
+    .PARAMETER name
+        The name of the user.
+    .PARAMETER email
+        The email of the user.
+    .EXAMPLE
+        Submit-Prompt -description "test" -content "test" -name "test" -email "test"
+    .INPUTS
+        None
+    .OUTPUTS
+        None
+    .LINK
+        https://github.com/chenxizhang/openai-powershell
+    #>
+
+
     [CmdletBinding()]
     [Alias("submit")]
     param (

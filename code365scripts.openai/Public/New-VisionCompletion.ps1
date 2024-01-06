@@ -56,7 +56,7 @@ function New-VisionCompletion {
     #>
 
     [CmdletBinding()]
-    [Alias("vc")]
+    [Alias("vc","vision")]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)][string]$prompt,
         [Parameter(Mandatory = $true)][string[]]$files,

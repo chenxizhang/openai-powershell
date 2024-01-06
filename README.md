@@ -26,11 +26,13 @@ The model you will find in another page. According to the newest release, you mi
 
 ## How to use
 
-Currently, we support three cmdlets:
+Currently, we support below cmdlets:
 
 - `New-OpenAICompletion` (alias: `noc`)
 - `New-ChatGPTConversation` (alias: `chat` or `chatgpt` )
 - `New-ImageGeneration` (alias: `image` or `dall`)
+- `New-VisionCompletion` (alias: `vision` or `vc`)
+- `Submit-Prompt` (alias: `submit`)
 
 You can find the full help by using `Get-Help **cmdlet name or alias** -Full` in your terminal.
 
