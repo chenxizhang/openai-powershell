@@ -7,6 +7,7 @@ function New-OpenAICompletion {
     .PARAMETER prompt
         The prompt to get completion from OpenAI API. If yuo provide a file path, we will read the file as prompt. You can also set prompt in pipeline input.
         You can also specify the prompt as a url, we will read the url as prompt.
+        You can read the prompt from a library (https://github.com/code365opensource/promptlibrary), by use "lib:xxxxx" as the prompt, for example, "lib:fitness".
     .PARAMETER api_key
         The api_key to get completion from OpenAI API. You can also set api_key in environment variable OPENAI_API_KEY or OPENAI_API_KEY_AZURE (if you want to use Azure OpenAI Service API).
     .PARAMETER engine

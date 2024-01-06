@@ -8,6 +8,7 @@ function New-VisionCompletion {
     .PARAMETER prompt
         The prompt to get completion from OpenAI API. If yuo provide a file path, we will read the file as prompt. You can also set prompt in pipeline input.
         You can also specify a url, we will read the url as prompt.
+        You can read the prompt from a library (https://github.com/code365opensource/promptlibrary), by use "lib:xxxxx" as the prompt, for example, "lib:fitness".
     .PARAMETER files
         The image files to get completion from OpenAI API. We support jpg, png, gif, and you can input multiple images, and you can even mix local file path and online url.
     .PARAMETER api_key

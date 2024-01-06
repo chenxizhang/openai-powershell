@@ -17,12 +17,14 @@ function New-ChatGPTConversation {
         The system prompt, this is a string, you can use it to define the role you want it be, for example, "You are a chatbot, please answer the user's question according to the user's language."
         If you provide a file path to this parameter, we will read the file as the system prompt.
         You can also specify a url to this parameter, we will read the url as the system prompt.
+        You can read the prompt from a library (https://github.com/code365opensource/promptlibrary), by use "lib:xxxxx" as the prompt, for example, "lib:fitness".
     .PARAMETER stream
         If you want to stream the response, you can use this switch. Please note, we only support this feature in new Powershell (6.0+).
     .PARAMETER prompt
         If you want to get result immediately, you can use this parameter to define the prompt. It will not start the chat conversation.
         If you provide a file path to this parameter, we will read the file as the prompt.
         You can also specify a url to this parameter, we will read the url as the prompt.
+        You can read the prompt from a library (https://github.com/code365opensource/promptlibrary), by use "lib:xxxxx" as the prompt, for example, "lib:fitness".
     .PARAMETER config
         The dynamic settings for the API call, it can meet all the requirement for each model. please pass a custom object to this parameter, like @{temperature=1;max_tokens=1024}
     .PARAMETER environment

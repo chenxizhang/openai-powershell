@@ -12,7 +12,7 @@
     RootModule           = '.\code365scripts.openai.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '2.0.0.5'
+    ModuleVersion        = '2.0.0.6'
 
     # Supported PSEditions
     CompatiblePSEditions = @("Desktop")
@@ -78,7 +78,7 @@
     VariablesToExport    = '*'
 
     # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-    AliasesToExport      = @("noc", "chatgpt", "chat", "dall", "image", "vc", "submit")
+    AliasesToExport      = @("noc", "chatgpt", "chat", "dall", "image", "vc", "vision","submit")
 
     # DSC resources to export from this module
     # DscResourcesToExport = @()
@@ -108,6 +108,7 @@
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
+- 2024-01-06    v2.0.0.6    Add support to vision completion, and prompt library support. you can submit prompt by submit-prompt and use a prompt from the library in all the cmdlets.
 - 2023-12-15    v2.0.0.5    Enhance support online image, add outFile parameter, add alias to environment parameter.
 - 2023-12-15    v2.0.0.4    Support online prompt file (system or user prompt), and online image.
 - 2023-12-15    v2.0.0.3    Add alias to engine parameter (model, or deployment)
@@ -147,7 +148,7 @@
     } # End of PrivateData hashtable
 
     # HelpInfo URI of this module
-    HelpInfoURI          = 'https://xizhang.com/openai-powershell/'
+    HelpInfoURI          = 'https://github.com/chenxizhang/openai-powershell/'
 
     # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
     # DefaultCommandPrefix = ''
