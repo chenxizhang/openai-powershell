@@ -1,0 +1,7 @@
+{
+    "title": "OpenAI PowerShell SDK",
+    "author": "Ares Chen",
+    "description": "OpenAI PowerShell SDK, the unofficial PowerShell SDK for OpenAI API. You can use it to generate text, translate text, answer questions, generate image or understand image and more.",
+    "language": "en-US",
+    "root": "."
+}
