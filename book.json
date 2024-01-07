@@ -1,0 +1,22 @@
+{
+    "title": "OpenAI PowerShell SDK",
+    "author": "陈希章",
+    "description": "OpenAI PowerShell SDK, the unofficial PowerShell SDK for OpenAI API. You can use it to generate text, translate text, answer questions, generate image or understand image and more.",
+    "language": "zh-hans",
+    "root": "docs",
+    "plugins": [
+        "honkit-plugin-google-analytics",
+        "add-js",
+        "gitbook-plugin-collapsible-menu"
+    ],
+    "pluginsConfig": {
+        "analytics": {
+            "uid": "G-W5VP8TVR3L"
+        },
+        "add-js": {
+            "js": [
+                "../scripts/clarity.js"
+            ]
+        }
+    }
+}
