@@ -30,9 +30,12 @@ function Submit-Telemetry {
     $eventItem.Properties["innovationName"] = $innovationName
     # $eventItem.Properties["useAzure"] = $useAzure
     # add custom properties by foreach the hashtable and add them to the event
-    $props.Keys | ForEach-Object {
-        $eventItem.Properties[$_] = $props[$_].ToString()
+    if ($props) {
+        $props.Keys | ForEach-Object {
+            $eventItem.Properties[$_] = $props[$_].ToString()
+        }
     }
+
 
     $versionInfo = $PSVersionTable
 

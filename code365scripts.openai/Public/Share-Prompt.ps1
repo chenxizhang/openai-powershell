@@ -10,8 +10,12 @@ function Submit-Prompt {
         The content of the prompt. if the content is a file path, the content will be loaded from the file.
     .PARAMETER name
         The name of the user.
+        We will try to get the name from the environment variable openai.powershell.user.name if the name parameter is not set.
+        We will ask the user to input the name if the name is not set and then save the name to the environment variable openai.powershell.user.name.
     .PARAMETER email
         The email of the user.
+        We will try to get the email from the environment variable openai.powershell.user.email if the email parameter is not set.
+        We will ask the user to input the email if the email is not set and then save the email to the environment variable openai.powershell.user.email.
     .EXAMPLE
         Submit-Prompt -description "test" -content "test" -name "test" -email "test"
     .INPUTS
@@ -30,8 +34,8 @@ function Submit-Prompt {
         [Parameter(Mandatory = $true)]
         [Alias("file")]
         [string]$content,
-        [Parameter()][string]$name,
-        [Parameter()][string]$email
+        [Parameter()][string]$name = [System.Environment]::GetEnvironmentVariable("openai.powershell.user.name", "User"),
+        [Parameter()][string]$email = [System.Environment]::GetEnvironmentVariable("openai.powershell.user.email", "User")
     )
 
     Write-Verbose "description: $description, content: $content, name: $name, email: $email"
@@ -49,26 +53,26 @@ function Submit-Prompt {
 
     # if the name parameter is not set, we will try to get it from environment variable
     if (-not $name) {
-        $name = Get-FirstNonNullItemInArray("openai.powershell.user.name")
-    }
-    else {
-        # set the name to environment variable
-        [System.Environment]::SetEnvironmentVariable("openai.powershell.user.name", $name, "User")
+        while (-not $name) {
+            $name = Read-Host "Please input your name"
+            if ($name) {
+                [System.Environment]::SetEnvironmentVariable("openai.powershell.user.name", $name, "User")
+            }
+        }
     }
 
     # if the email parameter is not set, we will try to get it from environment variable
     if (-not $email) {
-        $email = Get-FirstNonNullItemInArray("openai.powershell.user.email")
-    }
-    else {
-        # set the email to environment variable
-        [System.Environment]::SetEnvironmentVariable("openai.powershell.user.email", $email, "User")
+        #if email is empty, ask user to input, until get a vaild email
+        while (-not $email) {
+            $email = Read-Host "Please input your email"
+            if ($email) {
+                [System.Environment]::SetEnvironmentVariable("openai.powershell.user.email", $email, "User")
+            }
+        }
     }
 
-    # if the name or email is not set, throw an exception
-    if (-not $name -or -not $email) {
-        throw "name or email is not set, you can set it by the name parameter or the email parameter."
-    }
+
 
     # if the content is empty or null, throw an exception
     if (-not $content) {
@@ -76,12 +80,7 @@ function Submit-Prompt {
     }
 
     try {
-        
-        # $url = New-Gist -access_token $access_token -description $description -content $content -provider $provider
-
-
-        # https://aresfuncs.azurewebsites.net/api/github_submit_prompt?
-
+    
         $result = Invoke-RestMethod -Uri "https://aresfuncs.azurewebsites.net/api/github_submit_prompt" -Method Post -Body (@{
                 message = $description
                 content = $content
