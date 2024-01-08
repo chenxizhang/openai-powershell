@@ -32,7 +32,8 @@ jobs:
           password: '${{ secrets.CERTIFICATE_PASSWORD }}'
           folder: 'code365scripts.openai'
           recursive: true
-          files: *.ps1
+          files: |
+            *.ps1
       - name: Publish Module to PowerShell Gallery (openai)
         uses: chenxizhang/publish-powershell-module-action@v35
         id: publish-openai
