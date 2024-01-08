@@ -45,4 +45,4 @@ jobs:
         with:
           token: ${{ secrets.NUGETKEY }}
           target: gallery
-          path: code365scripts.openai
+          path: code365scripts.openai/code365scripts.openai.psd1
