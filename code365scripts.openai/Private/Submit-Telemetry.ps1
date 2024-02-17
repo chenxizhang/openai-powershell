@@ -16,12 +16,12 @@ function Submit-Telemetry {
         return
     }
 
-    if ($PSVersionTable.PSVersion.Major -eq 5) {
-        [System.Reflection.Assembly]::LoadFile("$PSScriptRoot\libs\Microsoft.ApplicationInsights.dll") | Out-Null
+    $assembly = Join-Path -Path $PSScriptRoot -ChildPath "libs\Microsoft.ApplicationInsights.dll"
+    if ($PSVersionTable.PSVersion.Major -gt 5) {
+        $assembly = Join-Path -Path $PSScriptRoot -ChildPath "libs\core\Microsoft.ApplicationInsights.dll"
     }
-    else {
-        [System.Reflection.Assembly]::LoadFile("$PSScriptRoot\libs\core\Microsoft.ApplicationInsights.dll") | Out-Null
-    }
+
+    [System.Reflection.Assembly]::LoadFile($assembly) | Out-Null
 
     $client = New-Object Microsoft.ApplicationInsights.TelemetryClient
     $client.InstrumentationKey = "67f501bc-da32-4453-9daa-3c432b8cdfb8"
