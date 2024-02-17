@@ -281,6 +281,13 @@ function New-ChatGPTConversation {
     
                 if ($prompt -eq "f") {
 
+                    $os = [System.Environment]::OSVersion.Platform
+
+                    if($os -notin @([System.PlatformID]::Win32NT, [System.PlatformID]::Win32Windows, [System.PlatformID]::Win32S)) {
+                        Write-Host "File input is not supported on this platform. Please use another platform or use the file input mode."
+                        continue
+                    }
+
                     Write-Verbose "User pressed f, so we will prompt a window to collect user input from a file."
     
                     $file = Read-OpenFileDialog -WindowTitle $resources.file_prompt
