@@ -1,4 +1,4 @@
-Import-Module ".\code365scripts.openai\code365scripts.openai.psd1" -Force
+Import-Module  (Join-Path -Path "." -ChildPath "code365scripts.openai\code365scripts.openai.psd1") -Force
 
 # prepare test data
 New-Variable -Name "prompt" -Value "能否用小学生听得懂的方式讲解一下量子力学?" -Option ReadOnly -Scope Script -Force
