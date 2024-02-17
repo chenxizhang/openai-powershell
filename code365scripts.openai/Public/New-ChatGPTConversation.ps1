@@ -154,8 +154,8 @@ function New-ChatGPTConversation {
         $telemetries.Add("promptLib", $parsedprompt.lib)
 
         # if system is not empty and it is a file, then read the file as the system prompt
-        $parsedsystem =  Get-PromptContent($system)
-        $system =$parsedsystem.content
+        $parsedsystem = Get-PromptContent($system)
+        $system = $parsedsystem.content
         $telemetries.Add("systemPromptType", $parsedsystem.type)
         $telemetries.Add("systemPromptLib", $parsedsystem.lib)
 
@@ -251,8 +251,8 @@ function New-ChatGPTConversation {
                 $prompt = Read-Host -Prompt "`n[$current] $($resources.prompt)"
                 Write-Verbose "Prompt received: $prompt"
     
-                if ($prompt -eq "q") {
-                    Write-Verbose "User pressed q, so we will quit the chat."
+                if ($prompt -in ("q", "bye")) {
+                    Write-Verbose "User pressed $prompt, so we will quit the chat."
                     break
                 }
     
@@ -260,7 +260,7 @@ function New-ChatGPTConversation {
 
                     $os = [System.Environment]::OSVersion.Platform
 
-                    if($os -notin @([System.PlatformID]::Win32NT, [System.PlatformID]::Win32Windows, [System.PlatformID]::Win32S)) {
+                    if ($os -notin @([System.PlatformID]::Win32NT, [System.PlatformID]::Win32Windows, [System.PlatformID]::Win32S)) {
                         Write-Host "Multi-line input is not supported on this platform. Please use another platform or use the file mode."
                         continue
                     }
@@ -283,7 +283,7 @@ function New-ChatGPTConversation {
 
                     $os = [System.Environment]::OSVersion.Platform
 
-                    if($os -notin @([System.PlatformID]::Win32NT, [System.PlatformID]::Win32Windows, [System.PlatformID]::Win32S)) {
+                    if ($os -notin @([System.PlatformID]::Win32NT, [System.PlatformID]::Win32Windows, [System.PlatformID]::Win32S)) {
                         Write-Host "File input is not supported on this platform. Please use another platform or use the file input mode."
                         continue
                     }
