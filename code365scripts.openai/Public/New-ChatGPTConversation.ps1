@@ -92,7 +92,8 @@ function New-ChatGPTConversation {
         [Alias("env")]
         [string]$environment,
         [string]$api_version = "2023-09-01-preview",
-        [string]$outFile
+        [string]$outFile,
+        [switch]$json
     )
     BEGIN {
 
@@ -181,6 +182,10 @@ function New-ChatGPTConversation {
                 Body        = @{model = "$engine"; messages = $messages }
                 Headers     = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "Bearer $api_key" } }
                 ContentType = "application/json;charset=utf-8"
+            }
+
+            if ($json) {
+                $params.Body.Add("response_format" , @{type = "json_object" } )
             }
 
 
@@ -318,6 +323,11 @@ function New-ChatGPTConversation {
                     Headers     = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "Bearer $api_key" } }
                     ContentType = "application/json;charset=utf-8"
                 }
+
+                if ($json) {
+                    $params.Body.Add("response_format" , @{type = "json_object" } )
+                }
+
 
                 if ($config) {
                     Merge-Hashtable -table1 $params.Body -table2 $config
