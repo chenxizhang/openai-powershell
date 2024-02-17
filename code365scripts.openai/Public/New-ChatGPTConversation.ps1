@@ -257,8 +257,15 @@ function New-ChatGPTConversation {
                 }
     
                 if ($prompt -eq "m") {
-                    Write-Verbose "User pressed m, so we will prompt a window to collect user input in multi-lines mode."
 
+                    $os = [System.Environment]::OSVersion.Platform
+
+                    if($os -notin @([System.PlatformID]::Win32NT, [System.PlatformID]::Win32Windows, [System.PlatformID]::Win32S)) {
+                        Write-Host "Multi-line input is not supported on this platform. Please use another platform or use the file mode."
+                        continue
+                    }
+
+                    Write-Verbose "User pressed m, so we will prompt a window to collect user input in multi-lines mode."
                     $prompt = Read-MultiLineInputBoxDialog -Message $resources.multi_line_prompt -WindowTitle $resources.multi_line_prompt -DefaultText ""
 
                     Write-Verbose "Prompt received: $prompt"
