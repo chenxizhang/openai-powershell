@@ -12,7 +12,7 @@
     RootModule           = '.\code365scripts.openai.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '2.0.0.9'
+    ModuleVersion        = '2.0.1.0'
 
     # Supported PSEditions
     CompatiblePSEditions = @("Desktop")
@@ -108,6 +108,7 @@
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
+- 2024-02-17    v2.0.1.0    Added json output support for chat.
 - 2024-02-17    v2.0.0.9    Use can say "bye" to exit chat
 - 2024-02-17    v2.0.0.8    Fixed several issues on Mac and Linux
 - 2024-01-08    v2.0.0.7    Code signing the module
