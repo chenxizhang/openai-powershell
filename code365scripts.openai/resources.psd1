@@ -3,7 +3,7 @@ ConvertFrom-StringData -StringData @'
     error_missing_engine = Model is missing, Please set the environment variable OPENAI_ENGINE or OPENAI_ENGINE_AZURE, or you can specify the parameter -engine.
     error_missing_endpoint = Endpoint is missing, Please set the environment variable OPENAI_ENDPOINT or OPENAI_ENDPOINT_AZURE, or you can specify the parameter -endpoint.
     welcome = Welcome to OpenAI{0}'s world, The model you are currently using is: {1}, Please start with your prompt.
-    shortcuts=Shortcuts：Press q and Enter to exit, Press m and Enter to input multi-lines prompt， Press f and Enter to select a file from disk.
+    shortcuts=Shortcuts：Press q (or bye) and Enter to exit, Press m and Enter to input multi-lines prompt， Press f and Enter to select a file from disk. please note, only Windows supports m and f mode.
     azure_version = (Azure)
     prompt = Prompt
     response = Answered as below, consumed tokes are : {0} = {1} + {2}
