@@ -1,6 +1,6 @@
 ConvertFrom-StringData -StringData @'
     error_missing_api_key = API key is missing. Please set the environment variable OPENAI_API_KEY or OPENAI_API_KEY_AZURE, or you can specify the parameter -api_key.
-    error_missing_engine = Model is missing, Please set the environment variable OPENAI_ENGINE or OPENAI_ENGINE_AZURE, or you can specify the parameter -engine.
+    error_missing_engine = Model is missing, Please set the environment variable OPENAI_ENGINE or OPENAI_ENGINE_AZURE, or you can specify the parameter -model.
     error_missing_endpoint = Endpoint is missing, Please set the environment variable OPENAI_ENDPOINT or OPENAI_ENDPOINT_AZURE, or you can specify the parameter -endpoint.
     welcome = Welcome to OpenAI{0}'s world, The model you are currently using is: {1}, Please start with your prompt.
     shortcuts=Shortcuts：Press q (or bye) and Enter to exit, Press m and Enter to input multi-lines prompt， Press f and Enter to select a file from disk. please note, only Windows supports m and f mode.

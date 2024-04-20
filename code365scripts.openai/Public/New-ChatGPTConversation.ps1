@@ -8,7 +8,7 @@ function New-ChatGPTConversation {
     .PARAMETER api_key
         Your OpenAI API key, you can also set it in environment variable OPENAI_API_KEY or OPENAI_API_KEY_AZURE if you use Azure OpenAI API. If you use multiple environments, you can use OPENAI_API_KEY_AZURE_$environment to define the api key for each environment.
     .PARAMETER model
-        The engine to use for this request, you can also set it in environment variable OPENAI_CHAT_ENGINE or OPENAI_CHAT_ENGINE_AZURE if you use Azure OpenAI API. If you use multiple environments, you can use OPENAI_CHAT_ENGINE_AZURE_$environment to define the engine for each environment. You can use model or deployment as the alias of engine.
+        The model to use for this request, you can also set it in environment variable OPENAI_CHAT_MODEL or OPENAI_CHAT_DEPLOYMENT_AZURE if you use Azure OpenAI API. If you use multiple environments, you can use OPENAI_CHAT_DEPLOYMENT_AZURE_$environment to define the model for each environment. You can use engine or deployment as the alias of model.
     .PARAMETER endpoint
         The endpoint to use for this request, you can also set it in environment variable OPENAI_ENDPOINT or OPENAI_ENDPOINT_AZURE if you use Azure OpenAI API. If you use multiple environments, you can use OPENAI_ENDPOINT_AZURE_$environment to define the endpoint for each environment.
     .PARAMETER azure
@@ -18,8 +18,6 @@ function New-ChatGPTConversation {
         If you provide a file path to this parameter, we will read the file as the system prompt.
         You can also specify a url to this parameter, we will read the url as the system prompt.
         You can read the prompt from a library (https://github.com/code365opensource/promptlibrary), by use "lib:xxxxx" as the prompt, for example, "lib:fitness".
-    .PARAMETER stream
-        If you want to stream the response, you can use this switch. Please note, we only support this feature in new Powershell (6.0+).
     .PARAMETER prompt
         If you want to get result immediately, you can use this parameter to define the prompt. It will not start the chat conversation.
         If you provide a file path to this parameter, we will read the file as the prompt.
@@ -28,7 +26,7 @@ function New-ChatGPTConversation {
     .PARAMETER config
         The dynamic settings for the API call, it can meet all the requirement for each model. please pass a custom object to this parameter, like @{temperature=1;max_tokens=1024}
     .PARAMETER environment
-        The environment name, if you use Azure OpenAI API, you can use this parameter to define the environment name, it will be used to get the api key, engine and endpoint from environment variable. If the environment is not exist, it will use the default environment.
+        The environment name, if you use Azure OpenAI API, you can use this parameter to define the environment name, it will be used to get the api key, model and endpoint from environment variable. If the environment is not exist, it will use the default environment.
         You can use env as the alias of this parameter.
     .PARAMETER api_version
         The api version, if you use Azure OpenAI API, you can use this parameter to define the api version, the default value is 2023-09-01-preview.
@@ -43,26 +41,23 @@ function New-ChatGPTConversation {
         New-ChatGPTConverstaion -azure
         Create a new ChatGPT conversation, use Azure openai service with all the default settings.
     .EXAMPLE
-        New-ChatGPTConverstaion -azure -stream
-        Create a new ChatGPT conversation, use Azure openai service and stream the response, with all the default settings.
-    .EXAMPLE
         chat -azure
         Create a new ChatGPT conversation by cmdlet's alias(chat), use Azure openai service with all the default settings.
     .EXAMPLE
-        New-ChatGPTConversation -api_key "your api key" -engine "your engine id"
-        Create a new ChatGPT conversation, use openai service with your api key and engine id.
+        New-ChatGPTConversation -api_key "your api key" -model "your model name"
+        Create a new ChatGPT conversation, use openai service with your api key and model name.
     .EXAMPLE
-        New-ChatGPTConversation -api_key "your api key" -engine "your engine id" -azure
-        Create a new ChatGPT conversation, use Azure openai service with your api key and engine id.
+        New-ChatGPTConversation -api_key "your api key" -model "your deployment name" -azure
+        Create a new ChatGPT conversation, use Azure openai service with your api key and deployment name.
     .EXAMPLE
-        New-ChatGPTConversation -api_key "your api key" -engine "your engine id" -azure -system "You are a chatbot, please answer the user's question according to the user's language."
-        Create a new ChatGPT conversation, use Azure openai service with your api key and engine id, and define the system prompt.
+        New-ChatGPTConversation -api_key "your api key" -model "your deployment name" -azure -system "You are a chatbot, please answer the user's question according to the user's language."
+        Create a new ChatGPT conversation, use Azure openai service with your api key and deployment name, and define the system prompt.
     .EXAMPLE
-        New-ChatGPTConversation -api_key "your api key" -engine "your engine id" -azure -system "You are a chatbot, please answer the user's question according to the user's language." -endpoint "https://api.openai.com/v1/completions"
-        Create a new ChatGPT conversation, use Azure openai service with your api key and engine id, and define the system prompt and endpoint.
+        New-ChatGPTConversation -api_key "your api key" -model "your deployment name" -azure -system "You are a chatbot, please answer the user's question according to the user's language." -endpoint "https://api.openai.com/v1/completions"
+        Create a new ChatGPT conversation, use Azure openai service with your api key and model id, and define the system prompt and endpoint.
     .EXAMPLE
         chat -azure -system "You are a chatbot, please answer the user's question according to the user's language." -environment "sweden"
-        Create a new ChatGPT conversation by cmdlet's alias(chat), use Azure openai service with the api key, engine and endpoint defined in environment variable OPENAI_API_KEY_AZURE_SWEDEN, OPENAI_CHAT_ENGINE_AZURE_SWEDEN and OPENAI_ENDPOINT_AZURE_SWEDEN.
+        Create a new ChatGPT conversation by cmdlet's alias(chat), use Azure openai service with the api key, model and endpoint defined in environment variable OPENAI_API_KEY_AZURE_SWEDEN, OPENAI_CHAT_DEPLOYMENT_AZURE_SWEDEN and OPENAI_ENDPOINT_AZURE_SWEDEN.
     .EXAMPLE
         chat -azure -api_version "2021-09-01-preview"
         Create a new ChatGPT conversation by cmdlet's alias(chat), use Azure openai service with the api version 2021-09-01-preview.
@@ -85,10 +80,10 @@ function New-ChatGPTConversation {
     [CmdletBinding(DefaultParameterSetName = "default")]
     [Alias("chatgpt")][Alias("chat")][Alias("gpt")]
     param(
-        [Parameter(ParameterSetName = "local", Mandatory = $true, Position = 0)]
+        [Parameter(ParameterSetName = "local", Mandatory = $true)]
         [Alias("ollama")]
         [switch]$local,
-        [Parameter(ParameterSetName = "azure", Mandatory = $true, Position = 0)]
+        [Parameter(ParameterSetName = "azure", Mandatory = $true)]
         [switch]$azure,
         [Parameter(ParameterSetName = "default")]
         [Parameter(ParameterSetName = "azure")]
@@ -110,10 +105,6 @@ function New-ChatGPTConversation {
         [Parameter(ParameterSetName = "azure")]    
         [Parameter(ParameterSetName = "local")]
         [string]$prompt = "",
-        [Parameter(ParameterSetName = "default")]
-        [Parameter(ParameterSetName = "azure")]    
-        [Parameter(ParameterSetName = "local")]
-        [switch]$stream,
         [Parameter(ParameterSetName = "default")]
         [Parameter(ParameterSetName = "azure")]    
         [Parameter(ParameterSetName = "local")]
@@ -141,13 +132,13 @@ function New-ChatGPTConversation {
         switch ($PSCmdlet.ParameterSetName) {
             "default" {
                 $api_key = if ($api_key) { $api_key } else { $env:OPENAI_API_KEY }
-                $engine = if ($engine) { $engine } else { if ($env:OPENAI_CHAT_ENGINE) { $env:OPENAI_CHAT_ENGINE }else { "gpt-3.5-turbo" } }
+                $model = if ($model) { $model } else { if ($env:OPENAI_CHAT_MODEL) { $env:OPENAI_CHAT_MODEL }else { "gpt-3.5-turbo" } }
                 $endpoint = if ($endpoint) { $endpoint } else { "https://api.openai.com/v1/chat/completions" }
             }
             "azure" {
                 $api_key = if ($api_key) { $api_key } else { Get-FirstNonNullItemInArray("OPENAI_API_KEY_AZURE_$environment", "OPENAI_API_KEY_AZURE") }
-                $engine = if ($engine) { $engine } else { Get-FirstNonNullItemInArray("OPENAI_CHAT_ENGINE_AZURE_$environment", "OPENAI_CHAT_ENGINE_AZURE") }
-                $endpoint = if ($endpoint) { $endpoint } else { "{0}openai/deployments/$engine/chat/completions?api-version=$api_version" -f (Get-FirstNonNullItemInArray("OPENAI_ENDPOINT_AZURE_$environment", "OPENAI_ENDPOINT_AZURE")) }
+                $model = if ($model) { $model } else { Get-FirstNonNullItemInArray("OPENAI_CHAT_DEPLOYMENT_AZURE_$environment", "OPENAI_CHAT_DEPLOYMENT_AZURE") }
+                $endpoint = if ($endpoint) { $endpoint } else { "{0}openai/deployments/$model/chat/completions?api-version=$api_version" -f (Get-FirstNonNullItemInArray("OPENAI_ENDPOINT_AZURE_$environment", "OPENAI_ENDPOINT_AZURE")) }
             }
             "local" {
                 $endpoint = if ($endpoint) { $endpoint }else { "http://localhost:11434/v1/chat/completions" }
@@ -155,7 +146,7 @@ function New-ChatGPTConversation {
             }
         }
 
-        Write-Verbose "Parameter parsed. api_key: $api_key, engine: $engine, endpoint: $endpoint"
+        Write-Verbose "Parameter parsed. api_key: $api_key, model: $model, endpoint: $endpoint"
 
         $hasError = $false
 
@@ -170,21 +161,13 @@ function New-ChatGPTConversation {
             $hasError = $true
         }
 
-        if (!$engine) {
+        if (!$model) {
             Write-Error $resources.error_missing_engine
             $hasError = $true
         }
 
-        if (($PSVersionTable['PSVersion'].Major -le 5) -and $stream) {
-            # only new powershell support stream
-            # Write-Error $resources.powershell_version_unsupported
-            # $hasError = $true
-            Write-Host "Powershell 5.0 detected, stream mode is not supported. We will use the normal mode."
-            $stream = $false
-        }
-
         # if user didn't specify the stream parameter, and current powershell version is greater than 5, then use the stream mode
-        if ($PSVersionTable['PSVersion'].Major -gt 5 -and !$stream) {
+        if ($PSVersionTable['PSVersion'].Major -gt 5) {
             Write-Verbose "Powershell 6.0+ detected, stream mode is not specified, we will use the stream mode by default."
             $stream = $true
         }
@@ -231,7 +214,7 @@ function New-ChatGPTConversation {
             $params = @{
                 Uri         = $endpoint
                 Method      = "POST"
-                Body        = @{model = "$engine"; messages = $messages }
+                Body        = @{model = "$model"; messages = $messages }
                 Headers     = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "Bearer $api_key" } }
                 ContentType = "application/json;charset=utf-8"
             }
@@ -286,7 +269,7 @@ function New-ChatGPTConversation {
             Write-Verbose "Prompt not received, so it is in chat mode."
 
             $index = 1; 
-            $welcome = "`n{0}`n{1}" -f ($resources.welcome_chatgpt -f $(if ($azure) { " $($resources.azure_version) " } else { "" }), $engine), $resources.shortcuts
+            $welcome = "`n{0}`n{1}" -f ($resources.welcome_chatgpt -f $(if ($azure) { " $($resources.azure_version) " } else { "" }), $model), $resources.shortcuts
     
             Write-Host $welcome -ForegroundColor Yellow
             Write-Host $system -ForegroundColor Cyan
@@ -371,7 +354,7 @@ function New-ChatGPTConversation {
                 $params = @{
                     Uri         = $endpoint
                     Method      = "POST"
-                    Body        = @{model = "$engine"; messages = ($systemPrompt + $messages[-5..-1]); stream = if ($stream) { $true }else { $false } } 
+                    Body        = @{model = "$model"; messages = ($systemPrompt + $messages[-5..-1]); stream = if ($stream) { $true }else { $false } } 
                     Headers     = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "Bearer $api_key" } }
                     ContentType = "application/json;charset=utf-8"
                 }
