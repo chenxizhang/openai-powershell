@@ -34,6 +34,8 @@ function New-ChatGPTConversation {
         The api version, if you use Azure OpenAI API, you can use this parameter to define the api version, the default value is 2023-09-01-preview.
     .PARAMETER outFile
         If you want to save the result to a file, you can use this parameter to set the file path.
+    .PARAMETER local
+        If you want to use the local LLMs, like the model hosted by ollama, you can use this switch. You can also use "ollama" as the alias.
     .EXAMPLE
         New-ChatGPTConversation
         Create a new ChatGPT conversation, use openai service with all the default settings.
@@ -78,22 +80,58 @@ function New-ChatGPTConversation {
 
 
     [CmdletBinding()]
-    [Alias("chatgpt")][Alias("chat")]
+    [Alias("chatgpt")][Alias("chat")][Alias("gpt")]
     param(
+        [Parameter(ParameterSetName = "Default")]
+        [Parameter(ParameterSetName = "azure")]
         [string]$api_key,
+
+        [Parameter(ParameterSetName = "Default")]
+        [Parameter(ParameterSetName = "azure")]
         [Alias("model", "deployment")]
         [string]$engine,
-        [string]$endpoint, 
+
+        [Parameter(ParameterSetName = "Default")]
+        [Parameter(ParameterSetName = "azure")]
+        [string]$endpoint,
+
+        [Parameter(ParameterSetName = "azure")] 
         [switch]$azure,
+
+        [Parameter(ParameterSetName = "Default")]
+        [Parameter(ParameterSetName = "azure")]
         [string]$system = "You are a chatbot, please answer the user's question according to the user's language.",
+
+        [Parameter(ParameterSetName = "Default")]
+        [Parameter(ParameterSetName = "azure")]
         [string]$prompt = "",
+
+        [Parameter(ParameterSetName = "Default")]
+        [Parameter(ParameterSetName = "azure")]
         [switch]$stream,
+
+        [Parameter(ParameterSetName = "Default")]
+        [Parameter(ParameterSetName = "azure")]
         [PSCustomObject]$config,
+
+        [Parameter(ParameterSetName = "azure")]
         [Alias("env")]
         [string]$environment,
+
+        [Parameter(ParameterSetName = "azure")]
         [string]$api_version = "2023-09-01-preview",
+
+        [Parameter(ParameterSetName = "Default")]
+        [Parameter(ParameterSetName = "azure")]        
         [string]$outFile,
-        [switch]$json
+
+        [Parameter(ParameterSetName = "Default")]
+        [Parameter(ParameterSetName = "azure")]
+        [switch]$json,
+
+        [Parameter(ParameterSetName = "Default")]
+        [Alias("ollama")]
+        [switch]$local
     )
     BEGIN {
 
@@ -109,6 +147,11 @@ function New-ChatGPTConversation {
             $api_key = if ($api_key) { $api_key } else { $env:OPENAI_API_KEY }
             $engine = if ($engine) { $engine } else { if ($env:OPENAI_CHAT_ENGINE) { $env:OPENAI_CHAT_ENGINE }else { "gpt-3.5-turbo" } }
             $endpoint = if ($endpoint) { $endpoint } else { "https://api.openai.com/v1/chat/completions" }
+
+            if ($lcoal) {
+                $endpoint = "http://localhost:11434/v1/chat/completions"
+                $api_key = "ollama"
+            }
         }
 
         Write-Verbose "Parameter parsed. api_key: $api_key, engine: $engine, endpoint: $endpoint"
