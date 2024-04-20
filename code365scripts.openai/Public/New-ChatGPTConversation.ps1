@@ -179,6 +179,13 @@ function New-ChatGPTConversation {
             Write-Error $resources.powershell_version_unsupported
             $hasError = $true
         }
+
+        # if user didn't specify the stream parameter, and current powershell version is greater than 5, then use the stream mode
+        if ($PSVersionTable['PSVersion'].Major -gt 5) {
+            if (!$stream) {
+                $stream = $true
+            }
+        }
     }
 
     PROCESS {
