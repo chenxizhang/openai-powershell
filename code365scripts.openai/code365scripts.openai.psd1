@@ -12,7 +12,7 @@
     RootModule           = '.\code365scripts.openai.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '2.0.1.0'
+    ModuleVersion        = '2.0.1.1'
 
     # Supported PSEditions
     CompatiblePSEditions = @("Desktop")
@@ -78,7 +78,7 @@
     VariablesToExport    = '*'
 
     # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-    AliasesToExport      = @("noc", "chatgpt", "chat", "dall", "image", "vc", "vision","submit")
+    AliasesToExport      = @("noc", "chatgpt", "chat", "dall", "image", "vc", "vision", "submit", "gpt")
 
     # DSC resources to export from this module
     # DscResourcesToExport = @()
@@ -108,6 +108,7 @@
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
+- 2024-04-20    v2.0.1.1    Added local models support and other enhancements.            
 - 2024-02-17    v2.0.1.0    Added json output support for chat.
 - 2024-02-17    v2.0.0.9    Use can say "bye" to exit chat
 - 2024-02-17    v2.0.0.8    Fixed several issues on Mac and Linux
