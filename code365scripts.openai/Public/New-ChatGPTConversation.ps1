@@ -7,7 +7,7 @@ function New-ChatGPTConversation {
         Create a new ChatGPT conversation, You can chat with the openai service just like chat with a human. You can also get the chat completion result if you specify the prompt parameter.
     .PARAMETER api_key
         Your OpenAI API key, you can also set it in environment variable OPENAI_API_KEY or OPENAI_API_KEY_AZURE if you use Azure OpenAI API. If you use multiple environments, you can use OPENAI_API_KEY_AZURE_$environment to define the api key for each environment.
-    .PARAMETER engine
+    .PARAMETER model
         The engine to use for this request, you can also set it in environment variable OPENAI_CHAT_ENGINE or OPENAI_CHAT_ENGINE_AZURE if you use Azure OpenAI API. If you use multiple environments, you can use OPENAI_CHAT_ENGINE_AZURE_$environment to define the engine for each environment. You can use model or deployment as the alias of engine.
     .PARAMETER endpoint
         The endpoint to use for this request, you can also set it in environment variable OPENAI_ENDPOINT or OPENAI_ENDPOINT_AZURE if you use Azure OpenAI API. If you use multiple environments, you can use OPENAI_ENDPOINT_AZURE_$environment to define the endpoint for each environment.
@@ -72,6 +72,9 @@ function New-ChatGPTConversation {
     .EXAMPLE
         chat -azure -system "c:\temp\system.txt" -prompt "c:\temp\prompt.txt"
         Create a new ChatGPT conversation by cmdlet's alias(chat), use Azure openai service with the system prompt and prompt from file.
+    .EXAMPLE
+        chat -local -model "llama3"
+        Create a new ChatGPT conversation by using local LLMs, for example, the llama3. The default endpoint is http://localhost:11434/v1/chat/completions. You can modify this endpoint as well.
     .OUTPUTS
         System.String, the completion result. If you use stream mode, it will not return anything. 
     .LINK
@@ -79,78 +82,76 @@ function New-ChatGPTConversation {
     #>
 
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = "default")]
     [Alias("chatgpt")][Alias("chat")][Alias("gpt")]
     param(
-        [Parameter(ParameterSetName = "Default")]
+        [Parameter(ParameterSetName = "local", Mandatory = $true, Position = 0)]
+        [Alias("ollama")]
+        [switch]$local,
+        [Parameter(ParameterSetName = "azure", Mandatory = $true, Position = 0)]
+        [switch]$azure,
+        [Parameter(ParameterSetName = "default")]
         [Parameter(ParameterSetName = "azure")]
         [string]$api_key,
-
-        [Parameter(ParameterSetName = "Default")]
-        [Parameter(ParameterSetName = "azure")]
-        [Alias("model", "deployment")]
-        [string]$engine,
-
-        [Parameter(ParameterSetName = "Default")]
-        [Parameter(ParameterSetName = "azure")]
+        [Parameter(ParameterSetName = "default")]
+        [Parameter(ParameterSetName = "azure")]    
+        [Parameter(ParameterSetName = "local", Mandatory = $true)]
+        [Alias("engine", "deployment")]
+        [string]$model,
+        [Parameter(ParameterSetName = "default")]
+        [Parameter(ParameterSetName = "azure")]    
+        [Parameter(ParameterSetName = "local")]
         [string]$endpoint,
-
-        [Parameter(ParameterSetName = "azure")] 
-        [switch]$azure,
-
-        [Parameter(ParameterSetName = "Default")]
-        [Parameter(ParameterSetName = "azure")]
+        [Parameter(ParameterSetName = "default")]
+        [Parameter(ParameterSetName = "azure")]    
+        [Parameter(ParameterSetName = "local")]
         [string]$system = "You are a chatbot, please answer the user's question according to the user's language.",
-
-        [Parameter(ParameterSetName = "Default")]
-        [Parameter(ParameterSetName = "azure")]
+        [Parameter(ParameterSetName = "default")]
+        [Parameter(ParameterSetName = "azure")]    
+        [Parameter(ParameterSetName = "local")]
         [string]$prompt = "",
-
-        [Parameter(ParameterSetName = "Default")]
-        [Parameter(ParameterSetName = "azure")]
+        [Parameter(ParameterSetName = "default")]
+        [Parameter(ParameterSetName = "azure")]    
+        [Parameter(ParameterSetName = "local")]
         [switch]$stream,
-
-        [Parameter(ParameterSetName = "Default")]
-        [Parameter(ParameterSetName = "azure")]
+        [Parameter(ParameterSetName = "default")]
+        [Parameter(ParameterSetName = "azure")]    
+        [Parameter(ParameterSetName = "local")]
         [PSCustomObject]$config,
-
         [Parameter(ParameterSetName = "azure")]
         [Alias("env")]
         [string]$environment,
-
         [Parameter(ParameterSetName = "azure")]
-        [string]$api_version = "2023-09-01-preview",
-
-        [Parameter(ParameterSetName = "Default")]
-        [Parameter(ParameterSetName = "azure")]        
+        [string]$api_version = "2023-09-01-preview",   
+        [Parameter(ParameterSetName = "default")]
+        [Parameter(ParameterSetName = "azure")]    
+        [Parameter(ParameterSetName = "local")]   
         [string]$outFile,
+        [Parameter(ParameterSetName = "default")]
+        [Parameter(ParameterSetName = "azure")]    
+        [Parameter(ParameterSetName = "local")]
+        [switch]$json
 
-        [Parameter(ParameterSetName = "Default")]
-        [Parameter(ParameterSetName = "azure")]
-        [switch]$json,
-
-        [Parameter(ParameterSetName = "Default")]
-        [Alias("ollama")]
-        [switch]$local
     )
     BEGIN {
 
         Write-Verbose "Parameter received`n$($PSBoundParameters | Out-String)"
         Write-Verbose "Environment variable detected.`n$(Get-ChildItem Env:OPENAI_* | Out-String)"
 
-        if ($azure) {
-            $api_key = if ($api_key) { $api_key } else { Get-FirstNonNullItemInArray("OPENAI_API_KEY_AZURE_$environment", "OPENAI_API_KEY_AZURE") }
-            $engine = if ($engine) { $engine } else { Get-FirstNonNullItemInArray("OPENAI_CHAT_ENGINE_AZURE_$environment", "OPENAI_CHAT_ENGINE_AZURE") }
-            $endpoint = if ($endpoint) { $endpoint } else { "{0}openai/deployments/$engine/chat/completions?api-version=$api_version" -f (Get-FirstNonNullItemInArray("OPENAI_ENDPOINT_AZURE_$environment", "OPENAI_ENDPOINT_AZURE")) }
-        }
-        else {
-            $api_key = if ($api_key) { $api_key } else { $env:OPENAI_API_KEY }
-            $engine = if ($engine) { $engine } else { if ($env:OPENAI_CHAT_ENGINE) { $env:OPENAI_CHAT_ENGINE }else { "gpt-3.5-turbo" } }
-            $endpoint = if ($endpoint) { $endpoint } else { "https://api.openai.com/v1/chat/completions" }
-
-            if ($lcoal) {
-                $endpoint = "http://localhost:11434/v1/chat/completions"
-                $api_key = "ollama"
+        switch ($PSCmdlet.ParameterSetName) {
+            "default" {
+                $api_key = if ($api_key) { $api_key } else { $env:OPENAI_API_KEY }
+                $engine = if ($engine) { $engine } else { if ($env:OPENAI_CHAT_ENGINE) { $env:OPENAI_CHAT_ENGINE }else { "gpt-3.5-turbo" } }
+                $endpoint = if ($endpoint) { $endpoint } else { "https://api.openai.com/v1/chat/completions" }
+            }
+            "azure" {
+                $api_key = if ($api_key) { $api_key } else { Get-FirstNonNullItemInArray("OPENAI_API_KEY_AZURE_$environment", "OPENAI_API_KEY_AZURE") }
+                $engine = if ($engine) { $engine } else { Get-FirstNonNullItemInArray("OPENAI_CHAT_ENGINE_AZURE_$environment", "OPENAI_CHAT_ENGINE_AZURE") }
+                $endpoint = if ($endpoint) { $endpoint } else { "{0}openai/deployments/$engine/chat/completions?api-version=$api_version" -f (Get-FirstNonNullItemInArray("OPENAI_ENDPOINT_AZURE_$environment", "OPENAI_ENDPOINT_AZURE")) }
+            }
+            "local" {
+                $endpoint = if ($endpoint) { $endpoint }else { "http://localhost:11434/v1/chat/completions" }
+                $api_key = if ($api_key) { $api_key } else { "local" }
             }
         }
 
@@ -176,15 +177,16 @@ function New-ChatGPTConversation {
 
         if (($PSVersionTable['PSVersion'].Major -le 5) -and $stream) {
             # only new powershell support stream
-            Write-Error $resources.powershell_version_unsupported
-            $hasError = $true
+            # Write-Error $resources.powershell_version_unsupported
+            # $hasError = $true
+            Write-Host "Powershell 5.0 detected, stream mode is not supported. We will use the normal mode."
+            $stream = $false
         }
 
         # if user didn't specify the stream parameter, and current powershell version is greater than 5, then use the stream mode
-        if ($PSVersionTable['PSVersion'].Major -gt 5) {
-            if (!$stream) {
-                $stream = $true
-            }
+        if ($PSVersionTable['PSVersion'].Major -gt 5 -and !$stream) {
+            Write-Verbose "Powershell 6.0+ detected, stream mode is not specified, we will use the stream mode by default."
+            $stream = $true
         }
     }
 
@@ -195,7 +197,7 @@ function New-ChatGPTConversation {
         }
 
         $telemetries = @{
-            useAzure = $azure
+            type = $PSCmdlet.ParameterSetName
         }
 
         # if prompt is not empty and it is a file, then read the file as the prompt

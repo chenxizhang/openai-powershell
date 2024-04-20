@@ -29,6 +29,7 @@ $cmds = @'
     New-OpenAICompletion "$prompt" -azure -environment "SWEDEN"
     noc "$prompt" -azure -environment "xxx"
     chat -prompt "$prompt"
+    chat -local -prompt"$prompt"
     chat -azure -prompt $promptFile
     chat -azure -prompt $promptFile | Out-File -Encoding utf8 -FilePath (New-TemporaryFile).FullName
     chat -azure -system $systemPromptFile -prompt $promptFile
