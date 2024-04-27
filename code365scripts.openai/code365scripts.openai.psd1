@@ -12,7 +12,7 @@
     RootModule           = '.\code365scripts.openai.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '2.0.1.4'
+    ModuleVersion        = '2.0.1.5'
 
     # Supported PSEditions
     CompatiblePSEditions = @("Desktop")
@@ -108,6 +108,7 @@
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
+- 2024-04-27    v2.0.1.5    Add context support, you can pass variable to prompt (both system and user prompt) at the runtime.         
 - 2024-04-25    v2.0.1.4    Bug fixes. 
 - 2024-04-21    v2.0.1.3    Simplify the module,and re-design the New-ImageGeneration function. 
 - 2024-04-20    v2.0.1.2    Bug fixs.   
