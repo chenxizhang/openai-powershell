@@ -143,7 +143,7 @@ function New-ChatGPTConversation {
             "azure" {
                 $api_key = if ($api_key) { $api_key } else { Get-FirstNonNullItemInArray("OPENAI_API_KEY_AZURE_$environment", "OPENAI_API_KEY_AZURE") }
                 $model = if ($model) { $model } else { Get-FirstNonNullItemInArray("OPENAI_CHAT_DEPLOYMENT_AZURE_$environment", "OPENAI_CHAT_DEPLOYMENT_AZURE") }
-                $endpoint = if ($endpoint) { $endpoint } else { "{0}openai/deployments/$model/chat/completions?api-version=$api_version" -f (Get-FirstNonNullItemInArray("OPENAI_ENDPOINT_AZURE_$environment", "OPENAI_ENDPOINT_AZURE")) }
+                $endpoint = if ($endpoint) { "{0}openai/deployments/$model/chat/completions?api-version=$api_version" -f $endpoint } else { "{0}openai/deployments/$model/chat/completions?api-version=$api_version" -f (Get-FirstNonNullItemInArray("OPENAI_ENDPOINT_AZURE_$environment", "OPENAI_ENDPOINT_AZURE")) }
             }
             "local" {
                 $endpoint = if ($endpoint) { $endpoint }else { "http://localhost:11434/v1/chat/completions" }
