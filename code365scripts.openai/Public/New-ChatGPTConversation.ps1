@@ -34,6 +34,8 @@ function New-ChatGPTConversation {
         If you want to save the result to a file, you can use this parameter to set the file path.
     .PARAMETER local
         If you want to use the local LLMs, like the model hosted by ollama, you can use this switch. You can also use "ollama" as the alias.
+    .PARAMETER context
+        If you want to pass some dymamic value to the prompt, you can use the context parameter here. It can be anything, you just specify a custom powershell object here.
     .EXAMPLE
         New-ChatGPTConversation
         Create a new ChatGPT conversation, use openai service with all the default settings.
@@ -121,8 +123,11 @@ function New-ChatGPTConversation {
         [Parameter(ParameterSetName = "default")]
         [Parameter(ParameterSetName = "azure")]    
         [Parameter(ParameterSetName = "local")]
-        [switch]$json
-
+        [switch]$json,
+        [Parameter(ParameterSetName = "default")]
+        [Parameter(ParameterSetName = "azure")]    
+        [Parameter(ParameterSetName = "local")]
+        [PSCustomObject]$context
     )
     BEGIN {
 
@@ -186,12 +191,32 @@ function New-ChatGPTConversation {
         # if prompt is not empty and it is a file, then read the file as the prompt
         $parsedprompt = Get-PromptContent($prompt)
         $prompt = $parsedprompt.content
+
+        # if user provide the context, inject the data into the prompt by replace the context key with the context value
+        if ($context) {
+            Write-Verbose "Context received: $($context | ConvertTo-Json -Depth 10)"
+            foreach ($key in $context.keys) {
+                $prompt = $prompt -replace "{{$key}}", $context[$key]
+            }
+            Write-Verbose "Prompt after context injected: $prompt"
+        }
+
         $telemetries.Add("promptType", $parsedprompt.type)
         $telemetries.Add("promptLib", $parsedprompt.lib)
 
         # if system is not empty and it is a file, then read the file as the system prompt
         $parsedsystem = Get-PromptContent($system)
         $system = $parsedsystem.content
+
+        # if user provide the context, inject the data into the system prompt by replace the context key with the context value
+        if ($context) {
+            Write-Verbose "Context received: $($context | ConvertTo-Json -Depth 10)"
+            foreach ($key in $context.keys) {
+                $system = $system -replace "{{$key}}", $context[$key]
+            }
+            Write-Verbose "System prompt after context injected: $system"
+        }
+
         $telemetries.Add("systemPromptType", $parsedsystem.type)
         $telemetries.Add("systemPromptLib", $parsedsystem.lib)
 
