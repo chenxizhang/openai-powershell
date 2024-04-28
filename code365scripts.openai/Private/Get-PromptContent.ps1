@@ -32,7 +32,7 @@ function Get-PromptContent($prompt) {
         }
         catch {
             <#Do this if a terminating exception happens#>
-            Write-Error $_.ErrorDetails
+            Write-Error $_
         }
     }
 
