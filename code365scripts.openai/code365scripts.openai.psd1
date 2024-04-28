@@ -12,7 +12,7 @@
     RootModule           = '.\code365scripts.openai.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '2.0.1.8'
+    ModuleVersion        = '2.0.1.9'
 
     # Supported PSEditions
     CompatiblePSEditions = @("Desktop")
@@ -108,6 +108,7 @@
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
+- 2024-04-28    v2.0.1.9    Fixed a bug related to get content from prompt parameter.
 - 2024-04-28    v2.0.1.8    Fixed a bug related to get content from prompt parameter.
 - 2024-04-28    v2.0.1.7    Fixed a bug related to get content from prompt parameter.
 - 2024-04-27    v2.0.1.6    Fixed a bug related to azure openai service endpoint.

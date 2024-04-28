@@ -1,4 +1,7 @@
 function Get-PromptContent($prompt) {
+    
+    # ignore error and continue
+    $ErrorActionPreference = "SilentlyContinue"
 
     $type = "userinput"
     $content = $prompt
@@ -8,7 +11,7 @@ function Get-PromptContent($prompt) {
         try {
             # if the prompt is a file path, read the file as prompt
             if (Test-Path $prompt -PathType Leaf) {
-
+                # in linux, if the prompt is too long, it will fail
                 $type = "file"
 
                 Write-Verbose "Prompt is a file path, read the file as prompt"
@@ -32,11 +35,12 @@ function Get-PromptContent($prompt) {
         }
         catch {
             <#Do this if a terminating exception happens#>
-            Write-Error $_
+            # ignore the error and just return the prompt
         }
     }
 
-
+    # restore error action preference
+    $ErrorActionPreference = "Continue"
     
     Write-Output @{
         type    = $type
