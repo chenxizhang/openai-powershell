@@ -6,8 +6,7 @@
     "root": "docs",
     "plugins": [
         "honkit-plugin-google-analytics",
-        "add-js",
-        "gitbook-plugin-collapsible-menu"
+        "add-js"
     ],
     "pluginsConfig": {
         "analytics": {

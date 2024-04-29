@@ -1,7 +1,7 @@
 {
     "title": "OpenAI PowerShell SDK",
     "author": "陈希章",
-    "description": "OpenAI PowerShell SDK, the unofficial PowerShell SDK for OpenAI API. You can use it to generate text, translate text, answer questions, generate image or understand image and more.",
+    "description": "这是一个非官方的OpenAI PowerShell模块，它支持你用OpenAI，Azure OpenAI，甚至本地模型进行文字生成，实时聊天，图片生成等操作，这个模块能直接跨平台使用，而且在Windows上面，你无需特意安装软件就能使用，因为Windows自带了PowerShell。这是一个让人振奋的人工智能时代，希望你能使用这个模块简化你的工作，提高工作效率。",
     "language": "zh-hans",
     "root": "."
 }

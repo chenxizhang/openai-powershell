@@ -4,7 +4,7 @@ This is a unofficial PowerShell Module for OpenAI, you can use the module to get
 
 ## Reference book
 
-Please read the book <https://ai.xizhang.com> for more information.
+Please read the book <https://xizhang.com/openai-powershell> for more information.
 
 ## Prerequisites
 
