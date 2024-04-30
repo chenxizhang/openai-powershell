@@ -1,8 +1,8 @@
 ---
-description: This is an unofficial PowerShell SDK. The initial purpose and intention for designing this SDK was to simplify everyone's access to OpenAI services and to seamlessly integrate it into their daily work. Initially, it was about meeting my own needs, but then it gradually expanded and formed a relatively complete and perfected version. Currently, it supports not only OpenAI service calls, but also Azure OpenAI service calls, even local model support recently. Furthermore, it is not merely a simple API wrapper, but an SDK that more closely fits PowerShell's use scenarios, such as support for pipeline operations, customizing output formats, file input and output, etc. which greatly improves the efficiency of users.
+description: This is an unofficial PowerShell SDK, designed with the intent and purpose of simplifying the difficulty of accessing OpenAI services for everyone, and seamlessly integrating it with their daily work. Initially, it was designed to solve my own needs, then gradually expanded, forming a relatively complete and integrated version. Currently, it supports both OpenAI services and Azure OpenAI services, and even recently supports local model services. Furthermore, it is not just a simple API wrapper but an SDK closer to PowerShell usage scenarios, supporting pipeline operations, customizable output formats, file input, and output, etc. Thus, significantly improving user efficiency.
 ---
 
-> This document was written by {{config.author}}, generated at {{honkit.time}}, for feedback on this article, please visit {{config.ref+file.path}}, or submit discussions at {{config.discussion}}.
+> The document is written by {{config.author}}, generated at {{honkit.time}}, feedback on this article, please visit {{config.ref+file.path}}, or discuss it at {{config.discussion}}.
 
 [![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/code365scripts.openai?label=code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai)
 
@@ -10,16 +10,22 @@ description: This is an unofficial PowerShell SDK. The initial purpose and inten
 
 {{page.description}}
 
+## Discussing about the current AI development 
 
-## Talking about the Current Round of AI and its Development
+Did you hear about the snow in 2022 that came late compared to previous years? And the spring breeze of 2023 was indeed accompanied with the emergence and spread of ChatGPT in the world. In China, happiness and prosperity are abundant. It is a golden era for everyone and the grand event of Artificial Intelligence. In this era, Artificial Intelligence is no longer a strange term, but has deeply penetrated into our lives and become a part of our lives. As a pioneer of Artificial Intelligence, OpenAI is playing a vital role in this era.
 
-Did you hear about it? The snowfall in 2022 arrived later than usual. And the spring breeze in 2023 certainly swept throughout the universe with the advent of ChatGPT. Across China, from the north to the south, there is a festive, thriving atmosphere. This is a golden age for everyone, and for artificial intelligence. In this era, artificial intelligence is no longer a strange term, but rather has permeated our daily lives and become a part of them. As a pioneer of artificial intelligence, OpenAI is playing a crucial role in this era. 
+With the constant innovation of Large Language Models (LLM), various application scenarios based on this new generation of artificial intelligence technology are also emerging. Amidst rapid development, we certainly see some problems, but what contrasts with the less optimistic global environment is that national politicians, technology elites, corporate giants, and even the public maintain an optimistic attitude towards this AI era. Artificial Intelligence may indeed replace many people's jobs in a few years, but for now, it seems to have created many jobs instead.
 
-With the continuous innovation of the large language model (LLM), various application scenarios based on this new generation of artificial intelligence technology are emerging constantly. As they rapidly develop, we naturally notice some issues. Yet, contrasted against a less-than-optimistic global situation, all from national dignitaries, technology experts, corporate giants, to ordinary people, are maintaining an optimistic attitude about this round of artificial intelligence. While artificial intelligence might replace many jobs in a few years, at present, it seems to have spurred a lot of employment instead.
+Suddenly, we have gained superpowers (yes, unless you are lying, don't you feel that GPT technology is like magic?). But it also brings a bother, that is how to really master this power and use it to improve our work or life, or create what you want. At present, this superpower is not free, and is even expensive in some cases. However, this is a problem that can be solved over time. 
 
-We suddenly have superpowers (yes, unless you are lying, don't you think GPT technology is like magic?) but have also gained a concern. That is how to truly master this ability, take advantage of it to improve our work and life, or create what you want. At present, such superpower is not free, and it can even be expensive in certain circumstances, but it may just be a problem that can be solved with time.
+What will the future bring? Will humans be smarter or more foolish? Sociologists might tell you the answer - even without the wave of AI, human wisdom and stupidity will be a constantly changing process. However, the GPT-represented AI technology may become an X-factor, making wise people wiser, or more foolish people more foolish. In short, it is likely to break this equilibrium – and it won't care.
 
-## When would you use this SDK
+## We need to use AI correctly
+
+The tools we possess are becoming unprecedentedly rich. Text directly becomes a programming language. People expressing themselves in their native languages can accomplish some unprecedented, amazing tasks. It is undoubtedly a contribution to human civilization, making people truly be themselves.
+
+Assume the day comes when these technologies become more widespread and safe, and more cost-effective — they will become a basic skill for humans, just like many people are born to use mobile phones now. Our descendants will most likely take these for granted. Although it is not the case.
 
 ## Why PowerShell
+
 
