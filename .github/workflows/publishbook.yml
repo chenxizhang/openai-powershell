@@ -27,6 +27,7 @@ jobs:
           files: docs/zh/*.md
           to_language: en
           useAzure: true
+          commit: false
           endpoint: ${{secrets.OPENAI_API_ENDPOINT_AZURE}}
           rules: |- 
             - You must fully understand the syntex of markdown, you are the expert of markdown.

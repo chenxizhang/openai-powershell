@@ -1,1 +1,0 @@
-## Auto Translation Assistant

@@ -1,2 +1,0 @@
-## Using Azure OpenAI Service
-
