@@ -1,7 +1,6 @@
 ---
-title: 必备神器
 description: 这里概要性地介绍了 OpenAI PowerShell SDK。以及讲解我为什么开发这个 SDK，典型应用场景等等。
-date: 2024-04-30
+date: '2024-04-30'
 author: chenxizhang | 陈希章
 ---
 
