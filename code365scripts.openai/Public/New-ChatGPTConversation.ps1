@@ -73,7 +73,7 @@ function New-ChatGPTConversation {
         chat -local -model "llama3"
         Create a new ChatGPT conversation by using local LLMs, for example, the llama3. The default endpoint is http://localhost:11434/v1/chat/completions. You can modify this endpoint as well.
     .OUTPUTS
-        System.String, the completion result. If you use stream mode, it will not return anything. 
+        System.String, the completion result. 
     .LINK
         https://github.com/chenxizhang/openai-powershell
     #>
@@ -170,12 +170,6 @@ function New-ChatGPTConversation {
             Write-Error $resources.error_missing_engine
             $hasError = $true
         }
-
-        # if user didn't specify the stream parameter, and current powershell version is greater than 5, then use the stream mode
-        if ($PSVersionTable['PSVersion'].Major -gt 5) {
-            Write-Verbose "Powershell 6.0+ detected, stream mode is not specified, we will use the stream mode by default."
-            $stream = $true
-        }
     }
 
     PROCESS {
@@ -223,7 +217,7 @@ function New-ChatGPTConversation {
         # collect the telemetry data
         Submit-Telemetry -cmdletName $MyInvocation.MyCommand.Name -innovationName $MyInvocation.InvocationName -props $telemetries
 
-        if ($prompt.Length -gt 0) {
+        if ($PSBoundParameters.Keys.Contains("prompt")) {
             Write-Verbose "Prompt received: $prompt, so it is in prompt mode, not in chat mode."
             $messages = @(
                 @{
@@ -285,13 +279,15 @@ function New-ChatGPTConversation {
                 Write-Output $result
 
                 # if user does not specify the outfile, copy the response to clipboard
-                Set-Clipboard $result
-                Write-Host "Copied the response to clipboard." -ForegroundColor Green
+                # Set-Clipboard $result
+                # Write-Host "Copied the response to clipboard." -ForegroundColor Green
             }
 
         }
         else {
             Write-Verbose "Prompt not received, so it is in chat mode."
+
+            $stream = ($PSVersionTable['PSVersion'].Major -gt 5)
 
             $index = 1; 
             $welcome = "`n{0}`n{1}" -f ($resources.welcome_chatgpt -f $(if ($azure) { " $($resources.azure_version) " } else { "" }), $model), $resources.shortcuts
@@ -379,7 +375,7 @@ function New-ChatGPTConversation {
                 $params = @{
                     Uri         = $endpoint
                     Method      = "POST"
-                    Body        = @{model = "$model"; messages = ($systemPrompt + $messages[-5..-1]); stream = if ($stream) { $true }else { $false } } 
+                    Body        = @{model = "$model"; messages = ($systemPrompt + $messages[-5..-1]); stream = $stream} 
                     Headers     = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "Bearer $api_key" } }
                     ContentType = "application/json;charset=utf-8"
                 }
