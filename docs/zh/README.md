@@ -3,7 +3,7 @@ description: 这里概要性地介绍了 OpenAI PowerShell SDK。以及讲解我
 title: 开发神器
 ---
 
-> 文档由 {{book.author}} 于 {{file.mtime}} 编写或修改, 在 {{honkit.time}} 生成, 关于本文的反馈，请访问 {{file.path}}, 或者在 {{book.discussion}} 提交讨论。
+> 文档由 {{config.author}} 于 {{file.mtime}} 编写或修改, 在 {{honkit.time}} 生成, 关于本文的反馈，请访问 {{file.path}}, 或者在 {{config.discussion}} 提交讨论。
 
 [![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/code365scripts.openai?label=code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai)
 
