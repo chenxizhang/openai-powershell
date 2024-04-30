@@ -1,11 +1,10 @@
----
-description: 这里概要性地介绍了 OpenAI PowerShell SDK。以及讲解我为什么开发这个 SDK，典型应用场景等等。
-title: 开发神器
----
+{% extends "./template.md" %}
 
-> 文档由 {{config.author}} 编写, 在 {{honkit.time}} 生成, 关于本文的反馈，请访问 {{config.ref+file.path}}, 或者在 {{config.discussion}} 提交讨论。
+{% block description %}
+OpenAI PowerShell SDK 是一个非官方的 PowerShell SDK，它旨在简化大家对 OpenAI 服务访问的难度，并且将其跟自己日常的工作能无缝地结合起来。
+{% endblock %}
 
-[![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/code365scripts.openai?label=code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai)
+{% block pagecontent %}
 
 ## 概述
 
@@ -21,7 +20,7 @@ title: 开发神器
 ## 为什么是PowerShell
 
 
-
+{% endblock %}
 
 
 
