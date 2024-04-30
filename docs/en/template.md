@@ -1,8 +1,8 @@
 ---
-description: {% block description %} 文章摘要 {% endblock %}
+description: {% block description %} Article Abstract {% endblock %}
 ---
 
-> 文档由 {{config.author}} 编写, 在 {{honkit.time}} 生成, 关于本文的反馈，请访问 {{config.ref+file.path}}, 或者在 {{config.discussion}} 提交讨论。
+> The document is authored by {{config.author}}, generated on {{honkit.time}}, for feedback on this article, please visit {{config.ref+file.path}}, or submit discussions at {{config.discussion}}.
 
 [![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/code365scripts.openai?label=code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai)
 
