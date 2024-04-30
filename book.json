@@ -17,5 +17,6 @@
                 "../scripts/clarity.js"
             ]
         }
-    }
+    },
+    "discussion": "https://github.com/chenxizhang/openai-powershell/discussions"
 }
