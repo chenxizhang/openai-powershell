@@ -6,11 +6,16 @@
     "root": "docs",
     "plugins": [
         "honkit-plugin-google-analytics",
-        "./plugin.js"
+        "add-js"
     ],
     "pluginsConfig": {
         "analytics": {
             "uid": "G-W5VP8TVR3L"
+        },
+        "add-js": {
+            "js": [
+                "../scripts/clarity.js"
+            ]
         }
     },
     "discussion": "https://github.com/chenxizhang/openai-powershell/discussions"
