@@ -1,14 +1,12 @@
 ---
 title: Essential Tool
-description: This provides a brief introduction to the OpenAI PowerShell SDK. It also explains why I developed this SDK, typical application scenarios, etc.
+description: This article provides an overview of the OpenAI PowerShell SDK. It also explains why I developed this SDK, typical application scenarios, and more.
 date: 2024-04-30
 author: chenxizhang | 陈希章
 ---
 
-> This document was written by {{page.author}} on {{page.date.tostring("yyyy-MM-dd")}} and generated on {{honkit.time}}.
+> This document was written by {{page.author}} on {{page.date}} and generated at {{honkit.time}}.
 
 [![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/code365scripts.openai?label=code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai)
 
-
-This is an unofficial PowerShell SDK. My intention and purpose for designing this SDK are to simplify everyone's access to the OpenAI service, and integrate it seamlessly into their daily work. Initially, it was actually to solve my own needs, then gradually expanded and formed a relatively complete and comprehensive version. Currently, it supports not only the OpenAI service calls, but also Azure OpenAI service calls, and even lately it has added support for local models. Furthermore, it's not just a simple API wrapper, but a more fitting PowerShell usage scenario SDK, such as supporting pipeline operations, supporting custom output formats, supporting file input and output, etc. This will greatly improve user efficiency.
-
+This is an unofficial PowerShell SDK. The intention and purpose behind my design of this SDK is to simplify everyone's access to the OpenAI service and seamlessly integrate it into their daily work. Initially, it was to meet my own needs, and then it gradually expanded and formed a relatively complete version. It currently supports both OpenAI service calls and Azure OpenAI service calls, it even recently added support for local models. In addition, it is not just a simple API wrapper, but an SDK that is more aligned with PowerShell use cases, such as supporting pipeline operations, custom output formats, file input and output, etc. All these features greatly improve user efficiency.
