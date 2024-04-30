@@ -5,7 +5,7 @@ date: 2024-04-30
 author: chenxizhang | 陈希章
 ---
 
-> 文档由 {{page.author}} 于 {{page.date.tostring("yyyy-MM-dd")}} 编写, 在 {{honkit.time}} 生成。
+> 文档由 {{page.author}} 于 {{page.date}} 编写, 在 {{honkit.time}} 生成。
 
 [![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/code365scripts.openai?label=code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai)
 
