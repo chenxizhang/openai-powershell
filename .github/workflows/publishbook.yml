@@ -33,6 +33,7 @@ jobs:
             - For a markdown link (for example: [link text](././link.md)), the first part is the text, the second part is the link. You don't need to translate the link.
             - For a markdown image (for example: ![image text](././image.png)), the first part is the text, the second part is the link. You don't need to translate the link.
             - If from_language is not English (en, en-us), but you see English text in the file, you should not translate the English text, this might be a keyword or specicial text. FOr example, "这是非官方的 PowerShell SDK, 我的目的是简化大家对于 OpenAI 和 Azure OpenAI 的使用", the from_language is Chinese, but you see "PowerShell SDK", "OpenAI", "Azure OpenAI" in the content, you should not translate them but you need to translate the whole sentence, and use them as keywords.
+            - 陈希章 or chenxizhang should not be translated.
       - name: Install & Build
         run: |
           npm install
