@@ -43,7 +43,7 @@ function Get-OnlineImageBase64Uri($url) {
 function Get-ImageBase64Uri($file) {
     # if the file is a local file path, then read the file as byte array
     if (Test-Path $file -PathType Leaf) {
-        Write-Verbose "Prompt is a local file path, read the file as prompt"
+        Write-Verbose $resources.verbose_prompt_local_file
         $image = [System.IO.File]::ReadAllBytes($file)
         # get extension without dot
         $type = [System.IO.Path]::GetExtension($file).TrimStart(".")
@@ -53,9 +53,8 @@ function Get-ImageBase64Uri($file) {
     }
 
     if ($file -match "^https?://") {
-        Write-Verbose "Prompt is a url, read the url as prompt"
+        Write-Verbose $resources.verbose_prompt_url
         $uri = Get-OnlineImageBase64Uri -url $file
-
         return $uri
     }
 }
