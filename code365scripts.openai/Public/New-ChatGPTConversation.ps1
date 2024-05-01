@@ -296,15 +296,9 @@ function New-ChatGPTConversation {
                 Write-Verbose ($resources.verbose_outfile_specified -f $outFile)
                 $result | Out-File -FilePath $outFile -Encoding utf8
             }
-            else {
-                Write-Verbose ($resources.verbose_outfile_not_specified)
-                Write-Output $result
 
-                # if user does not specify the outfile, copy the response to clipboard
-                # Set-Clipboard $result
-                # Write-Host "Copied the response to clipboard." -ForegroundColor Green
-            }
-
+            # support passthru, even though user specify the outfile, we still return the result to the pipeline
+            Write-Output $result
         }
         else {
             Write-Verbose ($resources.verbose_chat_mode)
