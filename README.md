@@ -48,5 +48,5 @@ We will collect the telemetry data to help us improve the module, we just collec
 
 > UnInstall-Module -Name code365scripts.openai
 
-> [!TIP] 这里可以有标题吗
+> [!TIP]
 > 这是一个测试
