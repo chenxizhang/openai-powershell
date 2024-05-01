@@ -107,9 +107,7 @@
             # IconUri = ''
 
             # ReleaseNotes of this module
-            ReleaseNotes = @'
-
-'@
+            ReleaseNotes = "https://github.com/chenxizhang/openai-powershell/blob/master/CHANGELOG.md"
             # Prerelease string of this module
             # Prerelease = ''
 
