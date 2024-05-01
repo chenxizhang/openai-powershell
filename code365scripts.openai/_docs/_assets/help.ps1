@@ -50,3 +50,17 @@ gpt -system $system `
     -endpoint "https://api.moonshot.cn/v1/chat/completions" `
     -api_key $env:KIMI_API_KEY `
     -config @{max_tokens = 20000 }
+
+
+# polish the readme file and then translate it to zh-cn
+
+$params = @{
+    "model" = "moonshot-v1-32k"
+    "endpoint" = "https://api.moonshot.cn/v1/chat/completions"
+    "api_key" = $env:KIMI_API_KEY
+    "config" = @{max_tokens = 20000 }
+}
+$polish ="You are a English native speaker, you understand the markdown syntax very well,  you help me to polish the content, thank you very much. You just need to correct the grammar, spelling, and punctuatio. You don't need to change the content structure, just polish it."
+$translate = "You are a Chinese native speaker, you understand the markdown syntax very well, you help me to translate the content, thank you very much. You just need to translate the content to Chinese, you don't need to change the content structure, just translate it."
+
+gpt -system $polish -prompt .\README.md @params | gpt -system $translate @params -outFile .\README.zh.md

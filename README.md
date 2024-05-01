@@ -12,7 +12,7 @@ You must have `PowerShell` to use this module, it is included in `Windows` by de
 - Linux
     - You can follow the guidance [here](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-linux?view=powershell-7.3) to install PowerShell in Linux, and then type `pwsh` in your terminal to start PowerShell.
 
-You also need to prepare your `API key`, this is the most important thing before you use the module, the basic understanding of the LLM models is also required. Mostly you need a subscription to use the `OpenAI` Service, `Azure OpenAI` Service or something other `OpenAI-like` service, and they are not free. We also support the `local` LLMs, you will be empowered in another way if you have a strong enough GPU machine.
+You also need to prepare your `API key`, this is the most important thing before you use the module, the basic understanding of the LLM models is also required. Mostly you need a subscription to use the `OpenAI` Service, `Azure OpenAI` Service or a lot of `OpenAI-like` services, and they are not free. We also support the `local` LLMs, you will be empowered in another way if you have a strong enough GPU machine.
 
 ## Install the Module
 
@@ -27,7 +27,7 @@ You need the basic knowledage of [PowerShell](https://learn.microsoft.com/en-us/
     1. OpenAI service powered by [OpenAI](https://platform.openai.com).
     1. Azure OpenAI service powered by [Microsoft](https://ai.azure.com/).
     1. Local LLMs powered by [ollama](https://ollama.com/blog/openai-compatibility)
-    1. DBRX powered by [Databricks](https://www.databricks.com/blog/introducing-dbrx-new-state-art-open-llm)
+    1. DBRX powered by [Databricks](https://www.databricks.com/blog/introducing-dbrx-new-state-art-open-llm), it isn't really compatible with OpenAI, but I have done some magic, and you can just pass your api_key and endpoint to use it.
     1. OpenAI compatible services, you just pass the specific api_key and endpoint, model name when you use this cmdlet.
         1. Kimi powered by [Moonshot](https://platform.moonshot.cn/docs/api/chat)
         1. GLM powered by [Zhipu](https://maas.aminer.cn/dev/api)
