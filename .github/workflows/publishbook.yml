@@ -1,12 +1,5 @@
 name: publish book to github pages
 on:
-  push:
-    branches: [ "master" ]
-    paths:
-      - 'docs/**'
-      - 'book.json'
-      - 'package.json'
-      - 'scripts/**'
   workflow_dispatch:
 
 permissions:

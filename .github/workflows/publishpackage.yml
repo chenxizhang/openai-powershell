@@ -34,12 +34,6 @@ jobs:
           recursive: true
           files: |
             *.ps1
-      # - name: Publish Module to PowerShell Gallery (openai)
-      #   uses: chenxizhang/publish-powershell-module-action@v35
-      #   id: publish-openai
-      #   with:
-      #     modulePath: code365scripts.openai
-      #     NuGetApiKey: ${{secrets.NUGETKEY}}
       - name: Publish PowerShell Module
         uses: natescherer/publish-powershell-action@v1
         with:
