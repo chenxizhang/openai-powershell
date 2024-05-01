@@ -53,7 +53,7 @@ function New-ImageGeneration {
     param(
         [Parameter(ParameterSetName = "default")]
         [Parameter(ParameterSetName = "azure")]
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)][string]$prompt,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, Position = 0)][string]$prompt,
         [Parameter(ParameterSetName = "default")]
         [Parameter(ParameterSetName = "azure")]
         [string]$api_key,

@@ -123,7 +123,7 @@ function New-ChatGPTConversation {
         [Parameter(ParameterSetName = "default")]
         [Parameter(ParameterSetName = "azure")]    
         [Parameter(ParameterSetName = "local")]
-        [Parameter(ValueFromPipeline = $true)]
+        [Parameter(ValueFromPipeline = $true, Position = 0)]
         [string]$prompt = "",
         [Parameter(ParameterSetName = "default")]
         [Parameter(ParameterSetName = "azure")]    
@@ -236,6 +236,9 @@ function New-ChatGPTConversation {
         # collect the telemetry data
         Submit-Telemetry -cmdletName $MyInvocation.MyCommand.Name -innovationName $MyInvocation.InvocationName -props $telemetries
 
+        # add databricks support, it will use the basic authorization method, not the bearer token
+        $header = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "$(if($endpoint.Contains("databricks-dbrx-instruct")){"Basic"}else{"Bearer"}) $api_key" } }
+
         if ($PSBoundParameters.Keys.Contains("prompt")) {
             Write-Verbose ($resources.verbose_prompt_mode -f $prompt)
             $messages = @(
@@ -253,7 +256,7 @@ function New-ChatGPTConversation {
                 Uri         = $endpoint
                 Method      = "POST"
                 Body        = @{model = "$model"; messages = $messages }
-                Headers     = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "Bearer $api_key" } }
+                Headers     = $header
                 ContentType = "application/json;charset=utf-8"
             }
 
@@ -395,7 +398,7 @@ function New-ChatGPTConversation {
                     Uri         = $endpoint
                     Method      = "POST"
                     Body        = @{model = "$model"; messages = ($systemPrompt + $messages[-5..-1]); stream = $stream } 
-                    Headers     = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "Bearer $api_key" } }
+                    Headers     = $header
                     ContentType = "application/json;charset=utf-8"
                 }
 
@@ -428,13 +431,10 @@ function New-ChatGPTConversation {
                         $request.Content.Headers.Clear()
                         $request.Content.Headers.Add("Content-Type", "application/json;charset=utf-8")
 
-                        if ($azure) {
-                            $request.Headers.Add("api-key", $api_key)
+                        foreach ($k in $header.Keys) {
+                            $request.Headers.Add($k, $header[$k])
                         }
-                        else {
-                            $request.Headers.Add("Authorization", "Bearer $api_key")
-                        }
-                                            
+                                        
                         $task = $client.Send($request)
                         $response = $task.Content.ReadAsStream()
                         $reader = [System.IO.StreamReader]::new($response)
