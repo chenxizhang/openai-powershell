@@ -34,7 +34,7 @@ You need the basic knowledage of [PowerShell](https://learn.microsoft.com/en-us/
 
 - `New-ImageGeneration` (alias: `image` or `dall`) to generate image from a prompt. It supports the Azure OpenAI service, OpenAI service, and currently use the `DALL-E-3` model.
 
-You can find the full help by using `Get-Help **cmdlet name or alias** -Full` in your terminal, we have the detailed help for each cmdlet in both English and Chinese.
+You can find the full help by using `Get-Help <cmdlet name or alias> -Full` in your terminal, we have the detailed help for each cmdlet in both English and Chinese.
 
 ## Telemetry data collection and privacy
 
@@ -47,3 +47,6 @@ We will collect the telemetry data to help us improve the module, we just collec
 ## Uninstall the Module
 
 > UnInstall-Module -Name code365scripts.openai
+
+>[!TIP]
+> If you have any questions or suggestions, please feel free to open an issue in the [GitHub]
