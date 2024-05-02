@@ -30,6 +30,37 @@ function New-ChatGPTConversation {
         If you want to pass some custom headers to the API call, you can use this parameter. You can pass a custom hashtable to this parameter, like @{header1="value1";header2="value2"}.
     .PARAMETER json
         Send the response in json format.
+    .EXAMPLE
+        New-ChatGPTConversation
+
+        Use OpenAI Service with all the default settings, will read the API key from environment variable (OPENAI_API_KEY), enter the chat mode.
+    .EXAMPLE 
+        New-ChatGPTConversation -api_key "your api key" -model "gpt-3.5-turbo"
+
+        Use OpenAI Service with the specified api key and model, enter the chat mode.
+    .EXAMPLE
+        chat -system "You help me to translate the text to Chinese."
+
+        Use OpenAI Service to translate text (system prompt specified), will read the API key from environment variable (OPENAI_API_KEY), enter the chat mode.
+    .EXAMPLE
+        chat -endpoint "ollama" -model "llama3"
+
+        Use OpenAI Service with the local model, enter the chat mode.
+    .EXAMPLE
+        chat -endpoint $endpoint $env:OPENAI_API_ENDPOINT_AZURE -model $env:OPENAI_API_MODEL_AZURE -api_key $env:OPENAI_API_KEY_AZURE
+
+        Use Azure OpenAI Service with the specified api key and model, enter the chat mode.
+    
+    .EXAMPLE
+        gpt -system "Translate the text to Chinese." -prompt "Hello, how are you?"
+
+        Use OpenAI Service to translate text (system prompt specified), will read the API key from environment variable (OPENAI_API_KEY), model from OPENAI_API_MODEL (if present) or use "gpt-3.5-turbo" as default, get the chat completion result directly.
+
+    .EXAMPLE
+        "Hello, how are you?" | gpt -system "Translate the text to Chinese."
+
+        Use OpenAI Service to translate text (system prompt specified, user prompt will pass from pipeline), will read the API key from environment variable (OPENAI_API_KEY), model from OPENAI_API_MODEL (if present) or use "gpt-3.5-turbo" as default, get the chat completion result directly.
+
     .OUTPUTS
         System.String, the completion result.  
     .LINK

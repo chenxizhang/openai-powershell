@@ -14,13 +14,13 @@ Generate image from prompt, using DALL-e-3 model.
 
 ### default (Default)
 ```
-New-ImageGeneration [-prompt <String>] [-api_key <String>] [-size <String>] [-outfolder <String>]
+New-ImageGeneration [[-prompt] <String>] [-api_key <String>] [-size <String>] [-outfolder <String>]
  [<CommonParameters>]
 ```
 
 ### azure
 ```
-New-ImageGeneration [-prompt <String>] [-api_key <String>] [-endpoint <String>] [-azure] [-size <String>]
+New-ImageGeneration [[-prompt] <String>] [-api_key <String>] [-endpoint <String>] [-azure] [-size <String>]
  [-outfolder <String>] [-environment <String>] [<CommonParameters>]
 ```
 
@@ -93,7 +93,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: Named
+Position: 1
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

@@ -19,7 +19,21 @@ Get-ChildItem -Filter *.md -Path code365scripts.openai\_docs | ForEach-Object {
         -prompt $_.FullName `
         -outFile $newPath `
         -model moonshot-v1-128k `
-        -endpoint "https://api.moonshot.cn/v1/chat/completions" `
+        -endpoint kimi `
+        -api_key $env:KIMI_API_KEY `
+        -config @{max_tokens = 20000 }
+    Write-Host ([DateTime]::Now.ToString())
+}
+
+Get-ChildItem -Filter *.md -Path code365scripts.openai\_docs | ForEach-Object {
+    Write-Host "Translating $($_.FullName)"
+    $newPath = $_.FullName.Replace("code365scripts.openai\_docs", "code365scripts.openai\_docs\zh-cn")
+    Write-Host ([DateTime]::Now.ToString())
+    gpt -system code365scripts.openai\_docs\_assets\prompt.md `
+        -prompt $_.FullName `
+        -outFile $newPath `
+        -model moonshot-v1-128k `
+        -endpoint kimi `
         -api_key $env:KIMI_API_KEY `
         -config @{max_tokens = 20000 }
     Write-Host ([DateTime]::Now.ToString())
