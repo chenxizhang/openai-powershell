@@ -100,7 +100,8 @@ function New-ChatGPTConversation {
 
         # if endpoint contains ".openai.azure.com", then people wants to use azure openai service, try to concat the endpoint with the model
         if ($endpoint.EndsWith("openai.azure.com/")) {
-            $endpoint += "openai/deployments/$model/chat/completions?api-version=2024-02-01"
+            $version = Get-AzureAPIVersion
+            $endpoint += "openai/deployments/$model/chat/completions?api-version=$version"
         }
 
 
