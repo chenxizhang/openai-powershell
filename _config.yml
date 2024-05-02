@@ -1,9 +1,0 @@
-exclude:
-  - "code365scripts.openai/"
-source: .
-destination: _site
-defaults:
-  - scope:
-      path: ""
-    values:
-      layout: "default"

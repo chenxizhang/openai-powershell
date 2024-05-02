@@ -1,12 +1,6 @@
----
-title: 可扩展的OpenAI PowerShell模块
-description: 这是一个非官方的OpenAI PowerShell模块，允许您直接在PowerShell中获取输入的补全或开始聊天体验。该模块与PowerShell 5.1及以上版本兼容，如果您使用的是PowerShell Core（6.x+），则可以在所有平台上使用它，包括Windows、MacOS和Linux。
-permalink: /zh
----
+[![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/code365scripts.openai?label=code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![](https://img.shields.io/badge/change-logs-blue)](CHANGELOG.md) [![](https://img.shields.io/badge/lang-English-blue)](README.md)
 
 这是一个非官方的OpenAI PowerShell模块，允许您直接在PowerShell中获取输入的补全或开始聊天体验。该模块与PowerShell 5.1及以上版本兼容，如果您使用的是PowerShell Core（6.x+），则可以在所有平台上使用它，包括Windows、MacOS和Linux。
-
-[![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/code365scripts.openai?label=code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![](https://img.shields.io/badge/changelog-blue)](https://github.com/chenxizhang/openai-powershell/blob/master/CHANGELOG.md) [![](https://img.shields.io/badge/English-blue)](/)
 
 ## 先决条件
 
