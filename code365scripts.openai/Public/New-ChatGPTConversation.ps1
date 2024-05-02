@@ -112,41 +112,21 @@ function New-ChatGPTConversation {
         [Parameter(ParameterSetName = "local", Mandatory = $true)]
         [Alias("engine", "deployment")]
         [string]$model,
-        [Parameter(ParameterSetName = "default")]
-        [Parameter(ParameterSetName = "azure")]    
-        [Parameter(ParameterSetName = "local")]
         [string]$endpoint,
-        [Parameter(ParameterSetName = "default")]
-        [Parameter(ParameterSetName = "azure")]    
-        [Parameter(ParameterSetName = "local")]
         [string]$system = "You are a chatbot, please answer the user's question according to the user's language.",
-        [Parameter(ParameterSetName = "default")]
-        [Parameter(ParameterSetName = "azure")]    
-        [Parameter(ParameterSetName = "local")]
         [Parameter(ValueFromPipeline = $true, Position = 0)]
         [string]$prompt = "",
-        [Parameter(ParameterSetName = "default")]
-        [Parameter(ParameterSetName = "azure")]    
-        [Parameter(ParameterSetName = "local")]
         [PSCustomObject]$config,
         [Parameter(ParameterSetName = "azure")]
         [Alias("env")]
         [string]$environment,
         [Parameter(ParameterSetName = "azure")]
         [string]$api_version = "2023-09-01-preview",   
-        [Parameter(ParameterSetName = "default")]
-        [Parameter(ParameterSetName = "azure")]    
-        [Parameter(ParameterSetName = "local")]
         [Alias("out")]   
         [string]$outFile,
-        [Parameter(ParameterSetName = "default")]
-        [Parameter(ParameterSetName = "azure")]    
-        [Parameter(ParameterSetName = "local")]
         [switch]$json,
-        [Parameter(ParameterSetName = "default")]
-        [Parameter(ParameterSetName = "azure")]    
-        [Parameter(ParameterSetName = "local")]
-        [PSCustomObject]$context
+        [PSCustomObject]$context,
+        [PSCustomObject]$headers
     )
     BEGIN {
 
@@ -238,6 +218,11 @@ function New-ChatGPTConversation {
 
         # add databricks support, it will use the basic authorization method, not the bearer token
         $header = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "$(if($endpoint.Contains("databricks-dbrx-instruct")){"Basic"}else{"Bearer"}) $api_key" } }
+
+        # if user provide the headers, merge the headers to the default headers
+        if ($headers) {
+            Merge-Hashtable -table1 $header -table2 $headers
+        }
 
         if ($PSBoundParameters.Keys.Contains("prompt")) {
             Write-Verbose ($resources.verbose_prompt_mode -f $prompt)
