@@ -153,10 +153,19 @@ function New-ChatGPTConversation {
 
         # add databricks support, it will use the basic authorization method, not the bearer token
         $azure = $endpoint.Contains("openai.azure.com")
+
         $header = if ($azure) { 
-            @{"api-key" = "$api_key" } 
+            # if the apikey is a jwt, then use the bearer token in authorization header
+            if ($api_key -match "^ey[a-zA-Z0-9-_]+\.[a-zA-Z0-9-_]+\.[a-zA-Z0-9-_]+$") {
+                @{"Authorization" = "Bearer $api_key" }
+            }
+            else {
+                @{"api-key" = "$api_key" } 
+            }
         }
         else { 
+            # dbrx instruct use the basic authorization method
+            
             @{"Authorization" = "$(if($endpoint.Contains("databricks-dbrx-instruct")){"Basic"}else{"Bearer"}) $api_key" } 
         }
 
