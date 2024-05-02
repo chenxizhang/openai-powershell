@@ -1,18 +1,15 @@
 function New-ChatGPTConversation {
-
     <#
     .SYNOPSIS
-        Create a new ChatGPT conversation or get a Chat Completion result.(if you specify the prompt parameter)
+        Create a new ChatGPT conversation or get a Chat Completion result if you specify the prompt parameter directly.
     .DESCRIPTION
         Create a new ChatGPT conversation, You can chat with the OpenAI service just like chat with a human. You can also get the chat completion result if you specify the prompt parameter.
     .PARAMETER api_key
-        The API key to access OpenAI service, if not specified, the API key will be read from environment variable OPENAI_API_KEY. if you use azure OpenAI service, you can specify the API key by environment variable OPENAI_API_KEY_AZURE or OPENAI_API_KEY_AZURE_<environment>, the <environment> can be any names you want, for example, OPENAI_API_KEY_AZURE_DEV, OPENAI_API_KEY_AZURE_PROD, OPENAI_API_KEY_AZURE_TEST, etc.
+        The API key to access OpenAI service, if not specified, the API key will be read from environment variable OPENAI_API_KEY. You can also use "token" or "access_token" or "accesstoken" as the alias.
     .PARAMETER model
-        The model to use for this request, you can also set it in environment variable OPENAI_CHAT_MODEL or OPENAI_CHAT_DEPLOYMENT_AZURE if you use Azure OpenAI service. If you use multiple environments, you can use OPENAI_CHAT_DEPLOYMENT_AZURE_<environment> to define the model for each environment. You can use engine or deployment as the alias of this parameter.
+        The model to use for this request, you can also set it in environment variable OPENAI_API_MODEL. If you are using Azure OpenAI Service, the model should be the deployment name you created in portal.
     .PARAMETER endpoint
-        The endpoint to use for this request, you can also set it in environment variable OPENAI_ENDPOINT or OPENAI_ENDPOINT_AZURE if you use Azure OpenAI service. If you use multiple environments, you can use OPENAI_ENDPOINT_AZURE_<environment> to define the endpoint for each environment.
-    .PARAMETER azure
-        if you use Azure OpenAI service, you can use this switch.
+        The endpoint to use for this request, you can also set it in environment variable OPENAI_API_ENDPOINT. You can also use some special value to specify the endpoint, like "ollama", "local", "kimi", "zhipu".
     .PARAMETER system
         The system prompt, this is a string, you can use it to define the role you want it be, for example, "You are a chatbot, please answer the user's question according to the user's language."
         If you provide a file path to this parameter, we will read the file as the system prompt.
@@ -25,140 +22,59 @@ function New-ChatGPTConversation {
         You can read the prompt from a library (https://github.com/code365opensource/promptlibrary), by use "lib:xxxxx" as the prompt, for example, "lib:fitness".
     .PARAMETER config
         The dynamic settings for the API call, it can meet all the requirement for each model. please pass a custom object to this parameter, like @{temperature=1;max_tokens=1024}.
-    .PARAMETER environment
-        The environment name, if you use Azure OpenAI service, you can use this parameter to define the environment name, it will be used to get the API key, model and endpoint from environment variable. If the environment is not exist, it will use the default environment. 
-        You can use env as the alias of this parameter.
-    .PARAMETER api_version
-        The api version, if you use Azure OpenAI service, you can use this parameter to define the api version, the default value is 2023-09-01-preview.
     .PARAMETER outFile
         If you want to save the result to a file, you can use this parameter to set the file path. You can also use "out" as the alias.
-    .PARAMETER local
-        If you want to use the local LLMs, like the model hosted by ollama, you can use this switch. You can also use "ollama" as the alias.
     .PARAMETER context
         If you want to pass some dymamic value to the prompt, you can use the context parameter here. It can be anything, you just specify a custom powershell object here. You define the variables in the system prompt or user prompt by using {{you_variable_name}} syntext, and then pass the data to the context parameter, like @{you_variable_name="your value"}. if there are multiple variables, you can use @{variable1="value1";variable2="value2"}.
+    .PARAMETER headers
+        If you want to pass some custom headers to the API call, you can use this parameter. You can pass a custom hashtable to this parameter, like @{header1="value1";header2="value2"}.
     .PARAMETER json
         Send the response in json format.
-    .EXAMPLE
-        New-ChatGPTConversation
-        Create a new ChatGPT conversation, use OpenAI service with all the default settings.
-    .EXAMPLE
-        New-ChatGPTConverstaion -azure
-        Create a new ChatGPT conversation, use Azure OpenAI service with all the default settings.
-    .EXAMPLE
-        chat -azure
-        Create a new ChatGPT conversation by cmdlet's alias(chat), use Azure OpenAI service with all the default settings.
-    .EXAMPLE
-        New-ChatGPTConversation -api_key "your API key" -model "your model name"
-        Create a new ChatGPT conversation, use OpenAI service with your API key and model name.
-    .EXAMPLE
-        New-ChatGPTConversation -api_key "your API key" -model "your deployment name" -azure
-        Create a new ChatGPT conversation, use Azure OpenAI service with your API key and deployment name.
-    .EXAMPLE
-        New-ChatGPTConversation -api_key "your API key" -model "your deployment name" -azure -system "You are a chatbot, please answer the user's question according to the user's language."
-        Create a new ChatGPT conversation, use Azure OpenAI service with your API key and deployment name, and define the system prompt.
-    .EXAMPLE
-        New-ChatGPTConversation -api_key "your API key" -model "your deployment name" -azure -system "You are a chatbot, please answer the user's question according to the user's language." -endpoint "https://api.openai.com/v1/completions"
-        Create a new ChatGPT conversation, use Azure OpenAI service with your API key and model id, and define the system prompt and endpoint.
-    .EXAMPLE
-        chat -azure -system "You are a chatbot, please answer the user's question according to the user's language." -env "sweden"
-        Create a new ChatGPT conversation by cmdlet's alias(chat), use Azure OpenAI service with the API key, model and endpoint defined in environment variable OPENAI_API_KEY_AZURE_SWEDEN, OPENAI_CHAT_DEPLOYMENT_AZURE_SWEDEN and OPENAI_ENDPOINT_AZURE_SWEDEN.
-    .EXAMPLE
-        chat -azure -api_version "2021-09-01-preview"
-        Create a new ChatGPT conversation by cmdlet's alias(chat), use Azure OpenAI service with the api version 2021-09-01-preview.
-    .EXAMPLE
-        gpt -azure -prompt "why people smile"
-        Create a new ChatGPT conversation by cmdlet's alias(gpt), use Azure OpenAI service with the prompt.
-    .EXAMPLE
-        "why people smile" | gpt -azure
-        Create a new ChatGPT conversation by cmdlet's alias(gpt), use Azure OpenAI service with the prompt from pipeline.
-    .EXAMPLE
-        gpt -azure -prompt "c:\temp\prompt.txt"
-        Create a new ChatGPT conversation by cmdlet's alias(gpt), use Azure OpenAI service with the prompt from file.
-    .EXAMPLE
-        gpt -azure -prompt "c:\temp\prompt.txt" -context @{variable1="value1";variable2="value2"}
-        Create a new ChatGPT conversation by cmdlet's alias(gpt), use Azure OpenAI service with the prompt from file, pass some data to the prompt.
-    .EXAMPLE
-        gpt -azure -system "c:\temp\system.txt" -prompt "c:\temp\prompt.txt"
-        Create a new ChatGPT conversation by cmdlet's alias(gpt), use Azure OpenAI service with the system prompt and prompt from file.
-    .EXAMPLE
-        gpt -azure -system "c:\temp\system.txt" -prompt "c:\temp\prompt.txt" -outFile "c:\temp\result.txt"
-        Create a new ChatGPT conversation by cmdlet's alias(gpt), use Azure OpenAI service with the system prompt and prompt from file, then save the result to a file.
-    .EXAMPLE
-        gpt -azure -system "c:\temp\system.txt" -prompt "c:\temp\prompt.txt" -config @{temperature=1;max_tokens=1024}
-        Create a new ChatGPT conversation by cmdlet's alias(gpt), use Azure OpenAI service with the system prompt and prompt from file and your customized settings.
-    .EXAMPLE
-        chat -local -model "llama3"
-        Create a new ChatGPT conversation by using local LLMs, for example, the llama3. The default endpoint is http://localhost:11434/v1/chat/completions. You can modify this endpoint as well.
     .OUTPUTS
         System.String, the completion result.  
     .LINK
         https://github.com/chenxizhang/openai-powershell
     #>
 
-
     [CmdletBinding(DefaultParameterSetName = "default")]
     [Alias("chatgpt")][Alias("chat")][Alias("gpt")]
     param(
-        [Parameter(ParameterSetName = "local", Mandatory = $true)]
-        [Alias("ollama")]
-        [switch]$local,
-        [Parameter(ParameterSetName = "azure", Mandatory = $true)]
-        [switch]$azure,
-        [Parameter(ParameterSetName = "default")]
-        [Parameter(ParameterSetName = "azure")]
+        [Alias("token", "access_token", "accesstoken", "key", "apikey")]
         [string]$api_key,
-        [Parameter(ParameterSetName = "default")]
-        [Parameter(ParameterSetName = "azure")]    
-        [Parameter(ParameterSetName = "local", Mandatory = $true)]
         [Alias("engine", "deployment")]
         [string]$model,
         [string]$endpoint,
         [string]$system = "You are a chatbot, please answer the user's question according to the user's language.",
         [Parameter(ValueFromPipeline = $true, Position = 0)]
         [string]$prompt = "",
-        [PSCustomObject]$config,
-        [Parameter(ParameterSetName = "azure")]
-        [Alias("env")]
-        [string]$environment,
-        [Parameter(ParameterSetName = "azure")]
-        [string]$api_version = "2023-09-01-preview",   
+        [Alias("settings")]
+        [PSCustomObject]$config, 
         [Alias("out")]   
         [string]$outFile,
         [switch]$json,
+        [Alias("variables")]
         [PSCustomObject]$context,
         [PSCustomObject]$headers
     )
     BEGIN {
 
         Write-Verbose ($resources.verbose_parameters_received -f ($PSBoundParameters | Out-String))
-        Write-Verbose ($resources.verbose_environment_received -f (Get-ChildItem Env:OPENAI_* | Out-String))
+        Write-Verbose ($resources.verbose_environment_received -f (Get-ChildItem Env:OPENAI_API_* | Out-String))
 
-        switch ($PSCmdlet.ParameterSetName) {
-            "default" {
-                $api_key = if ($api_key) { $api_key } else { $env:OPENAI_API_KEY }
-                $model = if ($model) { $model } else { if ($env:OPENAI_CHAT_MODEL) { $env:OPENAI_CHAT_MODEL }else { "gpt-3.5-turbo" } }
-                $endpoint = if ($endpoint) { $endpoint } else { "https://api.openai.com/v1/chat/completions" }
-            }
-            "azure" {
-                $api_key = if ($api_key) { $api_key } else { Get-FirstNonNullItemInArray("OPENAI_API_KEY_AZURE_$environment", "OPENAI_API_KEY_AZURE") }
-                $model = if ($model) { $model } else { Get-FirstNonNullItemInArray("OPENAI_CHAT_DEPLOYMENT_AZURE_$environment", "OPENAI_CHAT_DEPLOYMENT_AZURE") }
-                $endpoint = if ($endpoint) { "{0}openai/deployments/$model/chat/completions?api-version=$api_version" -f $endpoint } else { "{0}openai/deployments/$model/chat/completions?api-version=$api_version" -f (Get-FirstNonNullItemInArray("OPENAI_ENDPOINT_AZURE_$environment", "OPENAI_ENDPOINT_AZURE")) }
-            }
-            "local" {
-                $endpoint = if ($endpoint) { $endpoint }else { "http://localhost:11434/v1/chat/completions" }
-                $api_key = if ($api_key) { $api_key } else { "local" }
-            }
+        $api_key = ($api_key, [System.Environment]::GetEnvironmentVariable("OPENAI_API_KEY") | Where-Object { $_.Length -gt 0 } | Select-Object -First 1)
+        $model = ($model, [System.Environment]::GetEnvironmentVariable("OPENAI_API_MODEL"), "gpt-3.5-turbo" | Where-Object { $_.Length -gt 0 } | Select-Object -First 1)
+        $endpoint = ($endpoint, [System.Environment]::GetEnvironmentVariable("OPENAI_API_ENDPOINT"), "https://api.openai.com/v1/chat/completions" | Where-Object { $_.Length -gt 0 } | Select-Object -First 1)
+
+        $endpoint = switch ($endpoint) {
+            { $_ -in ("ollama", "local") } { "http://localhost:11434/v1/chat/completions" }
+            "kimi" { "https://api.moonshot.cn/v1/chat/completions" }
+            "zhipu" { "https://open.bigmodel.cn/api/paas/v4/chat/completions" }
+            default { $endpoint }
         }
 
         Write-Verbose ($resources.verbose_parameters_parsed -f $api_key, $model, $endpoint)
 
         $hasError = $false
-
-        if ((!$azure) -and ((Test-OpenAIConnectivity) -eq $False)) {
-            Write-Error $resources.openai_unavaliable
-            $hasError = $true
-        }
-
 
         if (!$api_key) {
             Write-Error $resources.error_missing_api_key
@@ -169,6 +85,11 @@ function New-ChatGPTConversation {
             Write-Error $resources.error_missing_engine
             $hasError = $true
         }
+
+        if (!$endpoint) {
+            Write-Error $resources.error_missing_endpoint
+            $hasError = $true
+        }
     }
 
     PROCESS {
@@ -177,8 +98,22 @@ function New-ChatGPTConversation {
             return
         }
 
+        # if endpoint contains ".openai.azure.com", then people wants to use azure openai service, try to concat the endpoint with the model
+        if ($endpoint.EndsWith("openai.azure.com/")) {
+            $endpoint += "openai/deployments/$model/chat/completions?api-version=2024-02-01"
+        }
+
+
         $telemetries = @{
-            type = $PSCmdlet.ParameterSetName
+            type = switch ($endpoint) {
+                { $_ -match "openai.azure.com" } { "azure" }
+                { $_ -match "localhost" } { "local" }
+                { $_ -match "databricks-dbrx" } { "dbrx" }
+                { $_ -match "api.openai.com" } { "openai" }
+                { $_ -match "platform.moonshot.cn" } { "kimi" }
+                { $_ -match "open.bigmodel.cn" } { "zhipu" }
+                default { $endpoint }
+            }
         }
 
         # if prompt is not empty and it is a file, then read the file as the prompt
@@ -217,7 +152,13 @@ function New-ChatGPTConversation {
         Submit-Telemetry -cmdletName $MyInvocation.MyCommand.Name -innovationName $MyInvocation.InvocationName -props $telemetries
 
         # add databricks support, it will use the basic authorization method, not the bearer token
-        $header = if ($azure) { @{"api-key" = "$api_key" } } else { @{"Authorization" = "$(if($endpoint.Contains("databricks-dbrx-instruct")){"Basic"}else{"Bearer"}) $api_key" } }
+        $azure = $endpoint.Contains("openai.azure.com")
+        $header = if ($azure) { 
+            @{"api-key" = "$api_key" } 
+        }
+        else { 
+            @{"Authorization" = "$(if($endpoint.Contains("databricks-dbrx-instruct")){"Basic"}else{"Bearer"}) $api_key" } 
+        }
 
         # if user provide the headers, merge the headers to the default headers
         if ($headers) {
@@ -426,11 +367,14 @@ function New-ChatGPTConversation {
     
                             $chunk = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta.content
                             Write-Host $chunk -NoNewline -ForegroundColor Green
-                            Write-Verbose ($resources.verbose_chat_stream_chunk_received -f $chunk)
+                            # Write-Verbose ($resources.verbose_chat_stream_chunk_received -f $chunk)
                             $result += $chunk
     
                             Start-Sleep -Milliseconds 50
                         }
+
+                        Write-Host ""
+
                         $reader.Close()
                         $reader.Dispose()
     
