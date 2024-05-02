@@ -3,7 +3,8 @@
 
 | Date       | Version  | Description                                                                 |
 |------------|----------|-----------------------------------------------------------------------------|
-| 2024-05-01 | v2.0.2.2 | Support databricks dbrx model, and update the readme file, add Chinese version.                   |
+| 2024-05-02 | v3.0.0.0 | Break changes version, re-design the New-ChatGPTConversation with more simple design. [#155](https://github.com/chenxizhang/openai-powershell/issues/155) [#154](https://github.com/chenxizhang/openai-powershell/issues/154) [#153](https://github.com/chenxizhang/openai-powershell/issues/153)  [#152](https://github.com/chenxizhang/openai-powershell/issues/152) |
+| 2024-05-01 | v2.0.2.2 | Support databricks dbrx model, and update the readme file, add Chinese version. |
 | 2024-05-01 | v2.0.2.1 | Update the help content, fully support Chinese and English.                   |
 | 2024-04-29 | v2.0.2.0 | Fixed a bug related to streaming and prompt mode.                            |
 | 2024-04-28 | v2.0.1.9 | Fixed a bug related to get content from prompt parameter.                    |

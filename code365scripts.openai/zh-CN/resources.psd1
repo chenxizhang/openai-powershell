@@ -1,7 +1,7 @@
 ConvertFrom-StringData -StringData @'
-    error_missing_api_key = 缺少API密钥。请设置环境变量OPENAI_API_KEY或OPENAI_API_KEY_AZURE，或者您可以指定参数-api_key。
-    error_missing_engine = 缺少模型，请输入环境变量OPENAI_ENGINE或OPENAI_ENGINE_AZURE，或者您可以指定参数-model。
-    error_missing_endpoint = 缺少端点，请输入环境变量OPENAI_ENDPOINT或OPENAI_ENDPOINT_AZURE，或者您可以指定参数-endpoint。
+    error_missing_api_key = 缺少API密钥。请设置环境变量OPENAI_API_KEY，或者您可以指定参数-api_key。
+    error_missing_engine = 缺少模型，请输入环境变量OPENAI_API_MODEL，或者您可以指定参数-model。
+    error_missing_endpoint = 缺少端点，请输入环境变量OPENAI_API_ENDPOINT，或者您可以指定参数-endpoint。
     welcome = 欢迎来到OpenAI{0}的世界，您当前使用的模型是：{1}，请用您的提示开始。
     shortcuts=快捷键：按q（或bye）并按Enter键退出，按m并按Enter键输入多行提示，按f并按Enter键从磁盘选择文件。请注意，只有Windows支持m和f模式。
     azure_version = (Azure)

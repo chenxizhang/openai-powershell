@@ -8,7 +8,7 @@ schema: 2.0.0
 # New-ChatGPTConversation
 
 ## SYNOPSIS
-创建一个新的 ChatGPT 对话，或者如果你直接指定了 prompt 参数，获取一个 Chat 完成的结果。
+Create a new ChatGPT conversation or get a Chat Completion result if you specify the prompt parameter directly.
 
 ## SYNTAX
 
@@ -19,8 +19,8 @@ New-ChatGPTConversation [-api_key <String>] [-model <String>] [-endpoint <String
 ```
 
 ## DESCRIPTION
-创建一个新的 ChatGPT 对话，你可以像和人类聊天一样和 OpenAI 服务聊天。
-如果你指定了 prompt 参数，你也可以获取聊天完成的结果。
+Create a new ChatGPT conversation, You can chat with the OpenAI service just like chat with a human.
+You can also get the chat completion result if you specify the prompt parameter.
 
 ## EXAMPLES
 
@@ -29,55 +29,55 @@ New-ChatGPTConversation [-api_key <String>] [-model <String>] [-endpoint <String
 New-ChatGPTConversation
 ```
 
-使用 OpenAI 服务，并使用所有默认设置，将从环境变量（OPENAI_API_KEY）中读取 API 密钥，进入聊天模式。
+Use OpenAI Service with all the default settings, will read the API key from environment variable (OPENAI_API_KEY), enter the chat mode.
 
 ### EXAMPLE 2
 ```
-New-ChatGPTConversation -api_key "你的 api 密钥" -model "gpt-3.5-turbo"
+New-ChatGPTConversation -api_key "your api key" -model "gpt-3.5-turbo"
 ```
 
-使用指定的 api 密钥和模型的 OpenAI 服务，进入聊天模式。
+Use OpenAI Service with the specified api key and model, enter the chat mode.
 
 ### EXAMPLE 3
 ```
-chat -system "你帮我翻译这段文字到中文。"
+chat -system "You help me to translate the text to Chinese."
 ```
 
-使用 OpenAI 服务翻译文本（指定了系统提示），将从环境变量（OPENAI_API_KEY）中读取 API 密钥，进入聊天模式。
+Use OpenAI Service to translate text (system prompt specified), will read the API key from environment variable (OPENAI_API_KEY), enter the chat mode.
 
 ### EXAMPLE 4
 ```
 chat -endpoint "ollama" -model "llama3"
 ```
 
-使用本地模型的 OpenAI 服务，进入聊天模式。
+Use OpenAI Service with the local model, enter the chat mode.
 
 ### EXAMPLE 5
 ```
 chat -endpoint $endpoint $env:OPENAI_API_ENDPOINT_AZURE -model $env:OPENAI_API_MODEL_AZURE -api_key $env:OPENAI_API_KEY_AZURE
 ```
 
-使用指定的 api 密钥和模型的 Azure OpenAI 服务，进入聊天模式。
+Use Azure OpenAI Service with the specified api key and model, enter the chat mode.
 
 ### EXAMPLE 6
 ```
-gpt -system "翻译这段文字到中文。" -prompt "Hello, how are you?"
+gpt -system "Translate the text to Chinese." -prompt "Hello, how are you?"
 ```
 
-使用 OpenAI 服务翻译文本（指定了系统提示），将从环境变量（OPENAI_API_KEY）中读取 API 密钥，模型从 OPENAI_API_MODEL（如果存在）或者使用 "gpt-3.5-turbo" 作为默认，直接获取聊天完成的结果。
+Use OpenAI Service to translate text (system prompt specified), will read the API key from environment variable (OPENAI_API_KEY), model from OPENAI_API_MODEL (if present) or use "gpt-3.5-turbo" as default, get the chat completion result directly.
 
 ### EXAMPLE 7
 ```
-"Hello, how are you?" | gpt -system "翻译这段文字到中文。"
+"Hello, how are you?" | gpt -system "Translate the text to Chinese."
 ```
 
-使用 OpenAI 服务翻译文本（指定了系统提示，用户提示将从管道传递），将从环境变量（OPENAI_API_KEY）中读取 API 密钥，模型从 OPENAI_API_MODEL（如果存在）或者使用 "gpt-3.5-turbo" 作为默认，直接获取聊天完成的结果。
+Use OpenAI Service to translate text (system prompt specified, user prompt will pass from pipeline), will read the API key from environment variable (OPENAI_API_KEY), model from OPENAI_API_MODEL (if present) or use "gpt-3.5-turbo" as default, get the chat completion result directly.
 
 ## PARAMETERS
 
 ### -api_key
-访问 OpenAI 服务的 API 密钥，如果没有指定，API 密钥将从环境变量 OPENAI_API_KEY 中读取。
-你也可以使用 "token" 或 "access_token" 或 "accesstoken" 作为别名。
+The API key to access OpenAI service, if not specified, the API key will be read from environment variable OPENAI_API_KEY.
+You can also use "token" or "access_token" or "accesstoken" as the alias.
 
 ```yaml
 Type: String
@@ -92,8 +92,8 @@ Accept wildcard characters: False
 ```
 
 ### -model
-用于此请求的模型，你也可以在环境变量 OPENAI_API_MODEL 中设置它。
-如果你使用的是 Azure OpenAI 服务，模型应该是你在门户中创建的部署名称。
+The model to use for this request, you can also set it in environment variable OPENAI_API_MODEL.
+If you are using Azure OpenAI Service, the model should be the deployment name you created in portal.
 
 ```yaml
 Type: String
@@ -108,8 +108,8 @@ Accept wildcard characters: False
 ```
 
 ### -endpoint
-用于此请求的端点，你也可以在环境变量 OPENAI_API_ENDPOINT 中设置它。
-你也可以使用一些特殊值来指定端点，比如 "ollama", "local", "kimi", "zhipu"。
+The endpoint to use for this request, you can also set it in environment variable OPENAI_API_ENDPOINT.
+You can also use some special value to specify the endpoint, like "ollama", "local", "kimi", "zhipu".
 
 ```yaml
 Type: String
@@ -124,10 +124,10 @@ Accept wildcard characters: False
 ```
 
 ### -system
-系统提示，这是一个字符串，你可以用它来定义你想要它扮演的角色，例如，"你是一个聊天机器人，请根据用户的语言回答用户的问题。"
-如果你为这个参数提供了一个文件路径，我们将读取该文件作为系统提示。
-你也可以指定一个 url 给这个参数，我们将读取该 url 作为系统提示。
-你可以通过使用 "lib:xxxxx" 作为提示，从库（https://github.com/code365opensource/promptlibrary）中读取提示，例如，"lib:fitness"。
+The system prompt, this is a string, you can use it to define the role you want it be, for example, "You are a chatbot, please answer the user's question according to the user's language."
+If you provide a file path to this parameter, we will read the file as the system prompt.
+You can also specify a url to this parameter, we will read the url as the system prompt.
+You can read the prompt from a library (https://github.com/code365opensource/promptlibrary), by use "lib:xxxxx" as the prompt, for example, "lib:fitness".
 
 ```yaml
 Type: String
@@ -136,17 +136,17 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: 你是一个聊天机器人，请根据用户的语言回答用户的问题。
+Default value: You are a chatbot, please answer the user's question according to the user's language.
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
 ### -prompt
-如果你想立即获取结果，你可以使用这个参数来定义提示。
-它不会启动聊天对话。
-如果你为这个参数提供了一个文件路径，我们将读取该文件作为提示。
-你也可以指定一个 url 给这个参数，我们将读取该 url 作为提示。
-你可以通过使用 "lib:xxxxx" 作为提示，从库（https://github.com/code365opensource/promptlibrary）中读取提示，例如，"lib:fitness"。
+If you want to get result immediately, you can use this parameter to define the prompt.
+It will not start the chat conversation.
+If you provide a file path to this parameter, we will read the file as the prompt.
+You can also specify a url to this parameter, we will read the url as the prompt.
+You can read the prompt from a library (https://github.com/code365opensource/promptlibrary), by use "lib:xxxxx" as the prompt, for example, "lib:fitness".
 
 ```yaml
 Type: String
@@ -161,8 +161,8 @@ Accept wildcard characters: False
 ```
 
 ### -config
-API 调用的动态设置，它可以满足每个模型的所有要求。
-请将一个自定义对象传递给这个参数，比如 @{temperature=1;max_tokens=1024}。
+The dynamic settings for the API call, it can meet all the requirement for each model.
+please pass a custom object to this parameter, like @{temperature=1;max_tokens=1024}.
 
 ```yaml
 Type: PSObject
@@ -177,8 +177,8 @@ Accept wildcard characters: False
 ```
 
 ### -outFile
-如果你想将结果保存到文件中，你可以使用这个参数来设置文件路径。
-你也可以使用 "out" 作为别名。
+If you want to save the result to a file, you can use this parameter to set the file path.
+You can also use "out" as the alias.
 
 ```yaml
 Type: String
@@ -193,7 +193,7 @@ Accept wildcard characters: False
 ```
 
 ### -json
-以 json 格式发送响应。
+Send the response in json format.
 
 ```yaml
 Type: SwitchParameter
@@ -208,10 +208,10 @@ Accept wildcard characters: False
 ```
 
 ### -context
-如果你想将一些动态值传递给提示，你可以在这里使用 context 参数。
-它可以是任何东西，你只需要在这里指定一个自定义的 powershell 对象。
-你通过使用 {{you_variable_name}} 语法，在系统提示或用户提示中定义变量，然后将数据传递给 context 参数，比如 @{you_variable_name="你的值"}。
-如果有多个变量，你可以使用 @{variable1="value1";variable2="value2"}。
+If you want to pass some dymamic value to the prompt, you can use the context parameter here.
+It can be anything, you just specify a custom powershell object here.
+You define the variables in the system prompt or user prompt by using {{you_variable_name}} syntext, and then pass the data to the context parameter, like @{you_variable_name="your value"}.
+if there are multiple variables, you can use @{variable1="value1";variable2="value2"}.
 
 ```yaml
 Type: PSObject
@@ -226,8 +226,8 @@ Accept wildcard characters: False
 ```
 
 ### -headers
-如果你想将一些自定义头部传递给 API 调用，你可以使用这个参数。
-你可以将一个自定义的哈希表传递给这个参数，比如 @{header1="value1";header2="value2"}。
+If you want to pass some custom headers to the API call, you can use this parameter.
+You can pass a custom hashtable to this parameter, like @{header1="value1";header2="value2"}.
 
 ```yaml
 Type: PSObject
@@ -242,15 +242,16 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-此 cmdlet 支持常见参数：-Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, 和 -WarningVariable。更多信息，请查看 [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216)。
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
 ## OUTPUTS
 
-### System.String, 完成的结果。
+### System.String, the completion result.
 ## NOTES
 
 ## RELATED LINKS
 
 [https://github.com/chenxizhang/openai-powershell](https://github.com/chenxizhang/openai-powershell)
+
