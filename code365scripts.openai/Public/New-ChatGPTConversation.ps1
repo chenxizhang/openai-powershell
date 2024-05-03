@@ -476,9 +476,9 @@ function New-ChatGPTConversation {
                         Write-Verbose ($resources.verbose_chat_message_combined -f ($messages | ConvertTo-Json -Depth 10))
                 
         
-                        Write-Host -ForegroundColor Red ("`r[$current] $($resources.response)" -f $total_tokens, $prompt_tokens, $completion_tokens )
+                        # Write-Host -ForegroundColor Red ("`r[$current] $($resources.response)" -f $total_tokens, $prompt_tokens, $completion_tokens )
                         
-                        Write-Host $result -ForegroundColor Green
+                        Write-Host "`r[$current] $result" -ForegroundColor Green
                     }
                 }
                 catch {
