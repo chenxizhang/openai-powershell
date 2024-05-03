@@ -293,6 +293,7 @@ function New-ChatGPTConversation {
 
                 $current = $index++
                 $prompt = Read-Host -Prompt "`n[$current] $($resources.prompt)"
+
                 Write-Verbose "Prompt received: $prompt"
     
                 if ($prompt -in ("q", "bye")) {
@@ -347,6 +348,8 @@ function New-ChatGPTConversation {
                         Write-Host "$($resources.multi_line_message)`n$prompt"
                     }
                 }
+
+                Write-Host -ForegroundColor ("blue", "red", "Green", "yellow", "gray", "black", "white" | Get-Random) ("`rThinking {0}" -f ("."*(Get-Random -Maximum 10 -Minimum 3))) -NoNewline
     
                 $messages += [PSCustomObject]@{
                     role    = "user"
@@ -373,7 +376,6 @@ function New-ChatGPTConversation {
                 }
                 $params.Body = ($params.Body | ConvertTo-Json -Depth 10)
 
-
                 Write-Verbose ($resources.verbose_prepare_params -f ($params | ConvertTo-Json -Depth 10))
     
                 try {
@@ -381,6 +383,8 @@ function New-ChatGPTConversation {
                     if ($stream) {
                         Write-Verbose ($resources.verbose_chat_stream_mode)
                         $client = New-Object System.Net.Http.HttpClient
+
+                                        
                         $body = $params.Body
                         Write-Verbose "body: $body"
     
@@ -397,16 +401,27 @@ function New-ChatGPTConversation {
                         }
                                         
                         $task = $client.Send($request)
+
+
                         $response = $task.Content.ReadAsStream()
                         $reader = [System.IO.StreamReader]::new($response)
                         $result = "" # message from the api
-                        Write-Host -ForegroundColor Red "`n[$current] " -NoNewline
+
+
+                                        
+                        $firstChunk = $true
     
                         while ($true) {
                             $line = $reader.ReadLine()
                             if (($line -eq $null) -or ($line -eq "data: [DONE]")) { break }
     
                             $chunk = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta.content
+
+                            if ($firstChunk) {
+                                $firstChunk = $false
+                                Write-Host "`r[$current] " -NoNewline -ForegroundColor Red
+                            }
+
                             Write-Host $chunk -NoNewline -ForegroundColor Green
                             # Write-Verbose ($resources.verbose_chat_stream_chunk_received -f $chunk)
                             $result += $chunk
@@ -414,7 +429,6 @@ function New-ChatGPTConversation {
                             Start-Sleep -Milliseconds 5
                         }
 
-                        Write-Host ""
 
                         $reader.Close()
                         $reader.Dispose()
@@ -462,7 +476,7 @@ function New-ChatGPTConversation {
                         Write-Verbose ($resources.verbose_chat_message_combined -f ($messages | ConvertTo-Json -Depth 10))
                 
         
-                        Write-Host -ForegroundColor Red ("`n[$current] $($resources.response)" -f $total_tokens, $prompt_tokens, $completion_tokens )
+                        Write-Host -ForegroundColor Red ("`r[$current] $($resources.response)" -f $total_tokens, $prompt_tokens, $completion_tokens )
                         
                         Write-Host $result -ForegroundColor Green
                     }
