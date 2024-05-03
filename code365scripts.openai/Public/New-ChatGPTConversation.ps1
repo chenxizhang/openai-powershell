@@ -411,7 +411,7 @@ function New-ChatGPTConversation {
                             # Write-Verbose ($resources.verbose_chat_stream_chunk_received -f $chunk)
                             $result += $chunk
     
-                            Start-Sleep -Milliseconds 50
+                            Start-Sleep -Milliseconds 5
                         }
 
                         Write-Host ""
