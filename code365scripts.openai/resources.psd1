@@ -53,4 +53,5 @@ ConvertFrom-StringData -StringData @'
     verbose_chat_response_summary = Response parsed to plain text: {0}, total_tokens: {1}, prompt_tokens: {2}, completion_tokens: {3}
     verbose_image_parameter_parsed = Parameter parsed. api_key: {0}, endpoint: {1}
     verbose_image_download_completed = Image download completed, save the image to {0}
+    thinking = Thinking
 '@

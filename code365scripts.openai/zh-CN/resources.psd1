@@ -53,4 +53,5 @@ ConvertFrom-StringData -StringData @'
     verbose_chat_response_summary = 响应解析为纯文本：{0}，total_tokens：{1}，prompt_tokens：{2}，completion_tokens：{3}
     verbose_image_parameter_parsed = 参数解析。api_key：{0}，endpoint：{1}
     verbose_image_download_completed = 图片下载完成，将图片保存到{0}
+    thinking = 正在思考
 '@
