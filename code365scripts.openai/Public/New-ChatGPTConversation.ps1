@@ -429,7 +429,7 @@ function New-ChatGPTConversation {
                             Start-Sleep -Milliseconds 5
                         }
 
-
+                        Write-Host ""
                         $reader.Close()
                         $reader.Dispose()
     
@@ -439,7 +439,7 @@ function New-ChatGPTConversation {
                         }
 
                         Write-Verbose ($resources.verbose_chat_message_combined -f ($messages | ConvertTo-Json -Depth 10))
-                        Write-Host ""
+                        
     
                     }
                     else {
