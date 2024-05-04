@@ -85,7 +85,8 @@ function New-ChatGPTConversation {
         [switch]$json,
         [Alias("variables")]
         [PSCustomObject]$context,
-        [PSCustomObject]$headers
+        [PSCustomObject]$headers,
+        [string[]]$functions
     )
     BEGIN {
 
@@ -206,7 +207,20 @@ function New-ChatGPTConversation {
             Merge-Hashtable -table1 $header -table2 $headers
         }
 
+        # if user provide the functions, get the functions from the functions file and define the tools and tool_choice thoughs the config parameter
+        if ($functions) {
+            $tools = Get-PredefinedFunctions -names $functions
+            if ($tools.Count -gt 0) {
+                if ($null -eq $config) {
+                    $config = @{}
+                }
+                $config["tools"] = @($tools)
+                $config["tool_choice"] = "auto"
+            }
+        }
+
         if ($PSBoundParameters.Keys.Contains("prompt")) {
+            # user provides the prompt directly, so enter the completion mode (return the result directly)
             Write-Verbose ($resources.verbose_prompt_mode -f $prompt)
             $messages = @(
                 @{
@@ -219,28 +233,57 @@ function New-ChatGPTConversation {
                 }
             ) 
 
+            $body = @{model = "$model"; messages = $messages }
+
             $params = @{
                 Uri         = $endpoint
                 Method      = "POST"
-                Body        = @{model = "$model"; messages = $messages }
                 Headers     = $header
                 ContentType = "application/json;charset=utf-8"
             }
 
             if ($json) {
-                $params.Body.Add("response_format" , @{type = "json_object" } )
+                $body.Add("response_format" , @{type = "json_object" } )
             }
-
 
             if ($config) {
-                Merge-Hashtable -table1 $params.Body -table2 $config
+                Merge-Hashtable -table1 $body -table2 $config
             }
 
-            $params.Body = ($params.Body | ConvertTo-Json -Depth 10)
+            $params.Body = ($body | ConvertTo-Json -Depth 10)
 
             Write-Verbose ($resources.verbose_prepare_params -f ($params | ConvertTo-Json -Depth 10))
 
             $response = Invoke-RestMethod @params
+
+            # if return the tool_calls, then execute the tool locally and add send the message again.
+
+            while ($response.choices -and $response.choices[0].message.tool_calls) {
+                # add the assistant message 
+                $this_message = $response.choices[0].message
+                $body.messages += $this_message
+                $tool_calls = $this_message.tool_calls
+                
+                foreach ($tool in $tool_calls) {
+                    Write-Verbose "calling the tool: $($tool.function.name)"
+                    $function_args = $tool.function.arguments | ConvertFrom-Json -Depth 10
+                    $tool_response = Invoke-Expression ("{0} {1}" -f $tool.function.name, (
+                            $function_args.PSObject.Properties | ForEach-Object {
+                                "-{0} {1}" -f $_.Name, $_.Value
+                            }
+                        ) -join " ")
+
+                    $body.messages += @{
+                        role         = "tool"
+                        name         = $tool.function.name
+                        tool_call_id = $tool.id
+                        content      = $tool_response
+                    }
+                }
+
+                $params.Body = ($body | ConvertTo-Json -Depth 10)
+                $response = Invoke-RestMethod @params
+            }
 
             if ($PSVersionTable['PSVersion'].Major -eq 5) {
                 Write-Verbose ($resources.verbose_powershell_5_utf8)
