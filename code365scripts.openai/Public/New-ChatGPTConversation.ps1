@@ -30,6 +30,8 @@ function New-ChatGPTConversation {
         If you want to pass some custom headers to the API call, you can use this parameter. You can pass a custom hashtable to this parameter, like @{header1="value1";header2="value2"}.
     .PARAMETER json
         Send the response in json format.
+    .PARAMETER functions
+        This is s super powerful feature to support the function_call of OpenAI, you can specify the function name(s) and it will be automatically called when the assistant needs it. You can find all the avaliable functions definition here (https://raw.githubusercontent.com/chenxizhang/openai-powershell/master/code365scripts.openai/Private/functions.json).
     .EXAMPLE
         New-ChatGPTConversation
 
