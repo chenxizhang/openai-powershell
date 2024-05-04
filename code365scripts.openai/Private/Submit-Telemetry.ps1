@@ -28,6 +28,9 @@ function Submit-Telemetry {
     $eventItem = New-Object Microsoft.ApplicationInsights.DataContracts.EventTelemetry
     $eventItem.Name = $cmdletName
     $eventItem.Properties["innovationName"] = $innovationName
+    $version = (Get-Module -Name code365scripts.openai -ListAvailable | Sort-Object Version -Descending | Select-Object -First 1).Version.ToString()
+    $eventItem.Properties["version"] = $version
+
     # $eventItem.Properties["useAzure"] = $useAzure
     # add custom properties by foreach the hashtable and add them to the event
     if ($props) {
