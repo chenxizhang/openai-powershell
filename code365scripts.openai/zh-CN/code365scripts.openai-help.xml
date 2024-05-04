@@ -6,66 +6,19 @@
       <command:verb>New</command:verb>
       <command:noun>ChatGPTConversation</command:noun>
       <maml:description>
-        <maml:para>创建一个新的 ChatGPT 对话或获取一个对话补全结果（如果您指定了 prompt 参数）。</maml:para>
+        <maml:para>创建一个新的 ChatGPT 对话，或者如果您直接指定了 prompt 参数，则获取聊天完成结果。</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>创建一个新的 ChatGPT 对话，您可以像与人类聊天一样与 OpenAI 服务进行对话。 如果您指定了 prompt 参数，您还可以获取对话补全结果。</maml:para>
+      <maml:para>创建一个新的 ChatGPT 对话，您可以像与人聊天一样与 OpenAI 服务聊天。 如果您指定了 prompt 参数，您也可以获得聊天完成结果。</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
         <maml:name>New-ChatGPTConversation</maml:name>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="ollama">
-          <maml:name>local</maml:name>
-          <maml:description>
-            <maml:para>如果您想使用本地大型语言模型，如由 ollama 托管的模型，可以使用此开关。 您也可以使用 "ollama" 作为此参数的别名。</maml:para>
-          </maml:description>
-          <dev:type>
-            <maml:name>SwitchParameter</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>False</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="engine, deployment">
-          <maml:name>model</maml:name>
-          <maml:description>
-            <maml:para>此请求要使用的模型，您也可以在环境变量 OPENAI_CHAT_MODEL 或 OPENAI_CHAT_DEPLOYMENT_AZURE 中设置它，如果您使用 Azure OpenAI 服务。 如果您使用多个环境，可以使用 OPENAI_CHAT_DEPLOYMENT_AZURE_&lt;environment&gt; 为每个环境定义模型。 您可以使用 engine 或 deployment 作为此参数的别名。</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>endpoint</maml:name>
-          <maml:description>
-            <maml:para>此请求要使用的端点，您也可以在环境变量 OPENAI_ENDPOINT 或 OPENAI_ENDPOINT_AZURE 中设置它，如果您使用 Azure OpenAI 服务。 如果您使用多个环境，可以使用 OPENAI_ENDPOINT_AZURE_&lt;environment&gt; 为每个环境定义端点。</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>system</maml:name>
-          <maml:description>
-            <maml:para>系统提示，这是一个字符串，您可以使用它来定义您想要的角色，例如，“你是一个聊天机器人，请根据用户的语言回答用户的问题。” 如果您为这个参数提供了一个文件路径，我们将把该文件作为系统提示读取。 您也可以指定一个 URL 给这个参数，我们将把该 URL 作为系统提示读取。 您可以通过使用 "lib:xxxxx" 作为提示，从库（https://github.com/code365opensource/promptlibrary）中读取提示，例如，"lib:fitness"。</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>你是一个聊天机器人，请根据用户的语言回答用户的问题。</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByValue)" position="1" aliases="none">
           <maml:name>prompt</maml:name>
           <maml:description>
-            <maml:para>如果您想立即获取结果，可以使用这个参数来定义提示。 它不会启动聊天对话。 如果您为这个参数提供了一个文件路径，我们将把该文件作为提示读取。 您也可以指定一个 URL 给这个参数，我们将把该 URL 作为提示读取。 您可以通过使用 "lib:xxxxx" 作为提示，从库（https://github.com/code365opensource/promptlibrary）中读取提示，例如，"lib:fitness"。</maml:para>
+            <maml:para>如果您希望立即获得结果，您可以使用此参数定义提示。 它不会启动聊天对话。 如果您提供一个文件路径到这个参数，我们将读取文件作为提示。 您也可以为此参数指定一个 URL，我们将读取 URL 作为提示。 您可以通过使用 "lib:xxxxx" 作为提示从库 (https://github.com/code365opensource/promptlibrary) 读取提示，例如，"lib:fitness"。</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -74,71 +27,10 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>config</maml:name>
-          <maml:description>
-            <maml:para>API 调用的动态设置，它可以满足每个模型的所有要求。 请将一个自定义对象传递给此参数，如 @{temperature=1;max_tokens=1024}。</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">PSObject</command:parameterValue>
-          <dev:type>
-            <maml:name>PSObject</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="out">
-          <maml:name>outFile</maml:name>
-          <maml:description>
-            <maml:para>如果您想将结果保存到文件中，可以使用此参数来设置文件路径。 您也可以使用 "out" 作为此参数的别名。</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>json</maml:name>
-          <maml:description>
-            <maml:para>以 json 格式发送响应。</maml:para>
-          </maml:description>
-          <dev:type>
-            <maml:name>SwitchParameter</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>False</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>context</maml:name>
-          <maml:description>
-            <maml:para>如果您想将一些动态值传递给提示，您可以在这里使用 context 参数。 它可以是任何东西，您只需在这里指定一个自定义的 PowerShell 对象。 您在系统提示或用户提示中使用 {{you_variable_name}} 语法定义变量，然后将数据传递给 context 参数，如 @{you_variable_name="your value"}。 如果有多个变量，可以使用 @{variable1="value1";variable2="value2"}。</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">PSObject</command:parameterValue>
-          <dev:type>
-            <maml:name>PSObject</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-      </command:syntaxItem>
-      <command:syntaxItem>
-        <maml:name>New-ChatGPTConversation</maml:name>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>azure</maml:name>
-          <maml:description>
-            <maml:para>如果您使用 Azure OpenAI 服务，可以使用此开关。</maml:para>
-          </maml:description>
-          <dev:type>
-            <maml:name>SwitchParameter</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>False</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="token, access_token, accesstoken, key, apikey">
           <maml:name>api_key</maml:name>
           <maml:description>
-            <maml:para>用于访问 OpenAI 服务的 API 密钥，如果没有指定，API 密钥将从环境变量 OPENAI_API_KEY 中读取。 如果您使用 azure OpenAI 服务，您可以通过环境变量 OPENAI_API_KEY_AZURE 或 OPENAI_API_KEY_AZURE_&lt;environment&gt; 指定 API 密钥，其中 &lt;environment&gt; 可以是您想要的任何名称，例如，OPENAI_API_KEY_AZURE_DEV、OPENAI_API_KEY_AZURE_PROD、OPENAI_API_KEY_AZURE_TEST 等。</maml:para>
+            <maml:para>用于访问 OpenAI Service 的 API 密钥，如果未指定，将从环境变量 OPENAI_API_KEY 中读取。 您也可以使用 "token"、"access_token" 或 "accesstoken" 作为别名。</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -150,7 +42,7 @@
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="engine, deployment">
           <maml:name>model</maml:name>
           <maml:description>
-            <maml:para>此请求要使用的模型，您也可以在环境变量 OPENAI_CHAT_MODEL 或 OPENAI_CHAT_DEPLOYMENT_AZURE 中设置它，如果您使用 Azure OpenAI 服务。 如果您使用多个环境，可以使用 OPENAI_CHAT_DEPLOYMENT_AZURE_&lt;environment&gt; 为每个环境定义模型。 您可以使用 engine 或 deployment 作为此参数的别名。</maml:para>
+            <maml:para>用于此请求的模型，您也可以在环境变量 OPENAI_API_MODEL 中设置。 如果您使用的是 Azure OpenAI Service，则模型应是您在门户中创建的部署名称。</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -162,7 +54,7 @@
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>endpoint</maml:name>
           <maml:description>
-            <maml:para>此请求要使用的端点，您也可以在环境变量 OPENAI_ENDPOINT 或 OPENAI_ENDPOINT_AZURE 中设置它，如果您使用 Azure OpenAI 服务。 如果您使用多个环境，可以使用 OPENAI_ENDPOINT_AZURE_&lt;environment&gt; 为每个环境定义端点。</maml:para>
+            <maml:para>用于此请求的端点，您也可以在环境变量 OPENAI_API_ENDPOINT 中设置。 您还可以使用一些特殊值来指定端点，如 "ollama", "local", "kimi", "zhipu"。</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -174,31 +66,19 @@
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>system</maml:name>
           <maml:description>
-            <maml:para>系统提示，这是一个字符串，您可以使用它来定义您想要的角色，例如，“你是一个聊天机器人，请根据用户的语言回答用户的问题。” 如果您为这个参数提供了一个文件路径，我们将把该文件作为系统提示读取。 您也可以指定一个 URL 给这个参数，我们将把该 URL 作为系统提示读取。 您可以通过使用 "lib:xxxxx" 作为提示，从库（https://github.com/code365opensource/promptlibrary）中读取提示，例如，"lib:fitness"。</maml:para>
+            <maml:para>系统提示，这是一个字符串，您可以使用它定义您希望它扮演的角色，例如，"You are a chatbot, please answer the user's question according to the user's language." 如果您提供一个文件路径到这个参数，我们将读取文件作为系统提示。 您也可以为此参数指定一个 URL，我们将读取 URL 作为系统提示。 您可以通过使用 "lib:xxxxx" 作为提示从库 (https://github.com/code365opensource/promptlibrary) 读取提示，例如，"lib:fitness"。</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
             <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
-          <dev:defaultValue>你是一个聊天机器人，请根据用户的语言回答用户的问题。</dev:defaultValue>
+          <dev:defaultValue>You are a chatbot, please answer the user's question according to the user's language.</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>prompt</maml:name>
-          <maml:description>
-            <maml:para>如果您想立即获取结果，可以使用这个参数来定义提示。 它不会启动聊天对话。 如果您为这个参数提供了一个文件路径，我们将把该文件作为提示读取。 您也可以指定一个 URL 给这个参数，我们将把该 URL 作为提示读取。 您可以通过使用 "lib:xxxxx" 作为提示，从库（https://github.com/code365opensource/promptlibrary）中读取提示，例如，"lib:fitness"。</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="settings">
           <maml:name>config</maml:name>
           <maml:description>
-            <maml:para>API 调用的动态设置，它可以满足每个模型的所有要求。 请将一个自定义对象传递给此参数，如 @{temperature=1;max_tokens=1024}。</maml:para>
+            <maml:para>API 调用的动态设置，它可以满足每个模型的所有要求。 请传递一个自定义对象到这个参数，如 @{temperature=1;max_tokens=1024}。</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">PSObject</command:parameterValue>
           <dev:type>
@@ -207,34 +87,10 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="env">
-          <maml:name>environment</maml:name>
-          <maml:description>
-            <maml:para>环境名称，如果您使用 Azure OpenAI 服务，可以使用此参数来定义环境名称，它将用于从环境变量中获取 API 密钥、模型和端点。 如果环境不存在，它将使用默认环境。 您可以使用 env 作为此参数的别名。</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>api_version</maml:name>
-          <maml:description>
-            <maml:para>API 版本，如果您使用 Azure OpenAI 服务，可以使用此参数来定义 API 版本，默认值是 2023-09-01-preview。</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>2023-09-01-preview</dev:defaultValue>
-        </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="out">
           <maml:name>outFile</maml:name>
           <maml:description>
-            <maml:para>如果您想将结果保存到文件中，可以使用此参数来设置文件路径。 您也可以使用 "out" 作为此参数的别名。</maml:para>
+            <maml:para>如果您希望将结果保存到文件中，您可以使用此参数设置文件路径。 您也可以使用 "out" 作为别名。</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -254,10 +110,10 @@
           </dev:type>
           <dev:defaultValue>False</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="variables">
           <maml:name>context</maml:name>
           <maml:description>
-            <maml:para>如果您想将一些动态值传递给提示，您可以在这里使用 context 参数。 它可以是任何东西，您只需在这里指定一个自定义的 PowerShell 对象。 您在系统提示或用户提示中使用 {{you_variable_name}} 语法定义变量，然后将数据传递给 context 参数，如 @{you_variable_name="your value"}。 如果有多个变量，可以使用 @{variable1="value1";variable2="value2"}。</maml:para>
+            <maml:para>如果您希望将一些动态值传递给提示，您可以在这里使用 context 参数。 它可以是任何东西，您只需在这里指定一个自定义的 PowerShell 对象。 您可以通过使用 {{you_variable_name}} 语法在系统提示或用户提示中定义变量，然后将数据传递给 context 参数，如 @{you_variable_name="your value"}。 如果有多个变量，您可以使用 @{variable1="value1";variable2="value2"}。</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">PSObject</command:parameterValue>
           <dev:type>
@@ -266,108 +122,10 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-      </command:syntaxItem>
-      <command:syntaxItem>
-        <maml:name>New-ChatGPTConversation</maml:name>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>api_key</maml:name>
+          <maml:name>headers</maml:name>
           <maml:description>
-            <maml:para>用于访问 OpenAI 服务的 API 密钥，如果没有指定，API 密钥将从环境变量 OPENAI_API_KEY 中读取。 如果您使用 azure OpenAI 服务，您可以通过环境变量 OPENAI_API_KEY_AZURE 或 OPENAI_API_KEY_AZURE_&lt;environment&gt; 指定 API 密钥，其中 &lt;environment&gt; 可以是您想要的任何名称，例如，OPENAI_API_KEY_AZURE_DEV、OPENAI_API_KEY_AZURE_PROD、OPENAI_API_KEY_AZURE_TEST 等。</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="engine, deployment">
-          <maml:name>model</maml:name>
-          <maml:description>
-            <maml:para>此请求要使用的模型，您也可以在环境变量 OPENAI_CHAT_MODEL 或 OPENAI_CHAT_DEPLOYMENT_AZURE 中设置它，如果您使用 Azure OpenAI 服务。 如果您使用多个环境，可以使用 OPENAI_CHAT_DEPLOYMENT_AZURE_&lt;environment&gt; 为每个环境定义模型。 您可以使用 engine 或 deployment 作为此参数的别名。</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>endpoint</maml:name>
-          <maml:description>
-            <maml:para>此请求要使用的端点，您也可以在环境变量 OPENAI_ENDPOINT 或 OPENAI_ENDPOINT_AZURE 中设置它，如果您使用 Azure OpenAI 服务。 如果您使用多个环境，可以使用 OPENAI_ENDPOINT_AZURE_&lt;environment&gt; 为每个环境定义端点。</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>system</maml:name>
-          <maml:description>
-            <maml:para>系统提示，这是一个字符串，您可以使用它来定义您想要的角色，例如，“你是一个聊天机器人，请根据用户的语言回答用户的问题。” 如果您为这个参数提供了一个文件路径，我们将把该文件作为系统提示读取。 您也可以指定一个 URL 给这个参数，我们将把该 URL 作为系统提示读取。 您可以通过使用 "lib:xxxxx" 作为提示，从库（https://github.com/code365opensource/promptlibrary）中读取提示，例如，"lib:fitness"。</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>你是一个聊天机器人，请根据用户的语言回答用户的问题。</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>prompt</maml:name>
-          <maml:description>
-            <maml:para>如果您想立即获取结果，可以使用这个参数来定义提示。 它不会启动聊天对话。 如果您为这个参数提供了一个文件路径，我们将把该文件作为提示读取。 您也可以指定一个 URL 给这个参数，我们将把该 URL 作为提示读取。 您可以通过使用 "lib:xxxxx" 作为提示，从库（https://github.com/code365opensource/promptlibrary）中读取提示，例如，"lib:fitness"。</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>config</maml:name>
-          <maml:description>
-            <maml:para>API 调用的动态设置，它可以满足每个模型的所有要求。 请将一个自定义对象传递给此参数，如 @{temperature=1;max_tokens=1024}。</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">PSObject</command:parameterValue>
-          <dev:type>
-            <maml:name>PSObject</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="out">
-          <maml:name>outFile</maml:name>
-          <maml:description>
-            <maml:para>如果您想将结果保存到文件中，可以使用此参数来设置文件路径。 您也可以使用 "out" 作为此参数的别名。</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>json</maml:name>
-          <maml:description>
-            <maml:para>以 json 格式发送响应。</maml:para>
-          </maml:description>
-          <dev:type>
-            <maml:name>SwitchParameter</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>False</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>context</maml:name>
-          <maml:description>
-            <maml:para>如果您想将一些动态值传递给提示，您可以在这里使用 context 参数。 它可以是任何东西，您只需在这里指定一个自定义的 PowerShell 对象。 您在系统提示或用户提示中使用 {{you_variable_name}} 语法定义变量，然后将数据传递给 context 参数，如 @{you_variable_name="your value"}。 如果有多个变量，可以使用 @{variable1="value1";variable2="value2"}。</maml:para>
+            <maml:para>如果您希望将一些自定义头传递到 API 调用，您可以使用此参数。 您可以传递一个自定义的哈希表给这个参数，如 @{header1="value1";header2="value2"}。</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">PSObject</command:parameterValue>
           <dev:type>
@@ -379,34 +137,10 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="ollama">
-        <maml:name>local</maml:name>
-        <maml:description>
-          <maml:para>如果您想使用本地大型语言模型，如由 ollama 托管的模型，可以使用此开关。 您也可以使用 "ollama" 作为此参数的别名。</maml:para>
-        </maml:description>
-        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
-        <dev:type>
-          <maml:name>SwitchParameter</maml:name>
-          <maml:uri />
-        </dev:type>
-        <dev:defaultValue>False</dev:defaultValue>
-      </command:parameter>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-        <maml:name>azure</maml:name>
-        <maml:description>
-          <maml:para>如果您使用 Azure OpenAI 服务，可以使用此开关。</maml:para>
-        </maml:description>
-        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
-        <dev:type>
-          <maml:name>SwitchParameter</maml:name>
-          <maml:uri />
-        </dev:type>
-        <dev:defaultValue>False</dev:defaultValue>
-      </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="token, access_token, accesstoken, key, apikey">
         <maml:name>api_key</maml:name>
         <maml:description>
-          <maml:para>用于访问 OpenAI 服务的 API 密钥，如果没有指定，API 密钥将从环境变量 OPENAI_API_KEY 中读取。 如果您使用 azure OpenAI 服务，您可以通过环境变量 OPENAI_API_KEY_AZURE 或 OPENAI_API_KEY_AZURE_&lt;environment&gt; 指定 API 密钥，其中 &lt;environment&gt; 可以是您想要的任何名称，例如，OPENAI_API_KEY_AZURE_DEV、OPENAI_API_KEY_AZURE_PROD、OPENAI_API_KEY_AZURE_TEST 等。</maml:para>
+          <maml:para>用于访问 OpenAI Service 的 API 密钥，如果未指定，将从环境变量 OPENAI_API_KEY 中读取。 您也可以使用 "token"、"access_token" 或 "accesstoken" 作为别名。</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -418,7 +152,7 @@
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="engine, deployment">
         <maml:name>model</maml:name>
         <maml:description>
-          <maml:para>此请求要使用的模型，您也可以在环境变量 OPENAI_CHAT_MODEL 或 OPENAI_CHAT_DEPLOYMENT_AZURE 中设置它，如果您使用 Azure OpenAI 服务。 如果您使用多个环境，可以使用 OPENAI_CHAT_DEPLOYMENT_AZURE_&lt;environment&gt; 为每个环境定义模型。 您可以使用 engine 或 deployment 作为此参数的别名。</maml:para>
+          <maml:para>用于此请求的模型，您也可以在环境变量 OPENAI_API_MODEL 中设置。 如果您使用的是 Azure OpenAI Service，则模型应是您在门户中创建的部署名称。</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -430,7 +164,7 @@
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>endpoint</maml:name>
         <maml:description>
-          <maml:para>此请求要使用的端点，您也可以在环境变量 OPENAI_ENDPOINT 或 OPENAI_ENDPOINT_AZURE 中设置它，如果您使用 Azure OpenAI 服务。 如果您使用多个环境，可以使用 OPENAI_ENDPOINT_AZURE_&lt;environment&gt; 为每个环境定义端点。</maml:para>
+          <maml:para>用于此请求的端点，您也可以在环境变量 OPENAI_API_ENDPOINT 中设置。 您还可以使用一些特殊值来指定端点，如 "ollama", "local", "kimi", "zhipu"。</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -442,19 +176,19 @@
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>system</maml:name>
         <maml:description>
-          <maml:para>系统提示，这是一个字符串，您可以使用它来定义您想要的角色，例如，“你是一个聊天机器人，请根据用户的语言回答用户的问题。” 如果您为这个参数提供了一个文件路径，我们将把该文件作为系统提示读取。 您也可以指定一个 URL 给这个参数，我们将把该 URL 作为系统提示读取。 您可以通过使用 "lib:xxxxx" 作为提示，从库（https://github.com/code365opensource/promptlibrary）中读取提示，例如，"lib:fitness"。</maml:para>
+          <maml:para>系统提示，这是一个字符串，您可以使用它定义您希望它扮演的角色，例如，"You are a chatbot, please answer the user's question according to the user's language." 如果您提供一个文件路径到这个参数，我们将读取文件作为系统提示。 您也可以为此参数指定一个 URL，我们将读取 URL 作为系统提示。 您可以通过使用 "lib:xxxxx" 作为提示从库 (https://github.com/code365opensource/promptlibrary) 读取提示，例如，"lib:fitness"。</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
           <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
-        <dev:defaultValue>你是一个聊天机器人，请根据用户的语言回答用户的问题。</dev:defaultValue>
+        <dev:defaultValue>You are a chatbot, please answer the user's question according to the user's language.</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByValue)" position="1" aliases="none">
         <maml:name>prompt</maml:name>
         <maml:description>
-          <maml:para>如果您想立即获取结果，可以使用这个参数来定义提示。 它不会启动聊天对话。 如果您为这个参数提供了一个文件路径，我们将把该文件作为提示读取。 您也可以指定一个 URL 给这个参数，我们将把该 URL 作为提示读取。 您可以通过使用 "lib:xxxxx" 作为提示，从库（https://github.com/code365opensource/promptlibrary）中读取提示，例如，"lib:fitness"。</maml:para>
+          <maml:para>如果您希望立即获得结果，您可以使用此参数定义提示。 它不会启动聊天对话。 如果您提供一个文件路径到这个参数，我们将读取文件作为提示。 您也可以为此参数指定一个 URL，我们将读取 URL 作为提示。 您可以通过使用 "lib:xxxxx" 作为提示从库 (https://github.com/code365opensource/promptlibrary) 读取提示，例如，"lib:fitness"。</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -463,10 +197,10 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="settings">
         <maml:name>config</maml:name>
         <maml:description>
-          <maml:para>API 调用的动态设置，它可以满足每个模型的所有要求。 请将一个自定义对象传递给此参数，如 @{temperature=1;max_tokens=1024}。</maml:para>
+          <maml:para>API 调用的动态设置，它可以满足每个模型的所有要求。 请传递一个自定义对象到这个参数，如 @{temperature=1;max_tokens=1024}。</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">PSObject</command:parameterValue>
         <dev:type>
@@ -475,34 +209,10 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="env">
-        <maml:name>environment</maml:name>
-        <maml:description>
-          <maml:para>环境名称，如果您使用 Azure OpenAI 服务，可以使用此参数来定义环境名称，它将用于从环境变量中获取 API 密钥、模型和端点。 如果环境不存在，它将使用默认环境。 您可以使用 env 作为此参数的别名。</maml:para>
-        </maml:description>
-        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-        <dev:type>
-          <maml:name>String</maml:name>
-          <maml:uri />
-        </dev:type>
-        <dev:defaultValue>None</dev:defaultValue>
-      </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-        <maml:name>api_version</maml:name>
-        <maml:description>
-          <maml:para>API 版本，如果您使用 Azure OpenAI 服务，可以使用此参数来定义 API 版本，默认值是 2023-09-01-preview。</maml:para>
-        </maml:description>
-        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-        <dev:type>
-          <maml:name>String</maml:name>
-          <maml:uri />
-        </dev:type>
-        <dev:defaultValue>2023-09-01-preview</dev:defaultValue>
-      </command:parameter>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="out">
         <maml:name>outFile</maml:name>
         <maml:description>
-          <maml:para>如果您想将结果保存到文件中，可以使用此参数来设置文件路径。 您也可以使用 "out" 作为此参数的别名。</maml:para>
+          <maml:para>如果您希望将结果保存到文件中，您可以使用此参数设置文件路径。 您也可以使用 "out" 作为别名。</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -523,10 +233,22 @@
         </dev:type>
         <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="variables">
         <maml:name>context</maml:name>
         <maml:description>
-          <maml:para>如果您想将一些动态值传递给提示，您可以在这里使用 context 参数。 它可以是任何东西，您只需在这里指定一个自定义的 PowerShell 对象。 您在系统提示或用户提示中使用 {{you_variable_name}} 语法定义变量，然后将数据传递给 context 参数，如 @{you_variable_name="your value"}。 如果有多个变量，可以使用 @{variable1="value1";variable2="value2"}。</maml:para>
+          <maml:para>如果您希望将一些动态值传递给提示，您可以在这里使用 context 参数。 它可以是任何东西，您只需在这里指定一个自定义的 PowerShell 对象。 您可以通过使用 {{you_variable_name}} 语法在系统提示或用户提示中定义变量，然后将数据传递给 context 参数，如 @{you_variable_name="your value"}。 如果有多个变量，您可以使用 @{variable1="value1";variable2="value2"}。</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="false">PSObject</command:parameterValue>
+        <dev:type>
+          <maml:name>PSObject</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>headers</maml:name>
+        <maml:description>
+          <maml:para>如果您希望将一些自定义头传递到 API 调用，您可以使用此参数。 您可以传递一个自定义的哈希表给这个参数，如 @{header1="value1";header2="value2"}。</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">PSObject</command:parameterValue>
         <dev:type>
@@ -540,7 +262,7 @@
     <command:returnValues>
       <command:returnValue>
         <dev:type>
-          <maml:name>System.String, 补全结果。</maml:name>
+          <maml:name>System.String, 完成的结果。</maml:name>
         </dev:type>
         <maml:description>
           <maml:para></maml:para>
@@ -557,119 +279,49 @@
         <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
         <dev:code>New-ChatGPTConversation</dev:code>
         <dev:remarks>
-          <maml:para>使用所有默认设置，创建一个新的 ChatGPT 对话，使用 OpenAI 服务。</maml:para>
+          <maml:para>使用所有默认设置的 OpenAI Service，将从环境变量 (OPENAI_API_KEY) 读取 API 密钥，进入聊天模式。</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
-        <dev:code>New-ChatGPTConverstaion -azure</dev:code>
+        <dev:code>New-ChatGPTConversation -api_key "your api key" -model "gpt-3.5-turbo"</dev:code>
         <dev:remarks>
-          <maml:para>使用所有默认设置，创建一个新的 ChatGPT 对话，使用 Azure OpenAI 服务。</maml:para>
+          <maml:para>使用指定的 API 密钥和模型的 OpenAI Service，进入聊天模式。</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
-        <dev:code>chat -azure</dev:code>
+        <dev:code>chat -system "You help me to translate the text to Chinese."</dev:code>
         <dev:remarks>
-          <maml:para>使用 cmdlet 的别名（chat），使用所有默认设置，创建一个新的 ChatGPT 对话，使用 Azure OpenAI 服务。</maml:para>
+          <maml:para>使用 OpenAI Service 翻译文本（指定系统提示），将从环境变量 (OPENAI_API_KEY) 读取 API 密钥，进入聊天模式。</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
-        <dev:code>New-ChatGPTConversation -api_key "你的 API 密钥" -model "你的模型名称"</dev:code>
+        <dev:code>chat -endpoint "ollama" -model "llama3"</dev:code>
         <dev:remarks>
-          <maml:para>使用您的 API 密钥和模型名称，创建一个新的 ChatGPT 对话，使用 OpenAI 服务。</maml:para>
+          <maml:para>使用本地模型的 OpenAI Service，进入聊天模式。</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 5 --------------------------</maml:title>
-        <dev:code>New-ChatGPTConversation -api_key "你的 API 密钥" -model "你的部署名称" -azure</dev:code>
+        <dev:code>chat -endpoint $endpoint $env:OPENAI_API_ENDPOINT_AZURE -model $env:OPENAI_API_MODEL_AZURE -api_key $env:OPENAI_API_KEY_AZURE</dev:code>
         <dev:remarks>
-          <maml:para>使用您的 API 密钥和部署名称，创建一个新的 ChatGPT 对话，使用 Azure OpenAI 服务。</maml:para>
+          <maml:para>使用指定的 API 密钥和模型的 Azure OpenAI Service，进入聊天模式。</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 6 --------------------------</maml:title>
-        <dev:code>New-ChatGPTConversation -api_key "你的 API 密钥" -model "你的部署名称" -azure -system "你是一个聊天机器人，请根据用户的语言回答用户的问题。"</dev:code>
+        <dev:code>gpt -system "Translate the text to Chinese." -prompt "Hello, how are you?"</dev:code>
         <dev:remarks>
-          <maml:para>使用您的 API 密钥和部署名称，创建一个新的 ChatGPT 对话，使用 Azure OpenAI 服务，并定义系统提示。</maml:para>
+          <maml:para>使用 OpenAI Service 翻译文本（指定系统提示），将从环境变量 (OPENAI_API_KEY) 读取 API 密钥，模型从 OPENAI_API_MODEL 读取（如果存在）或默认使用 "gpt-3.5-turbo"，直接获取聊天完成结果。</maml:para>
         </dev:remarks>
       </command:example>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 7 --------------------------</maml:title>
-        <dev:code>New-ChatGPTConversation -api_key "你的 API 密钥" -model "你的部署名称" -azure -system "你是一个聊天机器人，请根据用户的语言回答用户的问题。" -endpoint "https://api.openai.com/v1/completions"</dev:code>
+        <dev:code>"Hello, how are you?" | gpt -system "Translate the text to Chinese."</dev:code>
         <dev:remarks>
-          <maml:para>使用您的 API 密钥和模型 ID，创建一个新的 ChatGPT 对话，使用 Azure OpenAI 服务，并定义系统提示和端点。</maml:para>
-        </dev:remarks>
-      </command:example>
-      <command:example>
-        <maml:title>-------------------------- EXAMPLE 8 --------------------------</maml:title>
-        <dev:code>chat -azure -system "你是一个聊天机器人，请根据用户的语言回答用户的问题。" -env "sweden"</dev:code>
-        <dev:remarks>
-          <maml:para>使用 cmdlet 的别名（chat），使用 Azure OpenAI 服务，以及在环境变量 OPENAI_API_KEY_AZURE_SWEDEN、OPENAI_CHAT_DEPLOYMENT_AZURE_SWEDEN 和 OPENAI_ENDPOINT_AZURE_SWEDEN 中定义的 API 密钥、模型和端点，创建一个新的 ChatGPT 对话。</maml:para>
-        </dev:remarks>
-      </command:example>
-      <command:example>
-        <maml:title>-------------------------- EXAMPLE 9 --------------------------</maml:title>
-        <dev:code>chat -azure -api_version "2021-09-01-preview"</dev:code>
-        <dev:remarks>
-          <maml:para>使用 cmdlet 的别名（chat），使用 API 版本 2021-09-01-preview，创建一个新的 ChatGPT 对话，使用 Azure OpenAI 服务。</maml:para>
-        </dev:remarks>
-      </command:example>
-      <command:example>
-        <maml:title>-------------------------- EXAMPLE 10 --------------------------</maml:title>
-        <dev:code>gpt -azure -prompt "为什么人们会微笑"</dev:code>
-        <dev:remarks>
-          <maml:para>使用 cmdlet 的别名（gpt），使用 Azure OpenAI 服务和提示，创建一个新的 ChatGPT 对话。</maml:para>
-        </dev:remarks>
-      </command:example>
-      <command:example>
-        <maml:title>-------------------------- EXAMPLE 11 --------------------------</maml:title>
-        <dev:code>"为什么人们会微笑" | gpt -azure</dev:code>
-        <dev:remarks>
-          <maml:para>使用 cmdlet 的别名（gpt），使用 Azure OpenAI 服务和来自管道的提示，创建一个新的 ChatGPT 对话。</maml:para>
-        </dev:remarks>
-      </command:example>
-      <command:example>
-        <maml:title>-------------------------- EXAMPLE 12 --------------------------</maml:title>
-        <dev:code>gpt -azure -prompt "c:\temp\prompt.txt"</dev:code>
-        <dev:remarks>
-          <maml:para>使用 cmdlet 的别名（gpt），使用 Azure OpenAI 服务和来自文件的提示，创建一个新的 ChatGPT 对话。</maml:para>
-        </dev:remarks>
-      </command:example>
-      <command:example>
-        <maml:title>-------------------------- EXAMPLE 13 --------------------------</maml:title>
-        <dev:code>gpt -azure -prompt "c:\temp\prompt.txt" -context @{variable1="value1";variable2="value2"}</dev:code>
-        <dev:remarks>
-          <maml:para>使用 cmdlet 的别名（gpt），使用 Azure OpenAI 服务和来自文件的提示，并将一些数据传递给提示，创建一个新的 ChatGPT 对话。</maml:para>
-        </dev:remarks>
-      </command:example>
-      <command:example>
-        <maml:title>-------------------------- EXAMPLE 14 --------------------------</maml:title>
-        <dev:code>gpt -azure -system "c:\temp\system.txt" -prompt "c:\temp\prompt.txt"</dev:code>
-        <dev:remarks>
-          <maml:para>使用 cmdlet 的别名（gpt），使用 Azure OpenAI 服务和系统提示及来自文件的提示，创建一个新的 ChatGPT 对话。</maml:para>
-        </dev:remarks>
-      </command:example>
-      <command:example>
-        <maml:title>-------------------------- EXAMPLE 15 --------------------------</maml:title>
-        <dev:code>gpt -azure -system "c:\temp\system.txt" -prompt "c:\temp\prompt.txt" -outFile "c:\temp\result.txt"</dev:code>
-        <dev:remarks>
-          <maml:para>使用 cmdlet 的别名（gpt），使用 Azure OpenAI 服务和系统提示及来自文件的提示，然后将结果保存到文件，创建一个新的 ChatGPT 对话。</maml:para>
-        </dev:remarks>
-      </command:example>
-      <command:example>
-        <maml:title>-------------------------- EXAMPLE 16 --------------------------</maml:title>
-        <dev:code>gpt -azure -system "c:\temp\system.txt" -prompt "c:\temp\prompt.txt" -config @{temperature=1;max_tokens=1024}</dev:code>
-        <dev:remarks>
-          <maml:para>使用 cmdlet 的别名（gpt），使用 Azure OpenAI 服务和系统提示及来自文件的提示以及您的自定义设置，创建一个新的 ChatGPT 对话。</maml:para>
-        </dev:remarks>
-      </command:example>
-      <command:example>
-        <maml:title>-------------------------- EXAMPLE 17 --------------------------</maml:title>
-        <dev:code>chat -local -model "llama3"</dev:code>
-        <dev:remarks>
-          <maml:para>使用本地大型语言模型（例如，由 ollama 托管的模型 llama3）创建一个新的 ChatGPT 对话。 默认端点是 http://localhost:11434/v1/chat/completions。 您也可以修改此端点。</maml:para>
+          <maml:para>使用 OpenAI Service 翻译文本（指定系统提示，用户提示将通过管道传递），将从环境变量 (OPENAI_API_KEY) 读取 API 密钥，模型从 OPENAI_API_MODEL 读取（如果存在）或默认使用 "gpt-3.5-turbo"，直接获取聊天完成结果。</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -695,7 +347,7 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>New-ImageGeneration</maml:name>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
           <maml:name>prompt</maml:name>
           <maml:description>
             <maml:para>生成图像的提示，这是必需的，并且可以从管道传递。 如果您想使用文件作为提示，可以在这里指定文件路径。 您也可以指定一个 URL 作为提示，我们将读取 URL 作为提示。 您可以通过使用 "lib:xxxxx" 作为提示，从库（https://github.com/code365opensource/promptlibrary）中读取提示，例如，"lib:fitness"。</maml:para>
@@ -781,7 +433,7 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
         <maml:name>prompt</maml:name>
         <maml:description>
           <maml:para>生成图像的提示，这是必需的，并且可以从管道传递。 如果您想使用文件作为提示，可以在这里指定文件路径。 您也可以指定一个 URL 作为提示，我们将读取 URL 作为提示。 您可以通过使用 "lib:xxxxx" 作为提示，从库（https://github.com/code365opensource/promptlibrary）中读取提示，例如，"lib:fitness"。</maml:para>
@@ -929,7 +581,7 @@
         <maml:title>-------------------------- EXAMPLE 7 --------------------------</maml:title>
         <dev:code>New-ImageGeneration -outfolder "c:\temp" -azure -prompt "c:\temp\prompt.txt"</dev:code>
         <dev:remarks>
-          <maml:para>使用 dall-e-3 模型生成图像，图像大小为 1024x1024，生成的图像将保存到 c:\temp 文件夹，使用 Azure OpenAI 服务，并使用文件 c:\temp\prompt.txt 中的提示。</maml:para>
+          <maml:para>使用 dall-e-3 模型生成图像，图像大小为 1024x1024，生成的图像将保存到 c:\temp 文件夹，使用 Azure OpenAI 服务，并使用文件 c:\temp\prompt.txt 中的提示</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>

@@ -1,5 +1,7 @@
 function New-ImageGeneration {
     <#
+    .EXTERNALHELP
+        code365scripts.openai-help.xml
     .SYNOPSIS
         Generate image from prompt, using DALL-e-3 model.
     .DESCRIPTION

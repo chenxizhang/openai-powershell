@@ -8,7 +8,7 @@ schema: 2.0.0
 # New-ImageGeneration
 
 ## SYNOPSIS
-Generate image from prompt, using DALL-e-3 model.
+使用 DALL-E-3 模型从提示生成图像。
 
 ## SYNTAX
 
@@ -25,8 +25,8 @@ New-ImageGeneration [[-prompt] <String>] [-api_key <String>] [-endpoint <String>
 ```
 
 ## DESCRIPTION
-Generate image from prompt, using DALL-e-3 model.
-The image size can be 1024x1024, 1792x1024, 1024x1792.
+使用 DALL-E-3 模型从提示生成图像。
+图像大小可以是 1024x1024，1792x1024，1024x1792。
 
 ## EXAMPLES
 
@@ -35,57 +35,57 @@ The image size can be 1024x1024, 1792x1024, 1024x1792.
 New-ImageGeneration -prompt "A painting of a cat sitting on a chair"
 ```
 
-Use dall-e-3 model to generate image, the image size is 1024x1024, the generated image will be saved to current folder.
+使用 dall-e-3 模型生成图像，图像大小为 1024x1024，生成的图像将保存到当前文件夹。
 
 ### EXAMPLE 2
 ```
 image -prompt "A painting of a cat sitting on a chair"
 ```
 
-Use the alias (image) to generate image, the image size is 1024x1024, the generated image will be saved to current folder.
+使用别名（image）生成图像，图像大小为 1024x1024，生成的图像将保存到当前文件夹。
 
 ### EXAMPLE 3
 ```
 "A painting of a cat sitting on a chair" | New-ImageGeneration
 ```
 
-Pass the prompt from pipeline, the image size is 1024x1024, the generated image will be saved to current folder.
+从管道传递提示，图像大小为 1024x1024，生成的图像将保存到当前文件夹。
 
 ### EXAMPLE 4
 ```
 New-ImageGeneration -prompt "A painting of a cat sitting on a chair" -size medium -outfolder "c:\temp" -api_key "your API key" -endpoint "your endpoint"
 ```
 
-Use dall-e-3 model to generate image, the image size is 1792x1024, the generated image will be saved to c:\temp folder, use your own API key and endpoint.
+使用 dall-e-3 模型生成图像，图像大小为 1792x1024，生成的图像将保存到 c:\temp 文件夹，使用您自己的 API 密钥和端点。
 
 ### EXAMPLE 5
 ```
 New-ImageGeneration -prompt "A painting of a cat sitting on a chair" -size small -outfolder "c:\temp" -azure
 ```
 
-Use dall-e-3 model to generate image, the image size is 1024x1024, the generated image will be saved to c:\temp folder, use Azure OpenAI service.
+使用 dall-e-3 模型生成图像，图像大小为 1024x1024，生成的图像将保存到 c:\temp 文件夹，使用 Azure OpenAI 服务。
 
 ### EXAMPLE 6
 ```
 New-ImageGeneration -prompt "A painting of a cat sitting on a chair" -size small -outfolder "c:\temp" -azure -environment "dev"
 ```
 
-Use dall-e-3 model to generate image, the image size is 1024x1024, the generated image will be saved to c:\temp folder, use Azure OpenAI service, read API key and endpoint from environment variable OPENAI_API_KEY_AZURE_DEV and OPENAI_ENDPOINT_AZURE_DEV.
+使用 dall-e-3 模型生成图像，图像大小为 1024x1024，生成的图像将保存到 c:\temp 文件夹，使用 Azure OpenAI 服务，从环境变量 OPENAI_API_KEY_AZURE_DEV 和 OPENAI_ENDPOINT_AZURE_DEV 中读取 API 密钥和端点。
 
 ### EXAMPLE 7
 ```
 New-ImageGeneration -outfolder "c:\temp" -azure -prompt "c:\temp\prompt.txt"
 ```
 
-Use dall-e-3 model to generate image, the image size is 1024x1024, the generated image will be saved to c:\temp folder, use Azure OpenAI service, and use prompt from file c:\temp\prompt.txt
+使用 dall-e-3 模型生成图像，图像大小为 1024x1024，生成的图像将保存到 c:\temp 文件夹，使用 Azure OpenAI 服务，并使用文件 c:\temp\prompt.txt 中的提示
 
 ## PARAMETERS
 
 ### -prompt
-The prompt to generate image, this is required, and it can pass from pipeline.
-If you want to use a file as prompt, you can specify the file path here.
-You can also specify a url as prompt, we will read the url as prompt.
-You can read the prompt from a library (https://github.com/code365opensource/promptlibrary), by use "lib:xxxxx" as the prompt, for example, "lib:fitness".
+生成图像的提示，这是必需的，并且可以从管道传递。
+如果您想使用文件作为提示，可以在这里指定文件路径。
+您也可以指定一个 URL 作为提示，我们将读取 URL 作为提示。
+您可以通过使用 "lib:xxxxx" 作为提示，从库（https://github.com/code365opensource/promptlibrary）中读取提示，例如，"lib:fitness"。
 
 ```yaml
 Type: String
@@ -100,8 +100,8 @@ Accept wildcard characters: False
 ```
 
 ### -api_key
-The API key to access OpenAI service, if not specified, the API key will be read from environment variable OPENAI_API_KEY.
-if you use Azure OpenAI service, you can specify the API key by environment variable OPENAI_API_KEY_AZURE or OPENAI_API_KEY_AZURE_\<environment\>, the \<environment\> can be any names you want, for example, OPENAI_API_KEY_AZURE_DEV, OPENAI_API_KEY_AZURE_PROD, OPENAI_API_KEY_AZURE_TEST, etc.
+访问 OpenAI 服务的 API 密钥，如果没有指定，API 密钥将从环境变量 OPENAI_API_KEY 中读取。
+如果您使用 Azure OpenAI 服务，您可以通过环境变量 OPENAI_API_KEY_AZURE 或 OPENAI_API_KEY_AZURE_\<environment\> 指定 API 密钥，\<environment\> 可以是您想要的任何名称，例如，OPENAI_API_KEY_AZURE_DEV，OPENAI_API_KEY_AZURE_PROD，OPENAI_API_KEY_AZURE_TEST 等。
 
 ```yaml
 Type: String
@@ -116,8 +116,8 @@ Accept wildcard characters: False
 ```
 
 ### -endpoint
-The endpoint to access OpenAI service, if not specified, the endpoint will be read from environment variable OPENAI_ENDPOINT.
-if you use Azure OpenAI service, you can specify the endpoint by environment variable OPENAI_ENDPOINT_AZURE or OPENAI_ENDPOINT_AZURE_\<environment\>, the \<environment\> can be any names you want, for example, OPENAI_ENDPOINT_AZURE_DEV, OPENAI_ENDPOINT_AZURE_PROD, OPENAI_ENDPOINT_AZURE_TEST, etc.
+访问 OpenAI 服务的端点，如果没有指定，端点将从环境变量 OPENAI_ENDPOINT 中读取。
+如果您使用 Azure OpenAI 服务，您可以通过环境变量 OPENAI_ENDPOINT_AZURE 或 OPENAI_ENDPOINT_AZURE_\<environment\> 指定端点，\<environment\> 可以是您想要的任何名称，例如，OPENAI_ENDPOINT_AZURE_DEV，OPENAI_ENDPOINT_AZURE_PROD，OPENAI_ENDPOINT_AZURE_TEST 等。
 
 ```yaml
 Type: String
@@ -132,8 +132,8 @@ Accept wildcard characters: False
 ```
 
 ### -azure
-Use Azure OpenAI service, if specified, the API key and endpoint will be read from environment variable OPENAI_API_KEY_AZURE or OPENAI_API_KEY_AZURE_\<environment\>, the \<environment\> can be any names you want, for example, OPENAI_API_KEY_AZURE_DEV, OPENAI_API_KEY_AZURE_PROD, OPENAI_API_KEY_AZURE_TEST, etc.
-and OPENAI_ENDPOINT_AZURE or OPENAI_ENDPOINT_AZURE_\<environment\>.
+使用 Azure OpenAI 服务，如果指定，API 密钥和端点将从环境变量 OPENAI_API_KEY_AZURE 或 OPENAI_API_KEY_AZURE_\<environment\> 中读取，\<environment\> 可以是您想要的任何名称，例如，OPENAI_API_KEY_AZURE_DEV，OPENAI_API_KEY_AZURE_PROD，OPENAI_API_KEY_AZURE_TEST 等。
+和 OPENAI_ENDPOINT_AZURE 或 OPENAI_ENDPOINT_AZURE_\<environment\>。
 
 ```yaml
 Type: SwitchParameter
@@ -148,7 +148,7 @@ Accept wildcard characters: False
 ```
 
 ### -size
-The size of the image to generate, the value can be small (1024x1024), medium(1792x1024), large(1024x1792), the default is small.
+要生成的图像的大小，值可以是 small (1024x1024)，medium(1792x1024)，large(1024x1792)，默认是 small。
 
 ```yaml
 Type: String
@@ -163,8 +163,8 @@ Accept wildcard characters: False
 ```
 
 ### -outfolder
-The folder to save the generated image, default is current folder.
-You can use out as the alias of this parameter.
+保存生成的图像的文件夹，默认是当前文件夹。
+您可以使用 out 作为此参数的别名。
 
 ```yaml
 Type: String
@@ -179,8 +179,8 @@ Accept wildcard characters: False
 ```
 
 ### -environment
-The environment name, if you use Azure OpenAI service, you can specify the environment by this parameter, the environment name can be any names you want, for example, dev, prod, test, etc, the environment name will be used to read the API key and endpoint from environment variable, for example, OPENAI_API_KEY_AZURE_DEV, OPENAI_ENDPOINT_AZURE_DEV, etc.
-You can use env as the alias of this parameter.
+环境名称，如果您使用 Azure OpenAI 服务，可以通过此参数指定环境，环境名称可以是您想要的任何名称，例如，dev，prod，test 等，环境名称将用于从环境变量中读取 API 密钥和端点，例如，OPENAI_API_KEY_AZURE_DEV，OPENAI_ENDPOINT_AZURE_DEV 等。
+您可以使用 env 作为此参数的别名。
 
 ```yaml
 Type: String
@@ -195,16 +195,15 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+此 cmdlet 支持常见参数：-Debug，-ErrorAction，-ErrorVariable，-InformationAction，-InformationVariable，-OutVariable，-OutBuffer，-PipelineVariable，-Verbose，-WarningAction 和 -WarningVariable。有关更多信息，请参见 [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216)。
 
 ## INPUTS
 
 ## OUTPUTS
 
-### System.String, the file path of the generated image.
+### System.String, 生成的图像的文件路径。
 ## NOTES
 
 ## RELATED LINKS
 
 [https://github.com/chenxizhang/openai-powershell](https://github.com/chenxizhang/openai-powershell)
-

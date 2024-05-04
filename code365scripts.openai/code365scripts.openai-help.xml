@@ -6,7 +6,7 @@
       <command:verb>New</command:verb>
       <command:noun>ChatGPTConversation</command:noun>
       <maml:description>
-        <maml:para>Create a new ChatGPT conversation or get a Chat Completion result if you specify the prompt parameter directly.</maml:para>
+        <maml:para>Create a new ChatGPT conversation or get a Chat Completion result if you specify the prompt parameter directly</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
