@@ -1,6 +1,6 @@
 function Get-PredefinedFunctions {
     param([string[]]$names)
-    return Get-Content "$PSScriptRoot\functions.json" -Raw | ConvertFrom-Json -Depth 10 | Where-Object { $_.function.name -in $names }
+    return Get-Content "$PSScriptRoot\functions.json" -Raw | ConvertFrom-Json | Where-Object { $_.function.name -in $names }
 }
 
 # All functions can be invoke from the Chat conversation

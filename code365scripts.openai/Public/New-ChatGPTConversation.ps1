@@ -266,7 +266,7 @@ function New-ChatGPTConversation {
                 
                 foreach ($tool in $tool_calls) {
                     Write-Verbose "calling the tool: $($tool.function.name)"
-                    $function_args = $tool.function.arguments | ConvertFrom-Json -Depth 10
+                    $function_args = $tool.function.arguments | ConvertFrom-Json
                     $tool_response = Invoke-Expression ("{0} {1}" -f $tool.function.name, (
                             $function_args.PSObject.Properties | ForEach-Object {
                                 "-{0} {1}" -f $_.Name, $_.Value
@@ -313,7 +313,8 @@ function New-ChatGPTConversation {
         else {
             Write-Verbose ($resources.verbose_chat_mode)
 
-            $stream = ($PSVersionTable['PSVersion'].Major -gt 5)
+            # old version of powershell doesn't support the stream mode, functions are not supported in the stream mode
+            $stream = ($PSVersionTable['PSVersion'].Major -gt 5 -and !($config -and $config.tools))
 
             $index = 1; 
             $welcome = "`n{0}`n{1}" -f ($resources.welcome_chatgpt -f $(if ($azure) { " $($resources.azure_version) " } else { "" }), $model), $resources.shortcuts
@@ -401,23 +402,24 @@ function New-ChatGPTConversation {
 
                 Write-Verbose ($resources.verbose_prepare_messages -f ($messages | ConvertTo-Json -Depth 10))
     
+                # TODO #174 保留消息的个数是不是可以放宽
+                $body = @{model = "$model"; messages = ($systemPrompt + $messages[-5..-1]); stream = $stream } 
                 $params = @{
                     Uri         = $endpoint
                     Method      = "POST"
-                    Body        = @{model = "$model"; messages = ($systemPrompt + $messages[-5..-1]); stream = $stream } 
                     Headers     = $header
                     ContentType = "application/json;charset=utf-8"
                 }
 
                 if ($json) {
-                    $params.Body.Add("response_format" , @{type = "json_object" } )
+                    $body.Add("response_format" , @{type = "json_object" } )
                 }
 
 
                 if ($config) {
-                    Merge-Hashtable -table1 $params.Body -table2 $config
+                    Merge-Hashtable -table1 $body -table2 $config
                 }
-                $params.Body = ($params.Body | ConvertTo-Json -Depth 10)
+                $params.Body = ($body | ConvertTo-Json -Depth 10)
 
                 Write-Verbose ($resources.verbose_prepare_params -f ($params | ConvertTo-Json -Depth 10))
     
@@ -426,8 +428,6 @@ function New-ChatGPTConversation {
                     if ($stream) {
                         Write-Verbose ($resources.verbose_chat_stream_mode)
                         $client = New-Object System.Net.Http.HttpClient
-
-                                        
                         $body = $params.Body
                         Write-Verbose "body: $body"
     
@@ -444,31 +444,20 @@ function New-ChatGPTConversation {
                         }
                                         
                         $task = $client.Send($request)
-
-
                         $response = $task.Content.ReadAsStream()
                         $reader = [System.IO.StreamReader]::new($response)
                         $result = "" # message from the api
-
-
-                                        
                         $firstChunk = $true
-    
                         while ($true) {
                             $line = $reader.ReadLine()
                             if (($line -eq $null) -or ($line -eq "data: [DONE]")) { break }
-    
                             $chunk = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta.content
-
                             if ($firstChunk) {
                                 $firstChunk = $false
                                 Write-Host "`r[$current] " -NoNewline -ForegroundColor Red
                             }
-
                             Write-Host $chunk -NoNewline -ForegroundColor Green
-                            # Write-Verbose ($resources.verbose_chat_stream_chunk_received -f $chunk)
                             $result += $chunk
-    
                             Start-Sleep -Milliseconds 5
                         }
 
@@ -488,40 +477,53 @@ function New-ChatGPTConversation {
                     else {
 
                         Write-Verbose ($resources.verbose_chat_not_stream_mode)
-                        $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
                         $response = Invoke-RestMethod @params
                         Write-Verbose ($resources.verbose_chat_response_received -f ($response | ConvertTo-Json -Depth 10))
 
-                        $stopwatch.Stop()
+                        # TODO #175 将工具作为外部模块加载，而不是直接调用
+                        while ($response.choices -and $response.choices[0].message.tool_calls) {
+                            # add the assistant message 
+                            $this_message = $response.choices[0].message
+                            $body.messages += $this_message
+                            $tool_calls = $this_message.tool_calls
+                
+                            foreach ($tool in $tool_calls) {
+                                Write-Host "`rcalling the tool: $($tool.function.name)" -NoNewline
+                                $function_args = $tool.function.arguments | ConvertFrom-Json
+                                $tool_response = Invoke-Expression ("{0} {1}" -f $tool.function.name, (
+                                        $function_args.PSObject.Properties | ForEach-Object {
+                                            "-{0} {1}" -f $_.Name, $_.Value
+                                        }
+                                    ) -join " ")
+
+                                $body.messages += @{
+                                    role         = "tool"
+                                    name         = $tool.function.name
+                                    tool_call_id = $tool.id
+                                    content      = $tool_response
+                                }
+                            }
+
+                            $params.Body = ($body | ConvertTo-Json -Depth 10)
+                            $response = Invoke-RestMethod @params
+                        }
+
                         $result = $response.choices[0].message.content
-                        $total_tokens = $response.usage.total_tokens
-                        $prompt_tokens = $response.usage.prompt_tokens
-                        $completion_tokens = $response.usage.completion_tokens
-        
-                        Write-Verbose ($resources.verbose_chat_response_summary -f $result, $total_tokens, $prompt_tokens, $completion_tokens)
         
                         if ($PSVersionTable['PSVersion'].Major -le 5) {
-
                             Write-Verbose ($resources.verbose_powershell_5_utf8)
-
                             $dstEncoding = [System.Text.Encoding]::GetEncoding('iso-8859-1')
                             $srcEncoding = [System.Text.Encoding]::UTF8
                             $result = $srcEncoding.GetString([System.Text.Encoding]::Convert($srcEncoding, $dstEncoding, $srcEncoding.GetBytes($result)))
-
                             Write-Verbose ($resouces.verbose_response_utf8 -f $result)
                         }
         
                         $messages += [PSCustomObject]@{
                             role    = "assistant"
                             content = $result
-                        }
-
-                        Write-Verbose ($resources.verbose_chat_message_combined -f ($messages | ConvertTo-Json -Depth 10))
-                
-        
-                        # Write-Host -ForegroundColor Red ("`r[$current] $($resources.response)" -f $total_tokens, $prompt_tokens, $completion_tokens )
-                        
+                        }       
                         Write-Host "`r[$current] $result" -ForegroundColor Green
+                        Write-Verbose ($resources.verbose_chat_message_combined -f ($messages | ConvertTo-Json -Depth 10))
                     }
                 }
                 catch {
