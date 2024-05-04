@@ -1,9 +1,15 @@
+function Get-PredefinedFunctions {
+    param([string[]]$names)
+    return Get-Content "$PSScriptRoot\functions.json" -Raw | ConvertFrom-Json -Depth 10 | Where-Object { $_.function.name -in $names }
+}
+
 # All functions can be invoke from the Chat conversation
 
-function Get-Weather{
+function get_current_weather {
     param(
-        [string]$City
+        [string]$location
     )
 
-    return "The weather in $City is 25 degrees"
+    return "The weather in $location is 20 degrees"
 }
+
