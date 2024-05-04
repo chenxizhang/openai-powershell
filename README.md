@@ -47,7 +47,7 @@ You need the basic knowledage of [PowerShell](https://learn.microsoft.com/en-us/
     In another word, if you have above environment variables, you can just use the cmdlet if a very easy way. For example:
     
     ```powershell
-    
+
         # Start a chat experience
         chat
 
@@ -63,14 +63,14 @@ You need the basic knowledage of [PowerShell](https://learn.microsoft.com/en-us/
 
     ```
 
-    > ![TIP]
-    > We have a lot of advanced parameters (`config`,`headers`,`functions`,`context`,`json`,`outFile`), you can find the full help by using `Get-Help New-ChatGPTConversation -Full` in your terminal, we have the detailed help for each cmdlet in both English and Chinese.
+> ![TIP]
+> We have a lot of advanced parameters (`config`,`headers`,`functions`,`context`,`json`,`outFile`), you can find the full help by using `Get-Help New-ChatGPTConversation -Full` in your terminal, we have the detailed help for each cmdlet in both English and Chinese.
 
 
 - `New-ImageGeneration` (alias: `image` or `dall`) to generate image from a prompt. It supports the Azure OpenAI service, OpenAI service, and currently use the `DALL-E-3` model.
 
-    > [!TIP]
-    > You can find the full help by using `Get-Help New-ImageGeneration -Full` in your terminal, we have the detailed help for each cmdlet in both English and Chinese.
+> [!TIP]
+> You can find the full help by using `Get-Help New-ImageGeneration -Full` in your terminal, we have the detailed help for each cmdlet in both English and Chinese.
 
 ## Telemetry data collection and privacy
 
