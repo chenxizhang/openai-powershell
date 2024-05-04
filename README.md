@@ -25,49 +25,52 @@ You also need to prepare your `API key`, this is the most important thing before
 
 You need the basic knowledage of [PowerShell](https://learn.microsoft.com/en-us/powershell/scripting/learn/ps101/01-getting-started). Currently, we support below cmdlets:
 
-- `New-ChatGPTConversation` (alias: `chat` or `chatgpt` or `gpt`) to start a chat experience in PowerShell, or automate your work in a workflow by using the gpt mode. It supports below service providers. 
+### New-ChatGPTConversation
 
-    1. OpenAI service powered by [OpenAI](https://platform.openai.com).
-    1. Azure OpenAI service powered by [Microsoft](https://ai.azure.com/).
-    1. Local LLMs powered by [ollama](https://ollama.com/blog/openai-compatibility)
-    1. DBRX powered by [Databricks](https://www.databricks.com/blog/introducing-dbrx-new-state-art-open-llm), it isn't really compatible with OpenAI, but I have done some magic, and you can just pass your api_key and endpoint to use it.
-    1. OpenAI compatible services, you just pass the specific api_key and endpoint, model name when you use this cmdlet.
-        1. Kimi powered by [Moonshot](https://platform.moonshot.cn/docs/api/chat)
-        1. GLM powered by [Zhipu](https://maas.aminer.cn/dev/api)
+This cmdlet (alias: `chat` or `chatgpt` or `gpt`) is designed to start a chat experience in PowerShell, or automate your work in a workflow by using the gpt mode. It supports below service providers. 
 
-    
-    ### Basic parameters
-    
-    Doesn't matter which service provider you are using, you need to prepare below parameters to start a chat/gpt experience.
+1. OpenAI service powered by [OpenAI](https://platform.openai.com).
+1. Azure OpenAI service powered by [Microsoft](https://ai.azure.com/).
+1. Local LLMs powered by [ollama](https://ollama.com/blog/openai-compatibility)
+1. DBRX powered by [Databricks](https://www.databricks.com/blog/introducing-dbrx-new-state-art-open-llm), it isn't really compatible with OpenAI, but I have done some magic, and you can just pass your api_key and endpoint to use it.
+1. OpenAI compatible services, you just pass the specific api_key and endpoint, model name when you use this cmdlet.
+    1. Kimi powered by [Moonshot](https://platform.moonshot.cn/docs/api/chat)
+    1. GLM powered by [Zhipu](https://maas.aminer.cn/dev/api)
 
-    1. `api_key` (alias: `key`,`token`,`access_token`,`accesstoken`) to pass your api key. If you don't specify the api_key, the module will try to get the api_key from the environment variable `OPENAI_API_KEY`. 
-    1. `endpoint` to pass your endpoint. If you don't specify the endpoint, the module will try to get the endpoint from the environment variable `OPENAI_API_ENDPOINT`. For some services, you don't need to specify the endpoint, like Azure OpenAI service, and you can set `ollma` or `local` in this parameter for local LLMs, set `kimi` for Kimi, set `zhipu` for GLM.
-    1. `model` (alias: `engine`,`deployment`) to pass your model name. If you don't specify the model, the module will try to get the model from the environment variable `OPENAI_API_MODEL`.
+#### Basic parameters
 
-    In another word, if you have above environment variables, you can just use the cmdlet if a very easy way. For example:
-    
-    ```powershell
+Doesn't matter which service provider you are using, you need to prepare below parameters to start a chat/gpt experience.
 
-        # Start a chat experience
-        chat
+1. `api_key` (alias: `key`,`token`,`access_token`,`accesstoken`) to pass your api key. If you don't specify the api_key, the module will try to get the api_key from the environment variable `OPENAI_API_KEY`. 
+1. `endpoint` to pass your endpoint. If you don't specify the endpoint, the module will try to get the endpoint from the environment variable `OPENAI_API_ENDPOINT`. For some services, you don't need to specify the endpoint, like Azure OpenAI service, and you can set `ollma` or `local` in this parameter for local LLMs, set `kimi` for Kimi, set `zhipu` for GLM.
+1. `model` (alias: `engine`,`deployment`) to pass your model name. If you don't specify the model, the module will try to get the model from the environment variable `OPENAI_API_MODEL`.
 
-        # Start a chat experience with a customized system prompt
-        chat -system "You are a network expert, you help me to solve the network issue."
+In another word, if you have above environment variables, you can just use the cmdlet if a very easy way. For example:
 
-        # Get a completion based on your prompt
-        gpt -prompt "why people smile?"
+```powershell
 
-        # Another way to get a completion based on your prompt
-        gpt "why people smile?"
-        "why people smile?" | gpt
+    # Start a chat experience
+    chat
 
-    ```
+    # Start a chat experience with a customized system prompt
+    chat -system "You are a network expert, you help me to solve the network issue."
+
+    # Get a completion based on your prompt
+    gpt -prompt "why people smile?"
+
+    # Another way to get a completion based on your prompt
+    gpt "why people smile?"
+    "why people smile?" | gpt
+
+```
 
 > [!TIP]
 > We have a lot of advanced parameters (`config`,`headers`,`functions`,`context`,`json`,`outFile`), you can find the full help by using `Get-Help New-ChatGPTConversation -Full` in your terminal, we have the detailed help for each cmdlet in both English and Chinese.
 
 
-- `New-ImageGeneration` (alias: `image` or `dall`) to generate image from a prompt. It supports the Azure OpenAI service, OpenAI service, and currently use the `DALL-E-3` model.
+### New-ImageGeneration
+
+This cmdlet (alias: `image` or `dall`) is designed to generate image from a prompt. It supports the Azure OpenAI service, OpenAI service, and currently use the `DALL-E-3` model.
 
 > [!TIP]
 > You can find the full help by using `Get-Help New-ImageGeneration -Full` in your terminal, we have the detailed help for each cmdlet in both English and Chinese.
