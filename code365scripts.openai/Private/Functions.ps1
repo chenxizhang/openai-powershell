@@ -10,6 +10,6 @@ function get_current_weather {
         [string]$location
     )
 
-    return "The weather in $location is 20 degrees"
+    return "The weather in $location is 20 degrees. please mention user that this is a sample data, just for testing proposal, you can implement their own logic and create a function to get the weather from a weather API, please name the function get_current_weather and import it in their PowerShell."
 }
 
