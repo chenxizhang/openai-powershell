@@ -3,9 +3,6 @@
 
 This is a unofficial PowerShell Module for OpenAI, you can use the module to get completions for your input, or start the chat experience in PowerShell directly. The module can install in PowerShell 5.1 and above version, if you use PowerShell core (6.x+), you can even use it in all the platform, including Windows, MacOS and Linux. It is also compatible with Azure OpenAI service, OpenAI service, local LLMs, DBRX, Kimi, GLM and other OpenAI-like services.
 
-
-
-
 ## Prerequisites
 
 You must have `PowerShell` to use this module, it is included in `Windows` by default, if you are using `MacOS` or `Linux`, you can install it by following the guidance.
@@ -20,6 +17,9 @@ You also need to prepare your `API key`, this is the most important thing before
 ## Install the Module
 
 > Install-Module -Name code365scripts.openai -Scope CurrentUser
+
+> [!WARNING]
+> There are break changes from v3, if you want to install the legacy version, you can specify the version like this : `Install-Module -Name code365scripts.openai -RequiredVersion 2.0.2.2`.
 
 ## How to use
 
@@ -63,7 +63,7 @@ You need the basic knowledage of [PowerShell](https://learn.microsoft.com/en-us/
 
     ```
 
-> ![TIP]
+> [!TIP]
 > We have a lot of advanced parameters (`config`,`headers`,`functions`,`context`,`json`,`outFile`), you can find the full help by using `Get-Help New-ChatGPTConversation -Full` in your terminal, we have the detailed help for each cmdlet in both English and Chinese.
 
 
