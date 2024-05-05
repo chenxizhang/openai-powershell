@@ -3,6 +3,7 @@
 
 | Date       | Version  | Description                                                                 |
 |------------|----------|-----------------------------------------------------------------------------|
+| 2024-05-05 | v3.0.0.3 | Update the help content (both English and Chinese),and minor bug fixes  |
 | 2024-05-05 | v3.0.0.2 | Update the help content (both English and Chinese)  |
 | 2024-05-04 | v3.0.0.1 | Added function support [#172](https://github.com/chenxizhang/openai-powershell/issues/172)  |
 | 2024-05-02 | v3.0.0.0 | Break changes version, re-design the New-ChatGPTConversation with more simple design. [#155](https://github.com/chenxizhang/openai-powershell/issues/155) [#154](https://github.com/chenxizhang/openai-powershell/issues/154) [#153](https://github.com/chenxizhang/openai-powershell/issues/153)  [#152](https://github.com/chenxizhang/openai-powershell/issues/152) |

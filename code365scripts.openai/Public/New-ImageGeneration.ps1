@@ -89,7 +89,7 @@ function New-ImageGeneration {
             $endpoint = "https://api.openai.com/v1/images/generations" 
         }
 
-        Write-Verbose ($resources.verbose_parameters_parsed -f $api_key, $endpoint)
+        Write-Verbose ($resources.verbose_parameters_parsed -f $api_key, "dall-e-3", $endpoint)
 
         $hasError = $false
 

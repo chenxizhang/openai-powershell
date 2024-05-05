@@ -54,4 +54,5 @@ ConvertFrom-StringData -StringData @'
     verbose_image_parameter_parsed = Parameter parsed. api_key: {0}, endpoint: {1}
     verbose_image_download_completed = Image download completed, save the image to {0}
     thinking = Thinking
+    function_call = calling the tool
 '@

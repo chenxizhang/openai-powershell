@@ -54,4 +54,5 @@ ConvertFrom-StringData -StringData @'
     verbose_image_parameter_parsed = 参数解析。api_key：{0}，endpoint：{1}
     verbose_image_download_completed = 图片下载完成，将图片保存到{0}
     thinking = 正在思考
+    function_call = 正在调用工具
 '@

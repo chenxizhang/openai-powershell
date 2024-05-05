@@ -108,6 +108,11 @@ function New-ChatGPTConversation {
             default { $endpoint }
         }
 
+        # if use local model, and api_key is not specify, then generate a random key
+        if ($endpoint -eq "http://localhost:11434/v1/chat/completions" -and !$api_key){
+            $api_key = "local"
+        }
+
         Write-Verbose ($resources.verbose_parameters_parsed -f $api_key, $model, $endpoint)
 
         $hasError = $false
@@ -269,7 +274,7 @@ function New-ChatGPTConversation {
                 $tool_calls = $this_message.tool_calls
                 
                 foreach ($tool in $tool_calls) {
-                    Write-Verbose "calling the tool: $($tool.function.name)"
+                    Write-Verbose "$($resources.function_call): $($tool.function.name)"
                     $function_args = $tool.function.arguments | ConvertFrom-Json
                     $tool_response = Invoke-Expression ("{0} {1}" -f $tool.function.name, (
                             $function_args.PSObject.Properties | ForEach-Object {
@@ -334,7 +339,7 @@ function New-ChatGPTConversation {
                 }
             )
 
-            Write-Verbose "Prepare the system prompt: $($systemPrompt|ConvertTo-Json -Depth 10)"
+            Write-Verbose "$($systemPrompt|ConvertTo-Json -Depth 10)"
             
             while ($true) {
                 Write-Verbose ($resources.verbose_chat_let_chat)
@@ -342,7 +347,7 @@ function New-ChatGPTConversation {
                 $current = $index++
                 $prompt = Read-Host -Prompt "`n[$current] $($resources.prompt)"
 
-                Write-Verbose "Prompt received: $prompt"
+                Write-Verbose ($resources.verbose_prompt_received -f $prompt)
     
                 if ($prompt -in ("q", "bye")) {
                     Write-Verbose ($resources.verbose_chat_q_message -f $prompt)
@@ -492,7 +497,7 @@ function New-ChatGPTConversation {
                             $tool_calls = $this_message.tool_calls
                 
                             foreach ($tool in $tool_calls) {
-                                Write-Host "`rcalling the tool: $($tool.function.name)" -NoNewline
+                                Write-Host "`r$($resources.function_call): $($tool.function.name)" -NoNewline
                                 $function_args = $tool.function.arguments | ConvertFrom-Json
                                 $tool_response = Invoke-Expression ("{0} {1}" -f $tool.function.name, (
                                         $function_args.PSObject.Properties | ForEach-Object {
