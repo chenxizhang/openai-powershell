@@ -1,4 +1,4 @@
-[![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/code365scripts.openai?label=code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![](https://img.shields.io/badge/change-logs-blue)](CHANGELOG.md) [![](https://img.shields.io/badge/lang-English-blue)](README.md)
+[![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/code365scripts.openai?label=code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![](https://img.shields.io/badge/change-logs-blue)](CHANGELOG.md) [![](https://img.shields.io/badge/lang-English-blue)](README.md) [![](https://img.shields.io/badge/用户手册-中文-blue)](https://github.com/chenxizhang/openai-powershell/discussions/categories/use-cases-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)
 
 这是一个非官方的OpenAI PowerShell模块，允许您直接在PowerShell中获取输入的补全或开始聊天体验。该模块与PowerShell 5.1及以上版本兼容，如果您使用的是PowerShell Core（6.x+），则可以在所有平台上使用它，包括Windows、MacOS和Linux。
 
@@ -25,23 +25,27 @@ Install-Module -Name code365scripts.openai -Scope CurrentUser
 
 您需要对[PowerShell](https://learn.microsoft.com/en-us/powershell/scripting/learn/ps101/01-getting-started)有基本的了解。目前，该模块支持以下命令：
 
-- `New-ChatGPTConversation`（别名：`chat`、`chatgpt`、`gpt`）在PowerShell中开始聊天体验或使用gpt模式自动化您的工作流程。它支持以下服务提供商：
+### New-ChatGPTConversation
+这个命令（别名：`chat`、`chatgpt`、`gpt`）在PowerShell中开始聊天体验或使用gpt模式自动化您的工作流程。它支持以下 `OpenAI`, `Azure OpenAI`, `Databricks`, `KIMI`, `智谱清言`，以及大量由 `ollama` 运行的开源模型（如 llama3 等）和其他一切与 OpenAI 兼容的服务平台和大模型。
 
-  1. 由[OpenAI](https://platform.openai.com)支持的OpenAI服务。
-  2. 由[Microsoft](https://ai.azure.com/)支持的Azure OpenAI服务。
-  3. 由[ollama](https://ollama.com/blog/openai-compatibility)支持的本地LLM。
-  4. 由[Databricks](https://www.databricks.com/blog/introducing-dbrx-new-state-art-open-llm)支持的DBRX，它与OpenAI不完全兼容，但通过一些调整，您可以通过提供您的API密钥和端点来使用它。
-  5. 兼容OpenAI的服务，您可以在使用此命令时传递特定的API密钥、端点和模型名称。
-     - 由[Moonshot](https://platform.moonshot.cn/docs/api/chat)支持的Kimi。
-     - 由[Zhipu](https://maas.aminer.cn/dev/api)支持的GLM。
+### New-ImageGeneration
+这个命令（别名：`image`、`dall`）从提示生成图像。它支持Azure OpenAI服务、OpenAI服务，当前使用`DALL-E-3`模型。
 
-- `New-ImageGeneration`（别名：`image`、`dall`）从提示生成图像。它支持Azure OpenAI服务、OpenAI服务，当前使用`DALL-E-3`模型。
+### [用户手册](https://github.com/chenxizhang/openai-powershell/discussions/categories/use-cases-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87) 
 
-您可以在终端中使用`Get-Help **命令名称或别名** -Full`找到每个命令的完整帮助，包括英文和中文。
+1. [一个简单指令开启你的桌面ChatGPT之旅](https://github.com/chenxizhang/openai-powershell/discussions/180)
+2. [三个基本参数适配主流平台和模型](https://github.com/chenxizhang/openai-powershell/discussions/181)
+3. [使用帮助](https://github.com/chenxizhang/openai-powershell/discussions/183)
+4. [命令和参数的别名](https://github.com/chenxizhang/openai-powershell/discussions/182)
+5. [系统指令（system) 和用户指令 (prompt)](https://github.com/chenxizhang/openai-powershell/discussions/186)
+6. [个性化参数设置](https://github.com/chenxizhang/openai-powershell/discussions/185)
+7. [动态传入上下文数据 - context](https://github.com/chenxizhang/openai-powershell/discussions/187)
+8. [函数调用 （function_call)](https://github.com/chenxizhang/openai-powershell/discussions/189)
+9. [PowerShell 5.1 版本有什么限制？](https://github.com/chenxizhang/openai-powershell/discussions/179)
 
 ## 遥测数据收集和隐私
 
-我们收集遥测数据以帮助改进模块。收集的数据包括`命令名称`、`别名名称`、`您是否使用Azure（true或false）`和`您正在使用的PowerShell版本`。您可以在[这里](https://github.com/chenxizhang/openai-powershell/blob/master/code365scripts.openai/Private/Submit-Telemetry.ps1)查看源代码。**不收集任何个人或输入数据。**如果您不想发送遥测数据，可以将环境变量`DISABLE_TELEMETRY_OPENAI_POWERSHELL`设置为`true`。
+我们收集遥测数据以帮助改进模块。收集的数据包括`命令名`、`别名`、`服务提供者`、`模块版本` 和 `PowerShell版本`。您可以在[这里](https://github.com/chenxizhang/openai-powershell/blob/master/code365scripts.openai/Private/Submit-Telemetry.ps1)查看源代码。**不收集任何个人或输入数据。** 如果您不想发送遥测数据，可以将环境变量 `DISABLE_TELEMETRY_OPENAI_POWERSHELL` 设置为`true`。
 
 ## 更新模块
 
