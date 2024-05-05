@@ -29,11 +29,11 @@ This command (aliases: `image`, `dall`) generates images from prompts. It suppor
 
 ## User Manual
 
-1. [Start your desktop ChatGPT journey with a simple command](https://github.com/chenxizhang/openai-powershell/discussions/180)
-2. [Three basic parameters adapted to mainstream platforms and models](https://github.com/chenxizhang/openai-powershell/discussions/181)
-3. [Get Help](https://github.com/chenxizhang/openai-powershell/discussions/183)
-4. [Aliases for commands and parameters](https://github.com/chenxizhang/openai-powershell/discussions/182)
-5. [System and user prompts](https://github.com/chenxizhang/openai-powershell/discussions/186)
+1. [Start your desktop ChatGPT journey with a simple command](https://github.com/chenxizhang/openai-powershell/discussions/192)
+2. [Three basic parameters adapted to mainstream platforms and models](https://github.com/chenxizhang/openai-powershell/discussions/193)
+3. [Get Help](https://github.com/chenxizhang/openai-powershell/discussions/194)
+4. [Aliases for commands and parameters](https://github.com/chenxizhang/openai-powershell/discussions/195)
+5. [System and user prompts](https://github.com/chenxizhang/openai-powershell/discussions/196)
 6. [Customizing Settings](https://github.com/chenxizhang/openai-powershell/discussions/185)
 7. [Dynamically passing context data](https://github.com/chenxizhang/openai-powershell/discussions/187)
 8. [Function calls](https://github.com/chenxizhang/openai-powershell/discussions/189)
