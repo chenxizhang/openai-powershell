@@ -39,6 +39,7 @@ Install-Module -Name code365scripts.openai -Scope CurrentUser
 8. [函数调用 （function_call)](https://github.com/chenxizhang/openai-powershell/discussions/189)
 9. [PowerShell 5.1 版本有什么限制？](https://github.com/chenxizhang/openai-powershell/discussions/179)
 10. [使用 DALL-E-3 生成图像](https://github.com/chenxizhang/openai-powershell/discussions/190)
+11. [使用本地模型](https://github.com/chenxizhang/openai-powershell/discussions/191)
 
 ## 遥测数据收集和隐私
 
