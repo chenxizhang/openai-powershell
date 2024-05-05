@@ -1,93 +1,62 @@
-[![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/code365scripts.openai?label=code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![](https://img.shields.io/badge/change-logs-blue)](CHANGELOG.md) [![](https://img.shields.io/badge/lang-简体中文-blue)](README.zh.md)
+[![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/code365scripts.openai?label=code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![](https://img.shields.io/badge/change-logs-blue)](CHANGELOG.md) [![](https://img.shields.io/badge/lang-简体中文-blue)](README.zh.md) [![](https://img.shields.io/badge/user_manual-English-blue)](https://github.com/chenxizhang/openai-powershell/discussions/categories/use-cases)
 
-
-This is a unofficial PowerShell Module for OpenAI, you can use the module to get completions for your input, or start the chat experience in PowerShell directly. The module can install in PowerShell 5.1 and above version, if you use PowerShell core (6.x+), you can even use it in all the platform, including Windows, MacOS and Linux. It is also compatible with Azure OpenAI service, OpenAI service, local LLMs, DBRX, Kimi, GLM and other OpenAI-like services.
+This is an unofficial OpenAI PowerShell module that allows you to get input completion or start a chat experience directly in PowerShell. This module is compatible with PowerShell 5.1 and above, and if you are using PowerShell Core (6.x+), it can be used on all platforms including Windows, MacOS, and Linux.
 
 ## Prerequisites
 
-You must have `PowerShell` to use this module, it is included in `Windows` by default, if you are using `MacOS` or `Linux`, you can install it by following the guidance.
+To use this module, you must install PowerShell. It is included by default in Windows. If you are using MacOS or Linux, you can install it using the following guide:
 
-- MacOS
-    - You can run `brew install powershell/tap/powershell` to install PowerShell in MacOS, and then type `pwsh` in your terminal to start PowerShell.
-- Linux
-    - You can follow the guidance [here](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-linux?view=powershell-7.3) to install PowerShell in Linux, and then type `pwsh` in your terminal to start PowerShell.
+- MacOS:
+  - Run `brew install powershell/tap/powershell` to install PowerShell on MacOS, then enter `pwsh` in the terminal to launch PowerShell.
+- Linux:
+  - Follow the guide [here](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-linux?view=powershell-7.3) to install PowerShell on Linux, then enter `pwsh` in the terminal to launch PowerShell.
 
-You also need to prepare your `API key`, this is the most important thing before you use the module, the basic understanding of the LLM models is also required. Mostly you need a subscription to use the `OpenAI` Service, `Azure OpenAI` Service or a lot of `OpenAI-like` services, and they are not free. We also support the `local` LLMs, you will be empowered in another way if you have a strong enough GPU machine.
+You will also need to prepare your API key, which is essential before using the module. A basic understanding of LLM models is also necessary. Most OpenAI services, Azure OpenAI services, and many services similar to OpenAI require a subscription and are not free. The good news is we also support local LLM if you have a powerful GPU machine, which can offer additional functionality.
 
 ## Install the Module
 
-> Install-Module -Name code365scripts.openai -Scope CurrentUser
-
-> [!WARNING]
-> There are break changes from v3, if you want to install the legacy version, you can specify the version like this : `Install-Module -Name code365scripts.openai -RequiredVersion 2.0.2.2`.
-
-## How to use
-
-You need the basic knowledage of [PowerShell](https://learn.microsoft.com/en-us/powershell/scripting/learn/ps101/01-getting-started). Currently, we support below cmdlets:
-
-### New-ChatGPTConversation
-
-This cmdlet (alias: `chat` or `chatgpt` or `gpt`) is designed to start a chat experience in PowerShell, or automate your work in a workflow by using the gpt mode. It supports below service providers. 
-
-1. OpenAI service powered by [OpenAI](https://platform.openai.com).
-1. Azure OpenAI service powered by [Microsoft](https://ai.azure.com/).
-1. Local LLMs powered by [ollama](https://ollama.com/blog/openai-compatibility)
-1. DBRX powered by [Databricks](https://www.databricks.com/blog/introducing-dbrx-new-state-art-open-llm), it isn't really compatible with OpenAI, but I have done some magic, and you can just pass your api_key and endpoint to use it.
-1. OpenAI compatible services, you just pass the specific api_key and endpoint, model name when you use this cmdlet.
-    1. Kimi powered by [Moonshot](https://platform.moonshot.cn/docs/api/chat)
-    1. GLM powered by [Zhipu](https://maas.aminer.cn/dev/api)
-
-#### Basic parameters
-
-Doesn't matter which service provider you are using, you need to prepare below parameters to start a chat/gpt experience.
-
-1. `api_key` (alias: `key`,`token`,`access_token`,`accesstoken`) to pass your api key. If you don't specify the api_key, the module will try to get the api_key from the environment variable `OPENAI_API_KEY`. 
-1. `endpoint` to pass your endpoint. If you don't specify the endpoint, the module will try to get the endpoint from the environment variable `OPENAI_API_ENDPOINT`. For some services, you don't need to specify the endpoint, like Azure OpenAI service, and you can set `ollma` or `local` in this parameter for local LLMs, set `kimi` for Kimi, set `zhipu` for GLM.
-1. `model` (alias: `engine`,`deployment`) to pass your model name. If you don't specify the model, the module will try to get the model from the environment variable `OPENAI_API_MODEL`.
-
-In another word, if you have above environment variables, you can just use the cmdlet if a very easy way. For example:
+To install the module, run the following command in PowerShell:
 
 ```powershell
-
-    # Start a chat experience
-    chat
-
-    # Start a chat experience with a customized system prompt
-    chat -system "You are a network expert, you help me to solve the network issue."
-
-    # Get a completion based on your prompt
-    gpt -prompt "why people smile?"
-
-    # Another way to get a completion based on your prompt
-    gpt "why people smile?"
-    "why people smile?" | gpt
-
+Install-Module -Name code365scripts.openai -Scope CurrentUser
 ```
+Currently, the module supports the following commands:
+#### New-ChatGPTConversation
+This command (aliases: `chat`, `chatgpt`, `gpt`) starts a chat experience or automates your workflow using gpt mode in PowerShell. It supports `OpenAI`, `Azure OpenAI`, `Databricks`, `KIMI`, `Zhipu Qingyan`, and a large number of open-source models run by `ollama` (such as llama3, etc.) and any other platforms and large models compatible with OpenAI services.
 
-> [!TIP]
-> We have a lot of advanced parameters (`config`,`headers`,`functions`,`context`,`json`,`outFile`), you can find the full help by using `Get-Help New-ChatGPTConversation -Full` in your terminal, we have the detailed help for each cmdlet in both English and Chinese.
+#### New-ImageGeneration
+This command (aliases: `image`, `dall`) generates images from prompts. It supports the Azure OpenAI service, OpenAI service, currently using the `DALL-E-3` model.
 
+## User Manual
 
-### New-ImageGeneration
+1. [Start your desktop ChatGPT journey with a simple command](https://github.com/chenxizhang/openai-powershell/discussions/180)
+2. [Three basic parameters adapted to mainstream platforms and models](https://github.com/chenxizhang/openai-powershell/discussions/181)
+3. [Get Help](https://github.com/chenxizhang/openai-powershell/discussions/183)
+4. [Aliases for commands and parameters](https://github.com/chenxizhang/openai-powershell/discussions/182)
+5. [System and user prompts](https://github.com/chenxizhang/openai-powershell/discussions/186)
+6. [Customizing Settings](https://github.com/chenxizhang/openai-powershell/discussions/185)
+7. [Dynamically passing context data](https://github.com/chenxizhang/openai-powershell/discussions/187)
+8. [Function calls](https://github.com/chenxizhang/openai-powershell/discussions/189)
+9. [What are the limitations of PowerShell 5.1 version?](https://github.com/chenxizhang/openai-powershell/discussions/179)
+10. [Using DALL-E-3 to generate images](https://github.com/chenxizhang/openai-powershell/discussions/190)
+11. [Using local models](https://github.com/chenxizhang/openai-powershell/discussions/191)
 
-This cmdlet (alias: `image` or `dall`) is designed to generate image from a prompt. It supports the Azure OpenAI service, OpenAI service, and currently use the `DALL-E-3` model.
+## Telemetry Data Collection and Privacy
 
-> [!TIP]
-> You can find the full help by using `Get-Help New-ImageGeneration -Full` in your terminal, we have the detailed help for each cmdlet in both English and Chinese.
+We collect telemetry data to help improve the module. The collected data includes `command name`, `alias`, `service provider`, `module version`, and `PowerShell version`. You can view the source code [here](https://github.com/chenxizhang/openai-powershell/blob/master/code365scripts.openai/Private/Submit-Telemetry.ps1). **No personal or input data is collected.** If you do not wish to send telemetry data, you can set the environment variable `DISABLE_TELEMETRY_OPENAI_POWERSHELL` to `true`.
 
-## Telemetry data collection and privacy
+## Update the Module
 
-We will collect the telemetry data to help us improve the module, we just collect `command name`,`alias name`, `if you are using azure (true or false)`, `what Powershell version you are using`, You can check the source code [here](https://github.com/chenxizhang/openai-powershell/blob/master/code365scripts.openai/Private/Submit-Telemetry.ps1). **There are nothing related to your privacy information and your input data.** If you don't want to send the telemetry data, you can add the environment variable `DISABLE_TELEMETRY_OPENAI_POWERSHELL` and set the value to `true`.
+To update the module, run the following command in PowerShell:
 
-## Update the module
-
-> Update-Module -Name code365scripts.openai
+```powershell
+Update-Module -Name code365scripts.openai
+```
 
 ## Uninstall the Module
 
-> UnInstall-Module -Name code365scripts.openai
+To uninstall the module, run the following command in PowerShell:
 
-
-<!--
-https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll
--->
+```powershell
+Uninstall-Module -Name code365scripts.openai
+```
