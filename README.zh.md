@@ -42,6 +42,7 @@ Install-Module -Name code365scripts.openai -Scope CurrentUser
 7. [动态传入上下文数据 - context](https://github.com/chenxizhang/openai-powershell/discussions/187)
 8. [函数调用 （function_call)](https://github.com/chenxizhang/openai-powershell/discussions/189)
 9. [PowerShell 5.1 版本有什么限制？](https://github.com/chenxizhang/openai-powershell/discussions/179)
+10. [使用 DALL-E-3 生成图像](https://github.com/chenxizhang/openai-powershell/discussions/190)
 
 ## 遥测数据收集和隐私
 
