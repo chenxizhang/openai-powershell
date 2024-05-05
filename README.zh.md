@@ -21,9 +21,7 @@
 Install-Module -Name code365scripts.openai -Scope CurrentUser
 ```
 
-## 如何使用
-
-您需要对[PowerShell](https://learn.microsoft.com/en-us/powershell/scripting/learn/ps101/01-getting-started)有基本的了解。目前，该模块支持以下命令：
+目前，该模块支持以下命令：
 
 ### New-ChatGPTConversation
 这个命令（别名：`chat`、`chatgpt`、`gpt`）在PowerShell中开始聊天体验或使用gpt模式自动化您的工作流程。它支持以下 `OpenAI`, `Azure OpenAI`, `Databricks`, `KIMI`, `智谱清言`，以及大量由 `ollama` 运行的开源模型（如 llama3 等）和其他一切与 OpenAI 兼容的服务平台和大模型。
@@ -31,7 +29,7 @@ Install-Module -Name code365scripts.openai -Scope CurrentUser
 ### New-ImageGeneration
 这个命令（别名：`image`、`dall`）从提示生成图像。它支持Azure OpenAI服务、OpenAI服务，当前使用`DALL-E-3`模型。
 
-### [用户手册](https://github.com/chenxizhang/openai-powershell/discussions/categories/use-cases-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87) 
+## 用户手册 
 
 1. [一个简单指令开启你的桌面ChatGPT之旅](https://github.com/chenxizhang/openai-powershell/discussions/180)
 2. [三个基本参数适配主流平台和模型](https://github.com/chenxizhang/openai-powershell/discussions/181)
