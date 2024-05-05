@@ -20,13 +20,11 @@
 ```powershell
 Install-Module -Name code365scripts.openai -Scope CurrentUser
 ```
-
 目前，该模块支持以下命令：
-
-### New-ChatGPTConversation
+#### New-ChatGPTConversation
 这个命令（别名：`chat`、`chatgpt`、`gpt`）在PowerShell中开始聊天体验或使用gpt模式自动化您的工作流程。它支持以下 `OpenAI`, `Azure OpenAI`, `Databricks`, `KIMI`, `智谱清言`，以及大量由 `ollama` 运行的开源模型（如 llama3 等）和其他一切与 OpenAI 兼容的服务平台和大模型。
 
-### New-ImageGeneration
+#### New-ImageGeneration
 这个命令（别名：`image`、`dall`）从提示生成图像。它支持Azure OpenAI服务、OpenAI服务，当前使用`DALL-E-3`模型。
 
 ## 用户手册 
