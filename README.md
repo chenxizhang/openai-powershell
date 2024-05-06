@@ -40,6 +40,7 @@ This command (aliases: `image`, `dall`) generates images from prompts. It suppor
 9. [What are the limitations of PowerShell 5.1 version?](https://github.com/chenxizhang/openai-powershell/discussions/179)
 10. [Using DALL-E-3 to generate images](https://github.com/chenxizhang/openai-powershell/discussions/190)
 11. [Using local models](https://github.com/chenxizhang/openai-powershell/discussions/191)
+12. [Use environment variables]()
 
 ## Telemetry Data Collection and Privacy
 
