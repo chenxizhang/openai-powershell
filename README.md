@@ -34,13 +34,13 @@ This command (aliases: `image`, `dall`) generates images from prompts. It suppor
 3. [Get Help](https://github.com/chenxizhang/openai-powershell/discussions/194)
 4. [Aliases for commands and parameters](https://github.com/chenxizhang/openai-powershell/discussions/195)
 5. [System and user prompts](https://github.com/chenxizhang/openai-powershell/discussions/196)
-6. [Customizing Settings](https://github.com/chenxizhang/openai-powershell/discussions/185)
-7. [Dynamically passing context data](https://github.com/chenxizhang/openai-powershell/discussions/187)
-8. [Function calls](https://github.com/chenxizhang/openai-powershell/discussions/189)
-9. [What are the limitations of PowerShell 5.1 version?](https://github.com/chenxizhang/openai-powershell/discussions/179)
-10. [Using DALL-E-3 to generate images](https://github.com/chenxizhang/openai-powershell/discussions/190)
-11. [Using local models](https://github.com/chenxizhang/openai-powershell/discussions/191)
-12. [Use environment variables]()
+6. [Customizing Settings](https://github.com/chenxizhang/openai-powershell/discussions/198)
+7. [Dynamically passing context data](https://github.com/chenxizhang/openai-powershell/discussions/199)
+8. [Function calls](https://github.com/chenxizhang/openai-powershell/discussions/200)
+9. [What are the limitations of PowerShell 5.1 version?](https://github.com/chenxizhang/openai-powershell/discussions/201)
+10. [Using DALL-E-3 to generate images](https://github.com/chenxizhang/openai-powershell/discussions/202)
+11. [Using local models](https://github.com/chenxizhang/openai-powershell/discussions/203)
+12. [Use environment variables](https://github.com/chenxizhang/openai-powershell/discussions/204)
 
 ## Telemetry Data Collection and Privacy
 
