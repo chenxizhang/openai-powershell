@@ -58,6 +58,7 @@ function New-ImageGeneration {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, Position = 0)][string]$prompt,
         [Parameter(ParameterSetName = "default")]
         [Parameter(ParameterSetName = "azure")]
+        [Alias("key","token","access_token","accesstoken")]
         [string]$api_key,
         [Parameter(ParameterSetName = "azure")]
         [string]$endpoint, 
