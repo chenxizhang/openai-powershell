@@ -29,9 +29,17 @@ Install-Module -Name code365scripts.openai -Scope CurrentUser
 
     ![GIF 5-5-2024 10-49-20 PM](https://github.com/chenxizhang/openai-powershell/assets/1996954/eb5629f8-7014-4b0b-84e5-82259265ab07)
 
-1. Get text completions by using `gpt` command. You can generate any text based on your own prompt in a single line of command.
+1. Get text completions by using `gpt` command. You can generate any text based on your own prompt in a single line of command. 
 
     ![image](https://github.com/chenxizhang/openai-powershell/assets/1996954/f4a21c9d-93c6-4944-9936-ae3718d40857)
+
+   Imagine you need to classify the customer feedback by using GPT technology, then you write back the result in the CSV file. 
+
+   ```powershell
+   Import-Csv surveyresult.csv `
+     | Select-Object Eamil,Feedback, @{l="Category";e={gpt -system classifyprompt.md -prompt $_.Feedback}} `
+     | Export-Csv surveyresult.csv
+   ```
 
 1. Generate images by using the `image` command. It supports the Azure OpenAI service, OpenAI service, currently using the `DALL-E-3` model.
 
