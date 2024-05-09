@@ -37,7 +37,8 @@ Install-Module -Name code365scripts.openai -Scope CurrentUser
 
    ```powershell
    Import-Csv surveyresult.csv `
-     | Select-Object Eamil,Feedback, @{l="Category";e={gpt -system classifyprompt.md -prompt $_.Feedback}} `
+     | Select-Object Eamil,Feedback, `
+       @{l="Category";e={gpt -system classifyprompt.md -prompt $_.Feedback}} `
      | Export-Csv surveyresult.csv
    ```
 
