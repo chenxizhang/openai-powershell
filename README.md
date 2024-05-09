@@ -1,6 +1,8 @@
 [![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/code365scripts.openai?label=code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![](https://img.shields.io/badge/change-logs-blue)](CHANGELOG.md) [![](https://img.shields.io/badge/lang-简体中文-blue)](README.zh.md) [![](https://img.shields.io/badge/user_manual-English-blue)](https://github.com/chenxizhang/openai-powershell/discussions/categories/use-cases)
 
-This is an unofficial OpenAI PowerShell module that allows you to get input completion or start a chat experience directly in PowerShell. This module is compatible with PowerShell 5.1 and above, and if you are using PowerShell Core (6.x+), it can be used on all platforms including Windows, MacOS, and Linux.
+This is an unofficial OpenAI PowerShell module that allows you to get input completion or start a chat experience, or generate image directly in PowerShell. You can use OpenAI Service, Azure OpenAI Service and almost all the GPT services and even the local LLMs in a consistant way, You can easily automate those batch processing tasks, scheduled tasks, and heavy manual tasks in one or two lines of commands.
+
+This module is compatible with PowerShell 5.1 and above, and if you are using PowerShell Core (6.x+), it can be used on all platforms including Windows, MacOS, and Linux.
 
 ## Prerequisites
 
@@ -20,24 +22,20 @@ To install the module, run the following command in PowerShell:
 ```powershell
 Install-Module -Name code365scripts.openai -Scope CurrentUser
 ```
-Currently, the module supports the following commands:
-#### New-ChatGPTConversation
-
-> This command (aliases: `chat`, `chatgpt`, `gpt`) starts a chat experience or automates your workflow using gpt mode in PowerShell. It supports `OpenAI`, `Azure OpenAI`, `Databricks`, `KIMI`, `Zhipu Qingyan`, and a large number of open-source models run by `ollama` (such as llama3, etc.) and any other platforms and large models compatible with OpenAI services.
-
-#### New-ImageGeneration
-
-> This command (aliases: `image`, `dall`) generates images from prompts. It supports the Azure OpenAI service, OpenAI service, currently using the `DALL-E-3` model.
 
 ## Quick Start
 
-1. [Start a chat experience on your desktop](https://github.com/chenxizhang/openai-powershell/discussions/192) with the `chat` command, please make sure you set the environment variable `OPENAI_API_KEY` to your API key before running the command. 
+1. [Start a chat experience on your desktop](https://github.com/chenxizhang/openai-powershell/discussions/192) with the `chat` command, please make sure you set the environment variable `OPENAI_API_KEY` to your API key before running the command. If you are using **Azure OpenAI service** or other platform or LLMs rather than **OpenAI service**, you might want to set `OPENAI_API_ENDPOINT` and `OPENAI_API_MODEL` variables. It supports `OpenAI`, `Azure OpenAI`, `Databricks`, `KIMI`, `Zhipu Qingyan`, and a large number of open-source models run by `ollama` (such as llama3, etc.) and any other platforms and large models compatible with OpenAI services.
 
     ![GIF 5-5-2024 10-49-20 PM](https://github.com/chenxizhang/openai-powershell/assets/1996954/eb5629f8-7014-4b0b-84e5-82259265ab07)
 
-1. Get text completions by using `gpt` command.
+1. Get text completions by using `gpt` command. You can generate any text based on your own prompt in a single line of command.
 
-1. Generate images by using the `image` command.
+    ![image](https://github.com/chenxizhang/openai-powershell/assets/1996954/f4a21c9d-93c6-4944-9936-ae3718d40857)
+
+1. Generate images by using the `image` command. It supports the Azure OpenAI service, OpenAI service, currently using the `DALL-E-3` model.
+
+    <img width="956" alt="image" src="https://github.com/chenxizhang/openai-powershell/assets/1996954/cdad0352-9a8a-4d8f-bacd-ff8dd989a4bb">
 
 ## User Manual in details
 
