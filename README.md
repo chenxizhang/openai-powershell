@@ -33,7 +33,7 @@ Install-Module -Name code365scripts.openai -Scope CurrentUser
 
     ![image](https://github.com/chenxizhang/openai-powershell/assets/1996954/f4a21c9d-93c6-4944-9936-ae3718d40857)
 
-   Imagine you need to classify the customer feedback by using GPT technology, then you write back the result in the CSV file. 
+   Imagine you need to classify the customer feedback by using GPT technology, then you write back the result in the CSV file. You can achieve the goal with just a single line of code as below.
 
    ```powershell
    Import-Csv surveyresult.csv `
