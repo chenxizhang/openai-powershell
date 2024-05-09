@@ -22,12 +22,24 @@ Install-Module -Name code365scripts.openai -Scope CurrentUser
 ```
 Currently, the module supports the following commands:
 #### New-ChatGPTConversation
-This command (aliases: `chat`, `chatgpt`, `gpt`) starts a chat experience or automates your workflow using gpt mode in PowerShell. It supports `OpenAI`, `Azure OpenAI`, `Databricks`, `KIMI`, `Zhipu Qingyan`, and a large number of open-source models run by `ollama` (such as llama3, etc.) and any other platforms and large models compatible with OpenAI services.
+
+> This command (aliases: `chat`, `chatgpt`, `gpt`) starts a chat experience or automates your workflow using gpt mode in PowerShell. It supports `OpenAI`, `Azure OpenAI`, `Databricks`, `KIMI`, `Zhipu Qingyan`, and a large number of open-source models run by `ollama` (such as llama3, etc.) and any other platforms and large models compatible with OpenAI services.
 
 #### New-ImageGeneration
-This command (aliases: `image`, `dall`) generates images from prompts. It supports the Azure OpenAI service, OpenAI service, currently using the `DALL-E-3` model.
 
-## User Manual
+> This command (aliases: `image`, `dall`) generates images from prompts. It supports the Azure OpenAI service, OpenAI service, currently using the `DALL-E-3` model.
+
+## Quick Start
+
+1. [Start a chat experience on your desktop](https://github.com/chenxizhang/openai-powershell/discussions/192) with the `chat` command, please make sure you set the environment variable `OPENAI_API_KEY` to your API key before running the command. 
+
+    ![GIF 5-5-2024 10-49-20 PM](https://github.com/chenxizhang/openai-powershell/assets/1996954/eb5629f8-7014-4b0b-84e5-82259265ab07)
+
+1. Get text completions by using `gpt` command.
+
+1. Generate images by using the `image` command.
+
+## User Manual in details
 
 1. [Start your desktop ChatGPT journey with a simple command](https://github.com/chenxizhang/openai-powershell/discussions/192)
 2. [Three basic parameters adapted to mainstream platforms and models](https://github.com/chenxizhang/openai-powershell/discussions/193)
