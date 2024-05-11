@@ -64,9 +64,14 @@ function Get-PromptContent {
     # if user provide the context, inject the data into the prompt by replace the context key with the context value
     if ($context) {
         foreach ($key in $context.keys) {
-            $content = $content -replace "{{$key}}", $context[$key]
+            # replace the context key with the context value, the placeholder format should be {{key}} or {{key:defaultvalue}}
+            $content = $content -replace "{{$key(:[^}]*)?}}", $context[$key]
         }
     }
+
+    # if there are still placeholder in the prompt, replace it with the default value if present
+    $content = $content -replace "{{[^}]*:([^}]*)}}", '$1'
+
     # restore error action preference
     $ErrorActionPreference = "Continue"
 
