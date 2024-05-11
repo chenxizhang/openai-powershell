@@ -12,7 +12,7 @@
     RootModule           = '.\code365scripts.openai.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '3.0.0.3'
+    ModuleVersion        = '3.0.0.4'
 
     # Supported PSEditions
     CompatiblePSEditions = @("Desktop")
