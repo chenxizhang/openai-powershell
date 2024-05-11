@@ -379,9 +379,12 @@ function New-ChatGPTConversation {
                 }
 
                 Write-Verbose ($resources.verbose_prepare_messages -f ($messages | ConvertTo-Json -Depth 10))
+
+                if ($messages.Count -gt 10) {
+                    $messages = @($messages[0]) + $messages[-9..-1]
+                }
     
-                # TODO #174 保留消息的个数是不是可以放宽
-                $body = @{model = "$model"; messages = ($systemPrompt + $messages[-5..-1]); stream = $stream } 
+                $body = @{model = "$model"; messages = $messages; stream = $stream } 
                 $params = @{
                     Uri     = $endpoint
                     Method  = "POST"
