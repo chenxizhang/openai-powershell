@@ -1,8 +1,11 @@
-function Get-PromptContent($prompt) {
+function Get-PromptContent {
+    param(
+        [string]$prompt,
+        [hashtable]$context
+    )
     
     # ignore error and continue
     $ErrorActionPreference = "SilentlyContinue"
-
     $type = "userinput"
     $content = $prompt
     $lib = ""
@@ -39,9 +42,34 @@ function Get-PromptContent($prompt) {
         }
     }
 
+
+
+    # system variable
+    $systemVariables = @{
+        "username"       = $env:USERNAME
+        "computername"   = $env:COMPUTERNAME
+        "os"             = $env:OS
+        "osarch"         = $env:PROCESSOR_ARCHITECTURE
+        "currentTimeutc" = [System.DateTime]::UtcNow
+        "currentTime"    = [System.DateTime]::Now
+    }
+
+    if (!$context) {
+        $context = @{}
+    }
+
+    #merge system variables with context
+    Merge-Hashtable -table1 $systemVariables -table2 $context
+    $context = $systemVariables
+    # if user provide the context, inject the data into the prompt by replace the context key with the context value
+    if ($context) {
+        foreach ($key in $context.keys) {
+            $content = $content -replace "{{$key}}", $context[$key]
+        }
+    }
     # restore error action preference
     $ErrorActionPreference = "Continue"
-    
+
     Write-Output @{
         type    = $type
         content = $content

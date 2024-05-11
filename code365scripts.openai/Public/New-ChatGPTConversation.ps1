@@ -159,33 +159,14 @@ function New-ChatGPTConversation {
         }
 
         # if prompt is not empty and it is a file, then read the file as the prompt
-        $parsedprompt = Get-PromptContent($prompt)
+        $parsedprompt = Get-PromptContent -prompt $prompt -context $context
         $prompt = $parsedprompt.content
-
-        # if user provide the context, inject the data into the prompt by replace the context key with the context value
-        if ($context) {
-            Write-Verbose ($resources.verbose_context_received -f ($context | ConvertTo-Json -Depth 10))
-            foreach ($key in $context.keys) {
-                $prompt = $prompt -replace "{{$key}}", $context[$key]
-            }
-            Write-Verbose ($resources.verbose_prompt_context_injected -f $prompt)
-        }
-
         $telemetries.Add("promptType", $parsedprompt.type)
         $telemetries.Add("promptLib", $parsedprompt.lib)
 
         # if system is not empty and it is a file, then read the file as the system prompt
-        $parsedsystem = Get-PromptContent($system)
+        $parsedsystem = Get-PromptContent -prompt $system -context $context
         $system = $parsedsystem.content
-
-        # if user provide the context, inject the data into the system prompt by replace the context key with the context value
-        if ($context) {
-            Write-Verbose ($resources.verbose_context_received -f ($context | ConvertTo-Json -Depth 10))
-            foreach ($key in $context.keys) {
-                $system = $system -replace "{{$key}}", $context[$key]
-            }
-            Write-Verbose ($resources.verbose_prompt_context_injected -f $system)
-        }
 
         $telemetries.Add("systemPromptType", $parsedsystem.type)
         $telemetries.Add("systemPromptLib", $parsedsystem.lib)
@@ -245,9 +226,9 @@ function New-ChatGPTConversation {
             $body = @{model = "$model"; messages = $messages }
 
             $params = @{
-                Uri         = $endpoint
-                Method      = "POST"
-                Headers     = $header
+                Uri     = $endpoint
+                Method  = "POST"
+                Headers = $header
             }
 
             if ($json) {
@@ -402,9 +383,9 @@ function New-ChatGPTConversation {
                 # TODO #174 保留消息的个数是不是可以放宽
                 $body = @{model = "$model"; messages = ($systemPrompt + $messages[-5..-1]); stream = $stream } 
                 $params = @{
-                    Uri         = $endpoint
-                    Method      = "POST"
-                    Headers     = $header
+                    Uri     = $endpoint
+                    Method  = "POST"
+                    Headers = $header
                 }
 
                 if ($json) {
