@@ -109,7 +109,7 @@ function New-ChatGPTConversation {
         }
 
         # if use local model, and api_key is not specify, then generate a random key
-        if ($endpoint -eq "http://localhost:11434/v1/chat/completions" -and !$api_key){
+        if ($endpoint -eq "http://localhost:11434/v1/chat/completions" -and !$api_key) {
             $api_key = "local"
         }
 
@@ -248,7 +248,6 @@ function New-ChatGPTConversation {
                 Uri         = $endpoint
                 Method      = "POST"
                 Headers     = $header
-                ContentType = "application/json;charset=utf-8"
             }
 
             if ($json) {
@@ -263,7 +262,7 @@ function New-ChatGPTConversation {
 
             Write-Verbose ($resources.verbose_prepare_params -f ($params | ConvertTo-Json -Depth 10))
 
-            $response = Invoke-RestMethod @params
+            $response = Invoke-UniWebRequest $params
 
             # if return the tool_calls, then execute the tool locally and add send the message again.
 
@@ -291,20 +290,9 @@ function New-ChatGPTConversation {
                 }
 
                 $params.Body = ($body | ConvertTo-Json -Depth 10)
-                $response = Invoke-RestMethod @params
+                $response = Invoke-UniWebRequest $params
             }
 
-            if ($PSVersionTable['PSVersion'].Major -eq 5) {
-                Write-Verbose ($resources.verbose_powershell_5_utf8)
-
-                $dstEncoding = [System.Text.Encoding]::GetEncoding('iso-8859-1')
-                $srcEncoding = [System.Text.Encoding]::UTF8
-
-                $response.choices | ForEach-Object {
-                    $_.message.content = $srcEncoding.GetString([System.Text.Encoding]::Convert($srcEncoding, $dstEncoding, $srcEncoding.GetBytes($_.message.content)))
-                }
-
-            }
             Write-Verbose ($resources.verbose_response_utf8 -f ($response | ConvertTo-Json -Depth 10))
 
             $result = $response.choices[0].message.content
@@ -417,7 +405,6 @@ function New-ChatGPTConversation {
                     Uri         = $endpoint
                     Method      = "POST"
                     Headers     = $header
-                    ContentType = "application/json;charset=utf-8"
                 }
 
                 if ($json) {
@@ -446,7 +433,7 @@ function New-ChatGPTConversation {
                         $request.Headers.Clear()
                         $request.Content = [System.Net.Http.StringContent]::new(($body), [System.Text.Encoding]::UTF8)
                         $request.Content.Headers.Clear()
-                        $request.Content.Headers.Add("Content-Type", "application/json;charset=utf-8")
+                        $request.Content.Headers.Add("Content-Type", "application/json;chatset=utf-8")
 
                         foreach ($k in $header.Keys) {
                             $request.Headers.Add($k, $header[$k])
@@ -486,7 +473,7 @@ function New-ChatGPTConversation {
                     else {
 
                         Write-Verbose ($resources.verbose_chat_not_stream_mode)
-                        $response = Invoke-RestMethod @params
+                        $response = Invoke-UniWebRequest $params
                         Write-Verbose ($resources.verbose_chat_response_received -f ($response | ConvertTo-Json -Depth 10))
 
                         # TODO #175 将工具作为外部模块加载，而不是直接调用
@@ -514,19 +501,10 @@ function New-ChatGPTConversation {
                             }
 
                             $params.Body = ($body | ConvertTo-Json -Depth 10)
-                            $response = Invoke-RestMethod @params
+                            $response = Invoke-UniWebRequest $params
                         }
 
                         $result = $response.choices[0].message.content
-        
-                        if ($PSVersionTable['PSVersion'].Major -le 5) {
-                            Write-Verbose ($resources.verbose_powershell_5_utf8)
-                            $dstEncoding = [System.Text.Encoding]::GetEncoding('iso-8859-1')
-                            $srcEncoding = [System.Text.Encoding]::UTF8
-                            $result = $srcEncoding.GetString([System.Text.Encoding]::Convert($srcEncoding, $dstEncoding, $srcEncoding.GetBytes($result)))
-                            Write-Verbose ($resouces.verbose_response_utf8 -f $result)
-                        }
-        
                         $messages += [PSCustomObject]@{
                             role    = "assistant"
                             content = $result
