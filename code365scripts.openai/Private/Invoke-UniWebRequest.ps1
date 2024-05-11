@@ -4,7 +4,9 @@ function Invoke-UniWebRequest {
         [hashtable]$params
     )
 
+    $ProgressPreference = 'SilentlyContinue'
     $response = Invoke-WebRequest @params -ContentType "application/json;charset=utf-8"
+    $ProgressPreference = 'Continue'
 
     if (($PSVersionTable['PSVersion'].Major -ge 6) -or ($response.Headers['Content-Type'] -match 'charset=utf-8')) {
         return $response.Content | ConvertFrom-Json
