@@ -20,6 +20,8 @@
 ```powershell
 Install-Module -Name code365scripts.openai -Scope CurrentUser
 ```
+如果你在安装时遇到错误，请先运行 `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`.
+
 目前，该模块支持以下命令：
 #### New-ChatGPTConversation
 这个命令（别名：`chat`、`chatgpt`、`gpt`）在PowerShell中开始聊天体验或使用gpt模式自动化您的工作流程。它支持以下 `OpenAI`, `Azure OpenAI`, `Databricks`, `KIMI`, `智谱清言`，以及大量由 `ollama` 运行的开源模型（如 llama3 等）和其他一切与 OpenAI 兼容的服务平台和大模型。
