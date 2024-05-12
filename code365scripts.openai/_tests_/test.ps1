@@ -17,35 +17,13 @@ $dallFile = New-TemporaryFile
 # define the test cases, please note you need to configure all the environment variables before running the test cases, below is an example, which will use OpenAI service and Azure OpenAI service (2 different environments). The SWEDEN environment is a custom environment which has the dall-e-3 model.
 
 $cmds = @'
-    noc "$prompt"
-    New-OpenAICompletion "$prompt" -max_tokens 100
-    noc "$prompt" -temperature 0.5
-    New-OpenAICompletion "$prompt" -azure
-    New-OpenAICompletion "$prompt" -azure -outFile (New-TemporaryFile).FullName
-    noc -azure $promptFile
-    noc "$prompt" -azure -max_tokens 200
-    noc "$prompt" -azure -temperature 0.2
-    noc "$prompt" -azure -n 2
-    New-OpenAICompletion "$prompt" -azure -environment "SWEDEN"
-    noc "$prompt" -azure -environment "xxx"
-    chat -prompt "$prompt"
-    chat -local -prompt"$prompt"
-    chat -azure -prompt $promptFile
-    chat -azure -prompt $promptFile | Out-File -Encoding utf8 -FilePath (New-TemporaryFile).FullName
-    chat -azure -system $systemPromptFile -prompt $promptFile
-    chat -prompt "$prompt" -azure
-    chat -prompt "$prompt" -azure -outFile (New-TemporaryFile).FullName
-    chat -prompt "$prompt" -azure -config @{max_tokens=100; temperature=0.5}
-    chat -prompt "$prompt" -azure -environment "SWEDEN"
-    image -prompt "$imageprompt" -size 0 -outfolder $outputFolder
-    image -prompt $promptFile -size 0 -outfolder $outputFolder
-    image -prompt "$imageprompt" -size 0 -azure -outfolder $outputFolder
-    image -prompt "$imageprompt" -size 0 -azure -outfolder $outputFolder -n 2
-    image -prompt "$imageprompt" -size 2 -azure -dall3 -environment "SWEDEN" -outfolder $outputFolder
+    chat -prompt $prompt
+    gpt "what's the capital of china?"
+    gpt -prompt $prompt -api_key $env:KIMI_API_KEY -endpoint kimi -model moonshot-v1-32k
     chat
-    chat -stream
-    New-VisionCompletion -prompt "what's in the picture?" -files "https://xizhang.com/assets/images/profile.png" -azure -env SWEDEN
-    vc -prompt "what's in the picture?" -files "https://xizhang.com/assets/images/profile.png" -azure -env SWEDEN -outFile (New-TemporaryFile).FullName
+    chat -system "帮我翻译文字从中文到英文"
+    chat -functions get_current_weather
+    chat -functions get_current_weather,query_database
 '@
 
 
