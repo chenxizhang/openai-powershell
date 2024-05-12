@@ -24,5 +24,24 @@
                 ]
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "query_database",
+            "description": "query product database for product information",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "product name"
+                    }
+                },
+                "required": [
+                    "name"
+                ]
+            }
+        }
     }
 ]

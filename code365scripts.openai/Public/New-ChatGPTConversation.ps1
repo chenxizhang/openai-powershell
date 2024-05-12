@@ -199,15 +199,16 @@ function New-ChatGPTConversation {
 
         # if user provide the functions, get the functions from the functions file and define the tools and tool_choice thoughs the config parameter
         if ($functions) {
-            $tools = Get-PredefinedFunctions -names $functions
+            $tools = @(Get-PredefinedFunctions -names $functions)
             if ($tools.Count -gt 0) {
                 if ($null -eq $config) {
                     $config = @{}
                 }
-                $config["tools"] = @($tools)
+                $config["tools"] = $tools
                 $config["tool_choice"] = "auto"
             }
         }
+
 
         if ($PSBoundParameters.Keys.Contains("prompt")) {
             # user provides the prompt directly, so enter the completion mode (return the result directly)
@@ -292,7 +293,8 @@ function New-ChatGPTConversation {
             Write-Verbose ($resources.verbose_chat_mode)
 
             # old version of powershell doesn't support the stream mode, functions are not supported in the stream mode
-            $stream = ($PSVersionTable['PSVersion'].Major -gt 5 -and !($config -and $config.tools))
+            # $stream = ($PSVersionTable['PSVersion'].Major -gt 5 -and !($config -and $config.tools))
+            $stream = $PSVersionTable['PSVersion'].Major -gt 5
 
             $index = 1; 
             $welcome = "`n{0}`n{1}" -f ($resources.welcome_chatgpt -f $(if ($azure) { " $($resources.azure_version) " } else { "" }), $model), $resources.shortcuts
@@ -397,7 +399,10 @@ function New-ChatGPTConversation {
 
 
                 if ($config) {
+                    Write-Verbose "merge config: $config"
+                    Write-Verbose "merge body: $body"
                     Merge-Hashtable -table1 $body -table2 $config
+                    Write-Verbose "merged body: $body"
                 }
                 $params.Body = ($body | ConvertTo-Json -Depth 10)
 
@@ -407,44 +412,85 @@ function New-ChatGPTConversation {
     
                     if ($stream) {
                         Write-Verbose ($resources.verbose_chat_stream_mode)
-                        $client = New-Object System.Net.Http.HttpClient
-                        $body = $params.Body
-                        Write-Verbose "body: $body"
-    
-                        $request = [System.Net.Http.HttpRequestMessage]::new()
-                        $request.Method = "POST"
-                        $request.RequestUri = $params.Uri
-                        $request.Headers.Clear()
-                        $request.Content = [System.Net.Http.StringContent]::new(($body), [System.Text.Encoding]::UTF8)
-                        $request.Content.Headers.Clear()
-                        $request.Content.Headers.Add("Content-Type", "application/json;chatset=utf-8")
+                        $reader = Invoke-StreamWebRequest -uri $params.Uri -body $params.Body -header $header
+                        # check if tools_call is null, if not, then execute the tools_call
+                        $line = $reader.ReadLine()
+                        $delta = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta
 
-                        foreach ($k in $header.Keys) {
-                            $request.Headers.Add($k, $header[$k])
+                        while ($null -eq $delta.content) {
+                            $tool_calls = @()
+
+                            while ($true) {
+                                if ($delta.tool_calls) {
+                                    $temp = $delta.tool_calls
+                                    if ($temp.id -and $temp.function) {
+                                        $tool_calls += @([pscustomobject]@{
+                                                index    = $temp.index
+                                                id       = $temp.id
+                                                type     = "function"
+                                                function = @{
+                                                    name      = $temp.function.name
+                                                    arguments = $temp.function.arguments
+                                                }
+                                            })
+
+                                    }
+                                    elseif ($temp.function) {
+                                        $tool_calls | Where-Object { $_.index -eq $temp.index } | ForEach-Object {
+                                            $_.function.arguments += $temp.function.arguments
+                                        }
+                                    }
+                                }
+
+                                $line = $reader.ReadLine()
+                                if ($line -eq "data: [DONE]") { break }
+                                $delta = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta
+                            }
+
+                            # execute functions
+                            $body.messages += [pscustomobject]@{
+                                role       = "assistant"
+                                content    = ""
+                                tool_calls = @($tool_calls)
+                            }
+                            
+                            foreach ($tool in $tool_calls) {
+                                Write-Host "`r$($resources.function_call): $($tool.function.name)" -NoNewline
+                                $function_args = $tool.function.arguments | ConvertFrom-Json
+                                $tool_response = Invoke-Expression ("{0} {1}" -f $tool.function.name, (
+                                        $function_args.PSObject.Properties | ForEach-Object {
+                                            "-{0} {1}" -f $_.Name, $_.Value
+                                        }
+                                    ) -join " ")
+
+                                $body.messages += @{
+                                    role         = "tool"
+                                    name         = $tool.function.name
+                                    tool_call_id = $tool.id
+                                    content      = $tool_response
+                                }
+                            }
+
+                            $params.Body = ($body | ConvertTo-Json -Depth 10)
+                            $reader = Invoke-StreamWebRequest -uri $params.Uri -body $params.Body -header $header
+                            $line = $reader.ReadLine()
+                            $delta = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta
                         }
-                                        
-                        $task = $client.Send($request)
-                        $response = $task.Content.ReadAsStream()
-                        $reader = [System.IO.StreamReader]::new($response)
-                        $result = "" # message from the api
-                        $firstChunk = $true
+
+
+                        Write-Host "`r[$current] " -NoNewline -ForegroundColor Red
+                        $result = $delta.content
+                        Write-Host $result -NoNewline -ForegroundColor Green
                         while ($true) {
                             $line = $reader.ReadLine()
-                            if (($line -eq $null) -or ($line -eq "data: [DONE]")) { break }
+                            if ($line -eq "data: [DONE]") { break }
                             $chunk = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta.content
-                            if ($firstChunk) {
-                                $firstChunk = $false
-                                Write-Host "`r[$current] " -NoNewline -ForegroundColor Red
-                            }
                             Write-Host $chunk -NoNewline -ForegroundColor Green
                             $result += $chunk
                             Start-Sleep -Milliseconds 5
                         }
 
-                        Write-Host ""
-                        $reader.Close()
-                        $reader.Dispose()
-    
+                        Write-Host ""    
                         $messages += [PSCustomObject]@{
                             role    = "assistant"
                             content = $result
@@ -452,7 +498,6 @@ function New-ChatGPTConversation {
 
                         Write-Verbose ($resources.verbose_chat_message_combined -f ($messages | ConvertTo-Json -Depth 10))
                         
-    
                     }
                     else {
 
@@ -498,7 +543,7 @@ function New-ChatGPTConversation {
                     }
                 }
                 catch {
-                    Write-Error $_
+                    Write-Error ($_ | ConvertTo-Json)
                 }
             }
         }
