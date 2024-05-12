@@ -23,6 +23,8 @@ To install the module, run the following command in PowerShell:
 Install-Module -Name code365scripts.openai -Scope CurrentUser
 ```
 
+You might want to run `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` if you get an error when you run the `Install-Module` cmdlet.
+
 ## Quick Start
 
 1. [Start a chat experience on your desktop](https://github.com/chenxizhang/openai-powershell/discussions/192) with the `chat` command, please make sure you set the environment variable `OPENAI_API_KEY` to your API key before running the command. If you are using **Azure OpenAI service** or other platform or LLMs rather than **OpenAI service**, you might want to set `OPENAI_API_ENDPOINT` and `OPENAI_API_MODEL` variables. It supports `OpenAI`, `Azure OpenAI`, `Databricks`, `KIMI`, `Zhipu Qingyan`, and a large number of open-source models run by `ollama` (such as llama3, etc.) and any other platforms and large models compatible with OpenAI services.
