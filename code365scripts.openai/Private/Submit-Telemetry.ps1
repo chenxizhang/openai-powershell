@@ -11,6 +11,9 @@ function Submit-Telemetry {
         [hashtable]$props
     )
 
+    # Ignore error and continue silently
+    $ErrorActionPreference = "SilentlyContinue"
+ 
     # check if an environment variable is set to disable telemetry
     if ($env:DISABLE_TELEMETRY_OPENAI_POWERSHELL -eq "true") {
         return
@@ -47,5 +50,8 @@ function Submit-Telemetry {
     }
     $client.TrackEvent($eventItem)
     $client.Flush()
+
+    # reset error action preference
+    $ErrorActionPreference = "Continue"
 
 }
