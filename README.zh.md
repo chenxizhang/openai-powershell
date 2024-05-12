@@ -1,6 +1,8 @@
 [![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/code365scripts.openai?label=code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/code365scripts.openai)](https://www.powershellgallery.com/packages/code365scripts.openai) [![](https://img.shields.io/badge/change-logs-blue)](CHANGELOG.md) [![](https://img.shields.io/badge/lang-English-blue)](README.md) [![](https://img.shields.io/badge/用户手册-中文-blue)](https://github.com/chenxizhang/openai-powershell/discussions/categories/use-cases-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)
 
-这是一个非官方的OpenAI PowerShell模块，允许您直接在PowerShell中获取输入的补全或开始聊天体验。该模块与PowerShell 5.1及以上版本兼容，如果您使用的是PowerShell Core（6.x+），则可以在所有平台上使用它，包括Windows、MacOS和Linux。
+这是一个非官方的OpenAI PowerShell模块，允许您直接在PowerShell中根据提示词生成任意文本或直接开始聊天体验。你可以使用包括 OpenAI, Azure OpenAI 服务以及市面上几乎所有主流的GPT服务，甚至本地大语言模型（LLM），而且采用一种非常通用的调用模式，不需要考虑他们的差异。另外，如果你经常需要处理一些批量任务，自动化的任务，或者重度依赖人工的重复性任务，这个模块将对你帮助很大。
+
+该模块与PowerShell 5.1及以上版本兼容，如果您使用的是PowerShell Core（6.x+），则可以在所有平台上使用它，包括Windows、MacOS和Linux。
 
 ## 先决条件
 
@@ -22,12 +24,28 @@ Install-Module -Name code365scripts.openai -Scope CurrentUser
 ```
 如果你在安装时遇到错误，请先运行 `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`.
 
-目前，该模块支持以下命令：
-#### New-ChatGPTConversation
-这个命令（别名：`chat`、`chatgpt`、`gpt`）在PowerShell中开始聊天体验或使用gpt模式自动化您的工作流程。它支持以下 `OpenAI`, `Azure OpenAI`, `Databricks`, `KIMI`, `智谱清言`，以及大量由 `ollama` 运行的开源模型（如 llama3 等）和其他一切与 OpenAI 兼容的服务平台和大模型。
+## 快速入门
 
-#### New-ImageGeneration
-这个命令（别名：`image`、`dall`）从提示生成图像。它支持Azure OpenAI服务、OpenAI服务，当前使用`DALL-E-3`模型。
+1. 使用 `chat` 命令在您的桌面上开始聊天体验，请确保在运行该命令之前设置环境变量 `OPENAI_API_KEY` 为您的 API 密钥。如果您使用的是 **Azure OpenAI 服务** 或其他平台或 LLMs 而不是 **OpenAI 服务**，您可能希望设置 `OPENAI_API_ENDPOINT` 和 `OPENAI_API_MODEL` 变量。它支持 `OpenAI`、`Azure OpenAI`、`Databricks`、`KIMI`、`智谱清言` 以及大量由 `ollama` 维护的开源模型 （如 llama3 等）和与 OpenAI 服务兼容的其他平台和大型模型。
+
+    ![GIF 5-5-2024 10-49-20 PM](https://github.com/chenxizhang/openai-powershell/assets/1996954/eb5629f8-7014-4b0b-84e5-82259265ab07)
+
+2. 使用 `gpt` 命令获取文本完成。您可以根据自己的提示在一行命令中生成任何文本。
+
+    ![image](https://github.com/chenxizhang/openai-powershell/assets/1996954/f4a21c9d-93c6-4944-9936-ae3718d40857)
+
+   想象一下，您需要使用 GPT 技术对客户反馈进行分类，然后将结果写回 CSV 文件中。您只需使用以下单行代码即可实现目标。
+
+   ```powershell
+   Import-Csv surveyresult.csv `
+     | Select-Object Eamil,Feedback, `
+       @{l="Category";e={gpt -system classifyprompt.md -prompt $_.Feedback}} `
+     | Export-Csv surveyresult.csv
+   ```
+
+3. 使用 `image` 命令生成图像。它支持 Azure OpenAI 服务、OpenAI 服务，目前使用的是 `DALL-E-3` 模型。
+
+    <img width="956" alt="image" src="https://github.com/chenxizhang/openai-powershell/assets/1996954/cdad0352-9a8a-4d8f-bacd-ff8dd989a4bb">
 
 ## 用户手册 
 
