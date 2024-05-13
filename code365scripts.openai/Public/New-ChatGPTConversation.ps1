@@ -71,8 +71,8 @@ function New-ChatGPTConversation {
         https://github.com/chenxizhang/openai-powershell
     #>
 
-    [CmdletBinding(DefaultParameterSetName = "default")]
-    [Alias("chatgpt")][Alias("chat")][Alias("gpt")]
+    [CmdletBinding()]
+    [Alias("chatgpt")][Alias("chat")]
     param(
         [Alias("token", "access_token", "accesstoken", "key", "apikey")]
         [string]$api_key,
@@ -80,8 +80,6 @@ function New-ChatGPTConversation {
         [string]$model,
         [string]$endpoint,
         [string]$system = "You are a chatbot, please answer the user's question according to the user's language.",
-        [Parameter(ValueFromPipeline = $true, Position = 0)]
-        [string]$prompt = "",
         [Alias("settings")]
         [PSCustomObject]$config, 
         [Alias("out")]   
@@ -131,10 +129,6 @@ function New-ChatGPTConversation {
             Write-Error $resources.error_missing_endpoint
             $hasError = $true
         }
-    }
-
-    PROCESS {
-
         if ($hasError) {
             return
         }
@@ -144,35 +138,6 @@ function New-ChatGPTConversation {
             $version = Get-AzureAPIVersion
             $endpoint += "openai/deployments/$model/chat/completions?api-version=$version"
         }
-
-
-        $telemetries = @{
-            type = switch ($endpoint) {
-                { $_ -match "openai.azure.com" } { "azure" }
-                { $_ -match "localhost" } { "local" }
-                { $_ -match "databricks-dbrx" } { "dbrx" }
-                { $_ -match "api.openai.com" } { "openai" }
-                { $_ -match "platform.moonshot.cn" } { "kimi" }
-                { $_ -match "open.bigmodel.cn" } { "zhipu" }
-                default { $endpoint }
-            }
-        }
-
-        # if prompt is not empty and it is a file, then read the file as the prompt
-        $parsedprompt = Get-PromptContent -prompt $prompt -context $context
-        $prompt = $parsedprompt.content
-        $telemetries.Add("promptType", $parsedprompt.type)
-        $telemetries.Add("promptLib", $parsedprompt.lib)
-
-        # if system is not empty and it is a file, then read the file as the system prompt
-        $parsedsystem = Get-PromptContent -prompt $system -context $context
-        $system = $parsedsystem.content
-
-        $telemetries.Add("systemPromptType", $parsedsystem.type)
-        $telemetries.Add("systemPromptLib", $parsedsystem.lib)
-
-        # collect the telemetry data
-        Submit-Telemetry -cmdletName $MyInvocation.MyCommand.Name -innovationName $MyInvocation.InvocationName -props $telemetries
 
         # add databricks support, it will use the basic authorization method, not the bearer token
         $azure = $endpoint.Contains("openai.azure.com")
@@ -209,23 +174,131 @@ function New-ChatGPTConversation {
             }
         }
 
+        $telemetries = @{
+            type = switch ($endpoint) {
+                { $_ -match "openai.azure.com" } { "azure" }
+                { $_ -match "localhost" } { "local" }
+                { $_ -match "databricks-dbrx" } { "dbrx" }
+                { $_ -match "api.openai.com" } { "openai" }
+                { $_ -match "platform.moonshot.cn" } { "kimi" }
+                { $_ -match "open.bigmodel.cn" } { "zhipu" }
+                default { $endpoint }
+            }
+        }
 
-        if ($PSBoundParameters.Keys.Contains("prompt")) {
-            # user provides the prompt directly, so enter the completion mode (return the result directly)
-            Write-Verbose ($resources.verbose_prompt_mode -f $prompt)
-            $messages = @(
-                @{
-                    role    = "system"
-                    content = $system
-                },
-                @{
-                    role    = "user"
-                    content = $prompt
+
+
+        # if system is not empty and it is a file, then read the file as the system prompt
+        $parsedsystem = Get-PromptContent -prompt $system -context $context
+        $system = $parsedsystem.content
+
+        $telemetries.Add("systemPromptType", $parsedsystem.type)
+        $telemetries.Add("systemPromptLib", $parsedsystem.lib)
+
+        # collect the telemetry data
+        Submit-Telemetry -cmdletName $MyInvocation.MyCommand.Name -innovationName $MyInvocation.InvocationName -props $telemetries
+
+    }
+
+    PROCESS {
+
+
+        Write-Verbose ($resources.verbose_chat_mode)
+
+        # old version of powershell doesn't support the stream mode, functions are not supported in the stream mode
+        $stream = $PSVersionTable['PSVersion'].Major -gt 5
+
+        $index = 1; 
+        $welcome = "`n{0}`n{1}" -f ($resources.welcome_chatgpt -f $(if ($azure) { " $($resources.azure_version) " } else { "" }), $model), $resources.shortcuts
+    
+        Write-Host $welcome -ForegroundColor Yellow
+        Write-Host $system -ForegroundColor Cyan
+    
+        $messages = @()
+        $systemPrompt = @(
+            [PSCustomObject]@{
+                role    = "system"
+                content = $system
+            }
+        )
+
+        Write-Verbose "$($systemPrompt|ConvertTo-Json -Depth 10)"
+            
+        while ($true) {
+            Write-Verbose ($resources.verbose_chat_let_chat)
+
+            $current = $index++
+            $prompt = Read-Host -Prompt "`n[$current] $($resources.prompt)"
+
+            Write-Verbose ($resources.verbose_prompt_received -f $prompt)
+    
+            if ($prompt -in ("q", "bye")) {
+                Write-Verbose ($resources.verbose_chat_q_message -f $prompt)
+                break
+            }
+    
+            if ($prompt -eq "m") {
+
+                $os = [System.Environment]::OSVersion.Platform
+
+                if ($os -notin @([System.PlatformID]::Win32NT, [System.PlatformID]::Win32Windows, [System.PlatformID]::Win32S)) {
+                    Write-Host ($resources.verbose_chat_m_message_not_supported)
+                    continue
                 }
-            ) 
 
-            $body = @{model = "$model"; messages = $messages }
+                Write-Verbose ($resources.verbose_chat_m_message)
+                $prompt = Read-MultiLineInputBoxDialog -Message $resources.multi_line_prompt -WindowTitle $resources.multi_line_prompt -DefaultText ""
 
+                Write-Verbose ($resources.verbose_prompt_received -f $prompt)
+
+                if ($null -eq $prompt) {
+                    Write-Host $resources.cancel_button_message
+                    continue
+                }
+                else {
+                    Write-Host "$($resources.multi_line_message)`n$prompt"
+                }
+            }
+    
+            if ($prompt -eq "f") {
+
+                $os = [System.Environment]::OSVersion.Platform
+
+                if ($os -notin @([System.PlatformID]::Win32NT, [System.PlatformID]::Win32Windows, [System.PlatformID]::Win32S)) {
+                    Write-Host ($resources.verbose_chat_f_message_not_supported)
+                    continue
+                }
+
+                Write-Verbose ($resources.verbose_chat_f_message)
+    
+                $file = Read-OpenFileDialog -WindowTitle $resources.file_prompt
+
+                Write-Verbose ($resources.verbose_chat_file_read -f $file)
+    
+                if (!($file)) {
+                    Write-Host $resources.cancel_button_message
+                    continue
+                }
+                else {
+                    $prompt = Get-Content $file -Encoding utf8
+                    Write-Host "$($resources.multi_line_message)`n$prompt"
+                }
+            }
+
+            Write-Host -ForegroundColor ("blue", "red", "Green", "yellow", "gray", "black", "white" | Get-Random) ("`r$($resources.thinking) {0}" -f ("." * (Get-Random -Maximum 10 -Minimum 3))) -NoNewline
+    
+            $messages += [PSCustomObject]@{
+                role    = "user"
+                content = $prompt
+            }
+
+            Write-Verbose ($resources.verbose_prepare_messages -f ($messages | ConvertTo-Json -Depth 10))
+
+            if ($messages.Count -gt 10) {
+                $messages = @($messages[0]) + $messages[-9..-1]
+            }
+    
+            $body = @{model = "$model"; messages = $messages; stream = $stream } 
             $params = @{
                 Uri     = $endpoint
                 Method  = "POST"
@@ -236,317 +309,154 @@ function New-ChatGPTConversation {
                 $body.Add("response_format" , @{type = "json_object" } )
             }
 
+
             if ($config) {
                 Merge-Hashtable -table1 $body -table2 $config
             }
-
             $params.Body = ($body | ConvertTo-Json -Depth 10)
 
             Write-Verbose ($resources.verbose_prepare_params -f ($params | ConvertTo-Json -Depth 10))
-
-            $response = Invoke-UniWebRequest $params
-
-            # if return the tool_calls, then execute the tool locally and add send the message again.
-
-            while ($response.choices -and $response.choices[0].message.tool_calls) {
-                # add the assistant message 
-                $this_message = $response.choices[0].message
-                $body.messages += $this_message
-                $tool_calls = $this_message.tool_calls
-                
-                foreach ($tool in $tool_calls) {
-                    Write-Verbose "$($resources.function_call): $($tool.function.name)"
-                    $function_args = $tool.function.arguments | ConvertFrom-Json
-                    $tool_response = Invoke-Expression ("{0} {1}" -f $tool.function.name, (
-                            $function_args.PSObject.Properties | ForEach-Object {
-                                "-{0} {1}" -f $_.Name, $_.Value
-                            }
-                        ) -join " ")
-
-                    $body.messages += @{
-                        role         = "tool"
-                        name         = $tool.function.name
-                        tool_call_id = $tool.id
-                        content      = $tool_response
-                    }
-                }
-
-                $params.Body = ($body | ConvertTo-Json -Depth 10)
-                $response = Invoke-UniWebRequest $params
-            }
-
-            Write-Verbose ($resources.verbose_response_utf8 -f ($response | ConvertTo-Json -Depth 10))
-
-            $result = $response.choices[0].message.content
-            Write-Verbose ($resources.verbose_response_plain_text -f $result)
-
-            #if user specify the outfile, write the response to the file
-            if ($outFile) {
-                Write-Verbose ($resources.verbose_outfile_specified -f $outFile)
-                $result | Out-File -FilePath $outFile -Encoding utf8
-            }
-
-            # support passthru, even though user specify the outfile, we still return the result to the pipeline
-            Write-Output $result
-        }
-        else {
-            Write-Verbose ($resources.verbose_chat_mode)
-
-            # old version of powershell doesn't support the stream mode, functions are not supported in the stream mode
-            # $stream = ($PSVersionTable['PSVersion'].Major -gt 5 -and !($config -and $config.tools))
-            $stream = $PSVersionTable['PSVersion'].Major -gt 5
-
-            $index = 1; 
-            $welcome = "`n{0}`n{1}" -f ($resources.welcome_chatgpt -f $(if ($azure) { " $($resources.azure_version) " } else { "" }), $model), $resources.shortcuts
     
-            Write-Host $welcome -ForegroundColor Yellow
-            Write-Host $system -ForegroundColor Cyan
+            try {
     
-            $messages = @()
-            $systemPrompt = @(
-                [PSCustomObject]@{
-                    role    = "system"
-                    content = $system
-                }
-            )
+                if ($stream) {
+                    Write-Verbose ($resources.verbose_chat_stream_mode)
+                    $reader = Invoke-StreamWebRequest -uri $params.Uri -body $params.Body -header $header
+                    # check if tools_call is null, if not, then execute the tools_call
+                    $line = $reader.ReadLine()
+                    $delta = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta
 
-            Write-Verbose "$($systemPrompt|ConvertTo-Json -Depth 10)"
-            
-            while ($true) {
-                Write-Verbose ($resources.verbose_chat_let_chat)
+                    while ($null -eq $delta.content) {
+                        $tool_calls = @()
 
-                $current = $index++
-                $prompt = Read-Host -Prompt "`n[$current] $($resources.prompt)"
+                        while ($true) {
+                            if ($delta.tool_calls) {
+                                $temp = $delta.tool_calls
+                                if ($temp.id -and $temp.function) {
+                                    $tool_calls += @([pscustomobject]@{
+                                            index    = $temp.index
+                                            id       = $temp.id
+                                            type     = "function"
+                                            function = @{
+                                                name      = $temp.function.name
+                                                arguments = $temp.function.arguments
+                                            }
+                                        })
 
-                Write-Verbose ($resources.verbose_prompt_received -f $prompt)
-    
-                if ($prompt -in ("q", "bye")) {
-                    Write-Verbose ($resources.verbose_chat_q_message -f $prompt)
-                    break
-                }
-    
-                if ($prompt -eq "m") {
-
-                    $os = [System.Environment]::OSVersion.Platform
-
-                    if ($os -notin @([System.PlatformID]::Win32NT, [System.PlatformID]::Win32Windows, [System.PlatformID]::Win32S)) {
-                        Write-Host ($resources.verbose_chat_m_message_not_supported)
-                        continue
-                    }
-
-                    Write-Verbose ($resources.verbose_chat_m_message)
-                    $prompt = Read-MultiLineInputBoxDialog -Message $resources.multi_line_prompt -WindowTitle $resources.multi_line_prompt -DefaultText ""
-
-                    Write-Verbose ($resources.verbose_prompt_received -f $prompt)
-
-                    if ($null -eq $prompt) {
-                        Write-Host $resources.cancel_button_message
-                        continue
-                    }
-                    else {
-                        Write-Host "$($resources.multi_line_message)`n$prompt"
-                    }
-                }
-    
-                if ($prompt -eq "f") {
-
-                    $os = [System.Environment]::OSVersion.Platform
-
-                    if ($os -notin @([System.PlatformID]::Win32NT, [System.PlatformID]::Win32Windows, [System.PlatformID]::Win32S)) {
-                        Write-Host ($resources.verbose_chat_f_message_not_supported)
-                        continue
-                    }
-
-                    Write-Verbose ($resources.verbose_chat_f_message)
-    
-                    $file = Read-OpenFileDialog -WindowTitle $resources.file_prompt
-
-                    Write-Verbose ($resources.verbose_chat_file_read -f $file)
-    
-                    if (!($file)) {
-                        Write-Host $resources.cancel_button_message
-                        continue
-                    }
-                    else {
-                        $prompt = Get-Content $file -Encoding utf8
-                        Write-Host "$($resources.multi_line_message)`n$prompt"
-                    }
-                }
-
-                Write-Host -ForegroundColor ("blue", "red", "Green", "yellow", "gray", "black", "white" | Get-Random) ("`r$($resources.thinking) {0}" -f ("." * (Get-Random -Maximum 10 -Minimum 3))) -NoNewline
-    
-                $messages += [PSCustomObject]@{
-                    role    = "user"
-                    content = $prompt
-                }
-
-                Write-Verbose ($resources.verbose_prepare_messages -f ($messages | ConvertTo-Json -Depth 10))
-
-                if ($messages.Count -gt 10) {
-                    $messages = @($messages[0]) + $messages[-9..-1]
-                }
-    
-                $body = @{model = "$model"; messages = $messages; stream = $stream } 
-                $params = @{
-                    Uri     = $endpoint
-                    Method  = "POST"
-                    Headers = $header
-                }
-
-                if ($json) {
-                    $body.Add("response_format" , @{type = "json_object" } )
-                }
-
-
-                if ($config) {
-                    Write-Verbose "merge config: $config"
-                    Write-Verbose "merge body: $body"
-                    Merge-Hashtable -table1 $body -table2 $config
-                    Write-Verbose "merged body: $body"
-                }
-                $params.Body = ($body | ConvertTo-Json -Depth 10)
-
-                Write-Verbose ($resources.verbose_prepare_params -f ($params | ConvertTo-Json -Depth 10))
-    
-                try {
-    
-                    if ($stream) {
-                        Write-Verbose ($resources.verbose_chat_stream_mode)
-                        $reader = Invoke-StreamWebRequest -uri $params.Uri -body $params.Body -header $header
-                        # check if tools_call is null, if not, then execute the tools_call
-                        $line = $reader.ReadLine()
-                        $delta = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta
-
-                        while ($null -eq $delta.content) {
-                            $tool_calls = @()
-
-                            while ($true) {
-                                if ($delta.tool_calls) {
-                                    $temp = $delta.tool_calls
-                                    if ($temp.id -and $temp.function) {
-                                        $tool_calls += @([pscustomobject]@{
-                                                index    = $temp.index
-                                                id       = $temp.id
-                                                type     = "function"
-                                                function = @{
-                                                    name      = $temp.function.name
-                                                    arguments = $temp.function.arguments
-                                                }
-                                            })
-
-                                    }
-                                    elseif ($temp.function) {
-                                        $tool_calls | Where-Object { $_.index -eq $temp.index } | ForEach-Object {
-                                            $_.function.arguments += $temp.function.arguments
-                                        }
+                                }
+                                elseif ($temp.function) {
+                                    $tool_calls | Where-Object { $_.index -eq $temp.index } | ForEach-Object {
+                                        $_.function.arguments += $temp.function.arguments
                                     }
                                 }
-
-                                $line = $reader.ReadLine()
-                                if ($line -eq "data: [DONE]") { break }
-                                $delta = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta
                             }
 
-                            # execute functions
-                            $body.messages += [pscustomobject]@{
-                                role       = "assistant"
-                                content    = ""
-                                tool_calls = @($tool_calls)
-                            }
-                            
-                            foreach ($tool in $tool_calls) {
-                                Write-Host "`r$($resources.function_call): $($tool.function.name)" -NoNewline
-                                $function_args = $tool.function.arguments | ConvertFrom-Json
-                                $tool_response = Invoke-Expression ("{0} {1}" -f $tool.function.name, (
-                                        $function_args.PSObject.Properties | ForEach-Object {
-                                            "-{0} {1}" -f $_.Name, $_.Value
-                                        }
-                                    ) -join " ")
-
-                                $body.messages += @{
-                                    role         = "tool"
-                                    name         = $tool.function.name
-                                    tool_call_id = $tool.id
-                                    content      = $tool_response
-                                }
-                            }
-
-                            $params.Body = ($body | ConvertTo-Json -Depth 10)
-                            $reader = Invoke-StreamWebRequest -uri $params.Uri -body $params.Body -header $header
                             $line = $reader.ReadLine()
+                            if ($line -eq "data: [DONE]") { break }
                             $delta = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta
                         }
 
-
-                        Write-Host "`r[$current] " -NoNewline -ForegroundColor Red
-                        $result = $delta.content
-                        Write-Host $result -NoNewline -ForegroundColor Green
-                        while ($true) {
-                            $line = $reader.ReadLine()
-                            if ($line -eq "data: [DONE]") { break }
-                            $chunk = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta.content
-                            Write-Host $chunk -NoNewline -ForegroundColor Green
-                            $result += $chunk
-                            Start-Sleep -Milliseconds 5
+                        # execute functions
+                        $body.messages += [pscustomobject]@{
+                            role       = "assistant"
+                            content    = ""
+                            tool_calls = @($tool_calls)
                         }
+                            
+                        foreach ($tool in $tool_calls) {
+                            Write-Host ("`r$($resources.function_call): $($tool.function.name)" + (" " * 50)) -NoNewline
+                            $function_args = $tool.function.arguments | ConvertFrom-Json
+                            $tool_response = Invoke-Expression ("{0} {1}" -f $tool.function.name, (
+                                    $function_args.PSObject.Properties | ForEach-Object {
+                                        "-{0} {1}" -f $_.Name, $_.Value
+                                    }
+                                ) -join " ")
 
-                        Write-Host ""    
-                        $messages += [PSCustomObject]@{
-                            role    = "assistant"
-                            content = $result
-                        }
-
-                        Write-Verbose ($resources.verbose_chat_message_combined -f ($messages | ConvertTo-Json -Depth 10))
-                        
-                    }
-                    else {
-
-                        Write-Verbose ($resources.verbose_chat_not_stream_mode)
-                        $response = Invoke-UniWebRequest $params
-                        Write-Verbose ($resources.verbose_chat_response_received -f ($response | ConvertTo-Json -Depth 10))
-
-                        # TODO #175 将工具作为外部模块加载，而不是直接调用
-                        while ($response.choices -and $response.choices[0].message.tool_calls) {
-                            # add the assistant message 
-                            $this_message = $response.choices[0].message
-                            $body.messages += $this_message
-                            $tool_calls = $this_message.tool_calls
-                
-                            foreach ($tool in $tool_calls) {
-                                Write-Host "`r$($resources.function_call): $($tool.function.name)" -NoNewline
-                                $function_args = $tool.function.arguments | ConvertFrom-Json
-                                $tool_response = Invoke-Expression ("{0} {1}" -f $tool.function.name, (
-                                        $function_args.PSObject.Properties | ForEach-Object {
-                                            "-{0} {1}" -f $_.Name, $_.Value
-                                        }
-                                    ) -join " ")
-
-                                $body.messages += @{
-                                    role         = "tool"
-                                    name         = $tool.function.name
-                                    tool_call_id = $tool.id
-                                    content      = $tool_response
-                                }
+                            $body.messages += @{
+                                role         = "tool"
+                                name         = $tool.function.name
+                                tool_call_id = $tool.id
+                                content      = $tool_response
                             }
-
-                            $params.Body = ($body | ConvertTo-Json -Depth 10)
-                            $response = Invoke-UniWebRequest $params
                         }
 
-                        $result = $response.choices[0].message.content
-                        $messages += [PSCustomObject]@{
-                            role    = "assistant"
-                            content = $result
-                        }       
-                        Write-Host "`r[$current] $result" -ForegroundColor Green
-                        Write-Verbose ($resources.verbose_chat_message_combined -f ($messages | ConvertTo-Json -Depth 10))
+                        $params.Body = ($body | ConvertTo-Json -Depth 10)
+                        $reader = Invoke-StreamWebRequest -uri $params.Uri -body $params.Body -header $header
+                        $line = $reader.ReadLine()
+                        $delta = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta
                     }
+
+                    Write-Host ("`r" + (" " * 50)) -ForegroundColor Green -NoNewline
+                    Write-Host "`r[$current] " -NoNewline -ForegroundColor Red
+                    $result = $delta.content
+                    Write-Host $result -NoNewline -ForegroundColor Green
+                    while ($true) {
+                        $line = $reader.ReadLine()
+                        if ($line -eq "data: [DONE]") { break }
+                        $chunk = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta.content
+                        Write-Host $chunk -NoNewline -ForegroundColor Green
+                        $result += $chunk
+                        Start-Sleep -Milliseconds 5
+                    }
+
+                    Write-Host ""    
+                    $messages += [PSCustomObject]@{
+                        role    = "assistant"
+                        content = $result
+                    }
+
+                    Write-Verbose ($resources.verbose_chat_message_combined -f ($messages | ConvertTo-Json -Depth 10))
+                        
                 }
-                catch {
-                    Write-Error ($_ | ConvertTo-Json)
+                else {
+
+                    Write-Verbose ($resources.verbose_chat_not_stream_mode)
+                    $response = Invoke-UniWebRequest $params
+                    Write-Verbose ($resources.verbose_chat_response_received -f ($response | ConvertTo-Json -Depth 10))
+
+                    # TODO #175 将工具作为外部模块加载，而不是直接调用
+                    while ($response.choices -and $response.choices[0].message.tool_calls) {
+                        # add the assistant message 
+                        $this_message = $response.choices[0].message
+                        $body.messages += $this_message
+                        $tool_calls = $this_message.tool_calls
+                
+                        foreach ($tool in $tool_calls) {
+                            Write-Host ("`r$($resources.function_call): $($tool.function.name)" + (" " * 50)) -NoNewline
+                            $function_args = $tool.function.arguments | ConvertFrom-Json
+                            $tool_response = Invoke-Expression ("{0} {1}" -f $tool.function.name, (
+                                    $function_args.PSObject.Properties | ForEach-Object {
+                                        "-{0} {1}" -f $_.Name, $_.Value
+                                    }
+                                ) -join " ")
+
+                            $body.messages += @{
+                                role         = "tool"
+                                name         = $tool.function.name
+                                tool_call_id = $tool.id
+                                content      = $tool_response
+                            }
+                        }
+
+                        $params.Body = ($body | ConvertTo-Json -Depth 10)
+                        $response = Invoke-UniWebRequest $params
+                    }
+
+                    $result = $response.choices[0].message.content
+                    $messages += [PSCustomObject]@{
+                        role    = "assistant"
+                        content = $result
+                    }
+                    Write-Host ("`r" + (" " * 50)) -ForegroundColor Green -NoNewline
+                    Write-Host "`r[$current] $result" -ForegroundColor Green 
+                    Write-Verbose ($resources.verbose_chat_message_combined -f ($messages | ConvertTo-Json -Depth 10))
                 }
             }
+            catch {
+                Write-Error ($_ | ConvertTo-Json)
+            }
         }
+        
 
 
     }
