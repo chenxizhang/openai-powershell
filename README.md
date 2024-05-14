@@ -9,7 +9,7 @@ This module is compatible with PowerShell 5.1 and above, and if you are using Po
 To use this module, you must install PowerShell. It is included by default in Windows. If you are using MacOS or Linux, you can install it using the following guide:
 
 - MacOS:
-  - Run `brew install powershell/tap/powershell` to install PowerShell on MacOS, then enter `pwsh` in the terminal to launch PowerShell.
+  - Run `brew install powershell/tap/powershell` to install PowerShell on MacOS, then enter `pwsh` in the terminal to launch PowerShell. Follow the guide [here](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-macos) if you encountered any problem.
 - Linux:
   - Follow the guide [here](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-linux?view=powershell-7.3) to install PowerShell on Linux, then enter `pwsh` in the terminal to launch PowerShell.
 
