@@ -357,7 +357,7 @@ function New-ChatGPTConversation {
                         }
 
                         # execute functions
-                        $body.messages += [pscustomobject]@{
+                        $messages += [pscustomobject]@{
                             role       = "assistant"
                             content    = ""
                             tool_calls = @($tool_calls)
@@ -372,7 +372,7 @@ function New-ChatGPTConversation {
                                     }
                                 ) -join " ")
 
-                            $body.messages += @{
+                            $messages += @{
                                 role         = "tool"
                                 name         = $tool.function.name
                                 tool_call_id = $tool.id
@@ -380,6 +380,7 @@ function New-ChatGPTConversation {
                             }
                         }
 
+                        $body.messages = $messages
                         $params.Body = ($body | ConvertTo-Json -Depth 10)
                         $reader = Invoke-StreamWebRequest -uri $params.Uri -body $params.Body -header $header
                         $line = $reader.ReadLine()
@@ -430,14 +431,15 @@ function New-ChatGPTConversation {
                                     }
                                 ) -join " ")
 
-                            $body.messages += @{
+                            $messages += @{
                                 role         = "tool"
                                 name         = $tool.function.name
                                 tool_call_id = $tool.id
                                 content      = $tool_response
                             }
                         }
-
+                        
+                        $body.messages = $messages
                         $params.Body = ($body | ConvertTo-Json -Depth 10)
                         $response = Invoke-UniWebRequest $params
                     }
