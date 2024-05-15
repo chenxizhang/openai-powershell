@@ -4,7 +4,15 @@ function Invoke-StreamWebRequest {
         [Parameter(Mandatory = $true)][string]$body,
         [hashtable]$header
     )
-    [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
+
+    # define a result variable
+    $result = @{
+        status  = "ok"
+        message = ""
+        reader  = $null
+    }
+
+    [System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
     $client = New-Object System.Net.Http.HttpClient
     $request = [System.Net.Http.HttpRequestMessage]::new()
     $request.Method = "POST"
@@ -17,9 +25,28 @@ function Invoke-StreamWebRequest {
     foreach ($k in $header.Keys) {
         $request.Headers.Add($k, $header[$k])
     }
-                                        
-    $task = $client.Send($request)
-    $response = $task.Content.ReadAsStream()
-    $reader = [System.IO.StreamReader]::new($response)
-    return $reader
+
+    try {
+        $response = [System.Net.Http.HttpResponseMessage]$client.Send($request)
+
+        # if statuscode return OK, then return the reader
+        if ($response.StatusCode -eq [System.Net.HttpStatusCode]::OK) {
+            $stream = $response.Content.ReadAsStream()
+            $reader = [System.IO.StreamReader]::new($stream)
+            $result.reader = $reader
+        }
+        else {
+            $result.status = $response.StatusCode
+            $temp = $response.Content.ReadAsStringAsync().Result | ConvertFrom-Json
+            $result.message = "Got error message: $($temp.message), details: $($temp.details)"
+        }
+    }
+    finally {
+        $client.Dispose()
+        $request.Dispose()
+
+    }
+
+    return $result
+
 }
