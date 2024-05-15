@@ -321,7 +321,17 @@ function New-ChatGPTConversation {
     
                 if ($stream) {
                     Write-Verbose ($resources.verbose_chat_stream_mode)
-                    $reader = Invoke-StreamWebRequest -uri $params.Uri -body $params.Body -header $header
+                    $callapi = Invoke-StreamWebRequest -uri $params.Uri -body $params.Body -header $header
+
+                    # if the status of callapi is not ok, then write the error message to host and continue
+                    if ($callapi.status -ne "ok") {
+                        Write-Host "`r[$current] $($callapi.message)" -NoNewline -ForegroundColor Red
+                        Write-Host ""
+                        continue
+                    }
+                    
+                    # otherwise, get the read of the result
+                    $reader = $callapi.reader
                     # check if tools_call is null, if not, then execute the tools_call
                     $line = $reader.ReadLine()
                     $delta = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta
@@ -382,9 +392,22 @@ function New-ChatGPTConversation {
 
                         $body.messages = $messages
                         $params.Body = ($body | ConvertTo-Json -Depth 10)
-                        $reader = Invoke-StreamWebRequest -uri $params.Uri -body $params.Body -header $header
+                        $callapi = Invoke-StreamWebRequest -uri $params.Uri -body $params.Body -header $header
+
+                        if ($callapi.status -ne "ok") {
+                            Write-Host "`r[$current] $($callapi.message)" -NoNewline -ForegroundColor Red
+                            Write-Host ""
+                            break
+                        }
+
+                        $reader = $callapi.reader
                         $line = $reader.ReadLine()
                         $delta = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta
+                    }
+
+                    # if the callapi status is not ok, then write the error message to host and continue
+                    if ($callapi.status -ne "ok") {
+                        continue
                     }
 
                     Write-Host ("`r" + (" " * 50)) -ForegroundColor Green -NoNewline
@@ -413,6 +436,7 @@ function New-ChatGPTConversation {
 
                     Write-Verbose ($resources.verbose_chat_not_stream_mode)
                     $response = Invoke-UniWebRequest $params
+
                     Write-Verbose ($resources.verbose_chat_response_received -f ($response | ConvertTo-Json -Depth 10))
 
                     # TODO #175 将工具作为外部模块加载，而不是直接调用
@@ -455,7 +479,7 @@ function New-ChatGPTConversation {
                 }
             }
             catch {
-                Write-Error ($_ | ConvertTo-Json)
+                Write-Error ($_.Exception.Message)
             }
         }
         
