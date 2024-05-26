@@ -5,9 +5,14 @@ function Get-PredefinedFunctions {
     return $result
 }
 
-# All functions can be invoke from the Chat conversation
 
 function get_current_weather {
+    <#
+        .DESCRIPTION
+            Get the current weather in a given location
+        .PARAMETER location
+            The location to get the weather for, e.g. San Francisco, CA
+    #>
     param(
         [string]$location
     )
@@ -16,6 +21,13 @@ function get_current_weather {
 }
 
 function query_database {
+
+    <#
+        .DESCRIPTION
+            query product database for product information
+        .PARAMETER name
+            The product name to query
+    #>
     param(
         [string]$name
     )
