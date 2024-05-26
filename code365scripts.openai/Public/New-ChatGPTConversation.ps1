@@ -88,12 +88,60 @@ function New-ChatGPTConversation {
         [Alias("variables")]
         [PSCustomObject]$context,
         [PSCustomObject]$headers,
-        [string[]]$functions
+        [string[]]$functions,
+        [Alias("profile", "env")]
+        [string]$environment,
+        [string]$env_config = "$env:USERPROFILE/.openai-powershell/profile.json"
     )
     BEGIN {
 
         Write-Verbose ($resources.verbose_parameters_received -f ($PSBoundParameters | Out-String))
         Write-Verbose ($resources.verbose_environment_received -f (Get-ChildItem Env:OPENAI_API_* | Out-String))
+
+        if ($environment) {
+            if ($env_config -match "\.json$" -and (Test-Path $env_config -PathType Leaf)) {
+                $env_config = Get-Content $env_config -Raw -Encoding UTF8 
+            }
+
+            $parsed_env_config = ($env_config | ConvertFrom-Json | ConvertTo-Hashtable).profiles | Where-Object { $_.name -eq $environment } | Select-Object -First 1
+
+            if ($parsed_env_config) {
+                if ($parsed_env_config.api_key -and (!$api_key)) { $api_key = $parsed_env_config.api_key }
+                if ($parsed_env_config.model -and (!$model)) { $model = $parsed_env_config.model }
+                if ($parsed_env_config.endpoint -and (!$endpoint)) { $endpoint = $parsed_env_config.endpoint }
+                if ($parsed_env_config.config) { 
+                    if ($config) {
+                        Merge-Hashtable -table1 $config -table2 $parsed_env_config.config
+                    }
+                    else {
+                        $config = $parsed_env_config.config
+                    }
+                }
+                if ($parsed_env_config.headers) {
+
+                    # foreach all the headers, if the value contains {{model}} then replace it with the model, and if the value contains {{guid}} then replace it with a new guid
+                    $keys = @($parsed_env_config.headers.Keys)
+                    $keys | ForEach-Object {
+                        $parsed_env_config.headers[$_] = $parsed_env_config.headers[$_] -replace "{{model}}", $model
+                        $parsed_env_config.headers[$_] = $parsed_env_config.headers[$_] -replace "{{guid}}", [guid]::NewGuid().ToString()
+                    }
+
+                    if ($headers) {
+                        Merge-Hashtable -table1 $headers -table2 $parsed_env_config.headers
+                    }
+                    else {
+                        $headers = $parsed_env_config.headers
+                    }
+                }
+
+                if ($parsed_env_config.auth -and ($parsed_env_config.auth.type -eq "aad") -and $parsed_env_config.auth.aad) {
+                    $aad = $parsed_env_config.auth.aad
+                    $accesstoken = (Get-MsalToken @aad).AccessToken
+                    $api_key = $accesstoken
+                }
+            }
+        }
+
 
         $api_key = ($api_key, [System.Environment]::GetEnvironmentVariable("OPENAI_API_KEY") | Where-Object { $_.Length -gt 0 } | Select-Object -First 1)
         $model = ($model, [System.Environment]::GetEnvironmentVariable("OPENAI_API_MODEL"), "gpt-3.5-turbo" | Where-Object { $_.Length -gt 0 } | Select-Object -First 1)
