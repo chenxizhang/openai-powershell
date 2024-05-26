@@ -1,36 +1,50 @@
 function Get-PredefinedFunctions {
     param([string[]]$names)
-    $file = Join-Path $PSScriptRoot "functions.json"
-    $result = (Get-Content $file | ConvertFrom-Json) | Where-Object { $names -contains $_.function.name }
-    return $result
+
+    return $names | ForEach-Object {
+        Get-FunctionJson -functionName $_
+    } | Where-Object { $_ -ne $null }
+}
+
+function Get-FunctionJson {
+    param([string]$functionName)
+
+    # if the function is not exist, return null
+    if (-not (Get-Command $functionName -ErrorAction SilentlyContinue)) {
+        Write-Warning "Function $functionName does not exist."
+        return $null
+    }
+
+    # generate a json object based on the help content of the function
+    $help = Get-Help $functionName
+    $json = @{
+        type     = "function"
+        function = @{
+            name        = $help.Name
+            description = $help.description[0].Text
+            parameters  = @{
+                type       = "object"
+                properties = Get-FunctionParameters -obj $help.parameters.parameter
+                required   = @(
+                    $help.parameters.parameter | Where-Object { $_.required -eq $true } | Select-Object -ExpandProperty Name
+                )
+            }
+        }
+    }
+
+    return $json
 }
 
 
-function get_current_weather {
-    <#
-        .DESCRIPTION
-            Get the current weather in a given location
-        .PARAMETER location
-            The location to get the weather for, e.g. San Francisco, CA
-    #>
-    param(
-        [string]$location
-    )
+function Get-FunctionParameters {
+    param([psobject[]]$obj)
 
-    return "The weather in $location is 20 degrees. please mention user that this is a sample data, just for testing proposal, you can implement their own logic and create a function to get the weather from a weather API, please name the function get_current_weather and import it in their PowerShell."
-}
-
-function query_database {
-
-    <#
-        .DESCRIPTION
-            query product database for product information
-        .PARAMETER name
-            The product name to query
-    #>
-    param(
-        [string]$name
-    )
-
-    return "$name is a good product, unitprice is 20."
+    $hashtable = @{}
+    foreach ($item in $obj) {
+        $hashtable[$item.Name] = @{
+            type        = $item.type.name
+            description = $item.description[0].Text
+        }
+    }
+    return $hashtable
 }
