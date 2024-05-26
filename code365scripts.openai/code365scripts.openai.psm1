@@ -20,7 +20,7 @@ $profilePath = "$($env:USERPROFILE)\.openai-powershell\profile.json"
 
 if (Test-Path $profilePath) {
     $names = (Get-Content -Path $profilePath -Raw | ConvertFrom-Json).profiles.name
-    $scriptBlock = {
+    Register-ArgumentCompleter -CommandName New-ChatCompletions, New-ChatGPTConversation -ParameterName environment -ScriptBlock {
         param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
 
         $names | Where-Object {
@@ -29,8 +29,17 @@ if (Test-Path $profilePath) {
             "'$_'"
         }
     }
+}
 
-    Register-ArgumentCompleter -CommandName New-ChatCompletions -ParameterName environment -ScriptBlock $scriptBlock
 
-    Register-ArgumentCompleter -CommandName New-ChatGPTConversation -ParameterName environment -ScriptBlock $scriptBlock
+# register argumentcompleter for the functions parameter of new-chatcompletinos, and new-chatgptconversation functions, we will provide all the functions from get-command -CommandType Function
+$commandNames = Get-Command -CommandType Function | Select-Object -ExpandProperty Name
+Register-ArgumentCompleter -CommandName New-ChatCompletions, New-ChatGPTConversation -ParameterName functions -ScriptBlock {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+
+    $commandNames | Where-Object {
+        $_ -like "*$wordToComplete*"
+    } | ForEach-Object {
+        "'$_'"
+    }
 }

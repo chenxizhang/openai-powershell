@@ -9,7 +9,7 @@
                 "properties": {
                     "location": {
                         "type": "string",
-                        "description": "The city and state, e.g. San Francisco, CA"
+                        "description": "The location to get the weather for, e.g. San Francisco, CA"
                     },
                     "unit": {
                         "type": "string",
@@ -35,7 +35,7 @@
                 "properties": {
                     "name": {
                         "type": "string",
-                        "description": "product name"
+                        "description": "The product name to query"
                     }
                 },
                 "required": [
