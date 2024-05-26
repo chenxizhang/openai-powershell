@@ -34,6 +34,10 @@ function New-ChatCompletions {
         Send the response in json format.
     .PARAMETER functions
         This is s super powerful feature to support the function_call of OpenAI, you can specify the function name(s) and it will be automatically called when the assistant needs it. You can find all the avaliable functions definition here (https://raw.githubusercontent.com/chenxizhang/openai-powershell/master/code365scripts.openai/Private/functions.json)
+    .PARAMETER environment
+        If you have multiple environment to use, you can specify the environment name here, and then define the environment in the profile.json file. You can also use "profile" or "env" as the alias.
+    .PARAMETER env_config
+        The profile.json file path, the default value is "$env:USERPROFILE/.openai-powershell/profile.json".
     .OUTPUTS
         System.String, the completion result.  
     .LINK
@@ -106,6 +110,9 @@ function New-ChatCompletions {
                 }
 
                 if ($parsed_env_config.auth -and ($parsed_env_config.auth.type -eq "aad") -and $parsed_env_config.auth.aad) {
+
+                    Confirm-DependencyModule -ModuleName "MSAL.ps"
+
                     $aad = $parsed_env_config.auth.aad
                     $accesstoken = (Get-MsalToken @aad).AccessToken
                     $api_key = $accesstoken
