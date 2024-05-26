@@ -13,3 +13,24 @@ foreach ($directory in @('Public', 'Private')) {
 #     New-Item -Path $profilePath -ItemType File -Force
 #     Add-Content -Path $profilePath -Value (Get-Content "$PSScriptRoot\private\profile.ps1" -Raw)
 # }
+
+# check if the "$home\.openai-powershell\profile.json" exists, if so, read the file, and register a ArgumentCompleter for New-ChatCompletions, and New-ChatGPTConversation functions, the parameter name is environment
+
+$profilePath = "$($env:USERPROFILE)\.openai-powershell\profile.json"
+
+if (Test-Path $profilePath) {
+    $names = (Get-Content -Path $profilePath -Raw | ConvertFrom-Json).profiles.name
+    $scriptBlock = {
+        param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+
+        $names | Where-Object {
+            $_ -like "$wordToComplete*"
+        } | ForEach-Object {
+            "'$_'"
+        }
+    }
+
+    Register-ArgumentCompleter -CommandName New-ChatCompletions -ParameterName environment -ScriptBlock $scriptBlock
+
+    Register-ArgumentCompleter -CommandName New-ChatGPTConversation -ParameterName environment -ScriptBlock $scriptBlock
+}
