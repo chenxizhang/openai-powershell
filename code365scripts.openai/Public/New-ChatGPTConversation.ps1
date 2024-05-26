@@ -120,13 +120,10 @@ function New-ChatGPTConversation {
                 if ($parsed_env_config.headers) {
 
                     # foreach all the headers, if the value contains {{model}} then replace it with the model, and if the value contains {{guid}} then replace it with a new guid
-                    $parsed_env_config.headers.GetEnumerator() | ForEach-Object {
-                        if ($_.Value -match "{{model}}") {
-                            $_.Value = $_.Value -replace "{{model}}", $model
-                        }
-                        if ($_.Value -match "{{guid}}") {
-                            $_.Value = $_.Value -replace "{{guid}}", [guid]::NewGuid().ToString()
-                        }
+                    $keys = @($parsed_env_config.headers.Keys)
+                    $keys | ForEach-Object {
+                        $parsed_env_config.headers[$_] = $parsed_env_config.headers[$_] -replace "{{model}}", $model
+                        $parsed_env_config.headers[$_] = $parsed_env_config.headers[$_] -replace "{{guid}}", [guid]::NewGuid().ToString()
                     }
 
                     if ($headers) {
