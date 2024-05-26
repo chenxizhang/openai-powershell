@@ -3,6 +3,7 @@
 
 | Date       | Version  | Description                                                                 |
 |------------|----------|-----------------------------------------------------------------------------|
+| 2024-05-26 | v3.0.0.6 | Support AAD authentication, and multiple environments. |
 | 2024-05-11 | v3.0.0.5 | System variables and default value for variable, minor bug fixes. [#211](https://github.com/chenxizhang/openai-powershell/issues/211) [#210](https://github.com/chenxizhang/openai-powershell/issues/210) [#208](https://github.com/chenxizhang/openai-powershell/issues/208)   |
 | 2024-05-11 | v3.0.0.4 | Fixed encoding bug for PowerShell 5.1 [#206](https://github.com/chenxizhang/openai-powershell/issues/206)  |
 | 2024-05-05 | v3.0.0.3 | Update the help content (both English and Chinese),and minor bug fixes  |
