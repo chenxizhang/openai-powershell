@@ -289,6 +289,8 @@ function New-ChatGPTConversation {
             }
         )
 
+        $messages += $systemPrompt
+
         Write-Verbose "$($systemPrompt|ConvertTo-Json -Depth 10)"
             
         while ($true) {
@@ -510,8 +512,14 @@ function New-ChatGPTConversation {
                     while ($response.choices -and $response.choices[0].message.tool_calls) {
                         # add the assistant message 
                         $this_message = $response.choices[0].message
-                        $body.messages += $this_message
+                        # $body.messages += $this_message
                         $tool_calls = $this_message.tool_calls
+
+                        $messages += [pscustomobject]@{
+                            role       = "assistant"
+                            content    = ""
+                            tool_calls = @($tool_calls)
+                        }
                 
                         foreach ($tool in $tool_calls) {
                             Write-Host ("`r$($resources.function_call): $($tool.function.name)" + (" " * 50)) -NoNewline
@@ -532,6 +540,8 @@ function New-ChatGPTConversation {
                         
                         $body.messages = $messages
                         $params.Body = ($body | ConvertTo-Json -Depth 10)
+                        Write-Verbose $params.Body
+
                         $response = Invoke-UniWebRequest $params
                     }
 
@@ -549,9 +559,6 @@ function New-ChatGPTConversation {
                 Write-Error ($_.Exception.Message)
             }
         }
-        
-
-
     }
 
 }
