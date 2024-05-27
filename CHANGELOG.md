@@ -3,7 +3,7 @@
 
 | Date       | Version  | Description                                                                 |
 |------------|----------|-----------------------------------------------------------------------------|
-| 2024-05-27 | v3.0.0.7 | Better profile support and bug fix [#233](https://github.com/chenxizhang/openai-powershell/issues/233) [#231](https://github.com/chenxizhang/openai-powershell/issues/231) [#236](https://github.com/chenxizhang/openai-powershell/issues/236) [#238](https://github.com/chenxizhang/openai-powershell/issues/238) [#241](https://github.com/chenxizhang/openai-powershell/issues/241) . |
+| 2024-05-27 | v3.0.0.7 | Better profile and function support and bug fix [#175](https://github.com/chenxizhang/openai-powershell/issues/175) [#233](https://github.com/chenxizhang/openai-powershell/issues/233) [#231](https://github.com/chenxizhang/openai-powershell/issues/231) [#236](https://github.com/chenxizhang/openai-powershell/issues/236) [#238](https://github.com/chenxizhang/openai-powershell/issues/238) [#241](https://github.com/chenxizhang/openai-powershell/issues/241) . |
 | 2024-05-26 | v3.0.0.6 | Support AAD authentication, and multiple environments. [#227](https://github.com/chenxizhang/openai-powershell/issues/227) |
 | 2024-05-11 | v3.0.0.5 | System variables and default value for variable, minor bug fixes. [#211](https://github.com/chenxizhang/openai-powershell/issues/211) [#210](https://github.com/chenxizhang/openai-powershell/issues/210) [#208](https://github.com/chenxizhang/openai-powershell/issues/208)   |
 | 2024-05-11 | v3.0.0.4 | Fixed encoding bug for PowerShell 5.1 [#206](https://github.com/chenxizhang/openai-powershell/issues/206)  |
