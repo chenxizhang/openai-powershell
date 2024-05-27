@@ -219,6 +219,9 @@ function New-ChatGPTConversation {
         # if user provide the functions, get the functions from the functions file and define the tools and tool_choice thoughs the config parameter
         if ($functions) {
             $tools = @(Get-PredefinedFunctions -names $functions)
+
+            Write-Verbose  ($tools | ConvertTo-Json -Depth 10)
+
             if ($tools.Count -gt 0) {
                 if ($null -eq $config) {
                     $config = @{}

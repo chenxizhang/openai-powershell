@@ -17,7 +17,7 @@ function Get-FunctionJson {
 
     # generate a json object based on the help content of the function
     $help = Get-Help $functionName
-    $json = @{
+    $json = [pscustomobject]@{
         type     = "function"
         function = @{
             name        = $help.Name
@@ -31,7 +31,6 @@ function Get-FunctionJson {
             }
         }
     }
-
     return $json
 }
 
@@ -39,12 +38,12 @@ function Get-FunctionJson {
 function Get-FunctionParameters {
     param([psobject[]]$obj)
 
-    $hashtable = @{}
+    $result = [PSCustomObject]@{}
     foreach ($item in $obj) {
-        $hashtable[$item.Name] = @{
-            type        = $item.type.name
+        $result | Add-Member -MemberType NoteProperty -Name $item.Name -Value @{
+            type        = $item.type.name.tolower()
             description = $item.description[0].Text
         }
     }
-    return $hashtable
+    return $result
 }
