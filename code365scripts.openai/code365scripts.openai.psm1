@@ -43,3 +43,16 @@ Register-ArgumentCompleter -CommandName New-ChatCompletions, New-ChatGPTConversa
         "'$_'"
     }
 }
+
+# check the module version and notify the user if an update is available, this will run in background
+
+Start-Job -ScriptBlock {
+    $module = "code365scripts.openai"
+    $latestVersion = (Find-Module $module).Version
+    $currentVersion = (Get-Module $module -ListAvailable | Select-Object -First 1).Version
+    if ($latestVersion -gt $currentVersion) {
+            $notification = "An update to the module ($module) is available. Current version: $currentVersion. Latest version: $latestVersion. Run 'Update-Module $module' to update the module."
+            $Host.UI.RawUI.WindowTitle = "Update Available - $module"
+            Write-Host $notification
+    }
+} -Name "check_openai_UpdateNotification"

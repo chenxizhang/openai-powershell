@@ -269,6 +269,7 @@ function New-ChatGPTConversation {
 
     PROCESS {
 
+        Receive-Job -Name "check_openai_UpdateNotification" -ErrorAction SilentlyContinue
 
         Write-Verbose ($resources.verbose_chat_mode)
 
