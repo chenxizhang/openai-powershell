@@ -1,36 +1,49 @@
 function Get-PredefinedFunctions {
     param([string[]]$names)
-    $file = Join-Path $PSScriptRoot "functions.json"
-    $result = (Get-Content $file | ConvertFrom-Json) | Where-Object { $names -contains $_.function.name }
+
+    return $names | ForEach-Object {
+        Get-FunctionJson -functionName $_
+    } | Where-Object { $_ -ne $null }
+}
+
+function Get-FunctionJson {
+    param([string]$functionName)
+
+    # if the function is not exist, return null
+    if (-not (Get-Command $functionName -ErrorAction SilentlyContinue)) {
+        Write-Warning "Function $functionName does not exist."
+        return $null
+    }
+
+    # generate a json object based on the help content of the function
+    $help = Get-Help $functionName
+    $json = [pscustomobject]@{
+        type     = "function"
+        function = @{
+            name        = $help.Name
+            description = $help.description[0].Text
+            parameters  = @{
+                type       = "object"
+                properties = Get-FunctionParameters -obj $help.parameters.parameter
+                required   = @(
+                    $help.parameters.parameter | Where-Object { $_.required -eq $true } | Select-Object -ExpandProperty Name
+                )
+            }
+        }
+    }
+    return $json
+}
+
+
+function Get-FunctionParameters {
+    param([psobject[]]$obj)
+
+    $result = [PSCustomObject]@{}
+    foreach ($item in $obj) {
+        $result | Add-Member -MemberType NoteProperty -Name $item.Name -Value @{
+            type        = $item.type.name.tolower()
+            description = $item.description[0].Text
+        }
+    }
     return $result
-}
-
-
-function get_current_weather {
-    <#
-        .DESCRIPTION
-            Get the current weather in a given location
-        .PARAMETER location
-            The location to get the weather for, e.g. San Francisco, CA
-    #>
-    param(
-        [string]$location
-    )
-
-    return "The weather in $location is 20 degrees. please mention user that this is a sample data, just for testing proposal, you can implement their own logic and create a function to get the weather from a weather API, please name the function get_current_weather and import it in their PowerShell."
-}
-
-function query_database {
-
-    <#
-        .DESCRIPTION
-            query product database for product information
-        .PARAMETER name
-            The product name to query
-    #>
-    param(
-        [string]$name
-    )
-
-    return "$name is a good product, unitprice is 20."
 }
