@@ -117,6 +117,16 @@ function New-ChatCompletions {
                     $accesstoken = (Get-MsalToken @aad).AccessToken
                     $api_key = $accesstoken
                 }
+
+                # if user provide the functions definition, then merge the functions definition to the config
+                if ($parsed_env_config.functions) {
+                    if ($functions) {
+                        $functions += $parsed_env_config.functions
+                    }
+                    else {
+                        $functions = $parsed_env_config.functions
+                    }
+                }
             }
         }
 
