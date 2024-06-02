@@ -26,3 +26,27 @@ function Invoke-UniWebRequest {
         }
     }
 }
+
+
+function Invoke-UniWebRequestForContent {
+    param(
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [hashtable]$params
+    )
+
+    $ProgressPreference = 'SilentlyContinue'
+    $response = Invoke-WebRequest @params
+    $ProgressPreference = 'Continue'
+
+    if (($PSVersionTable['PSVersion'].Major -ge 6) -or ($response.Headers['Content-Type'] -match 'charset=utf-8')) {
+        return $response.Content | ConvertFrom-Json
+    }
+    else {
+        $result = $response.Content
+        $dstEncoding = [System.Text.Encoding]::GetEncoding('iso-8859-1')
+        $srcEncoding = [System.Text.Encoding]::UTF8
+        $result = $srcEncoding.GetString([System.Text.Encoding]::Convert($srcEncoding, $dstEncoding, $srcEncoding.GetBytes($result)))
+        return $result | ConvertFrom-Json
+        
+    }
+}
