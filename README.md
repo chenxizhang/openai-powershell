@@ -51,7 +51,7 @@ You might want to run `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` if y
 ## User Manual in details
 
 1. [Start your desktop ChatGPT journey with a simple command](https://github.com/chenxizhang/openai-powershell/discussions/192)
-2. [Three basic parameters adapted to mainstream platforms and models](https://github.com/chenxizhang/openai-powershell/discussions/193)
+2. [Three basic parameters adapted to major platforms and models](https://github.com/chenxizhang/openai-powershell/discussions/193)
 3. [Get Help](https://github.com/chenxizhang/openai-powershell/discussions/194)
 4. [Aliases for commands and parameters](https://github.com/chenxizhang/openai-powershell/discussions/195)
 5. [System and user prompts](https://github.com/chenxizhang/openai-powershell/discussions/196)
@@ -62,6 +62,7 @@ You might want to run `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` if y
 10. [Using DALL-E-3 to generate images](https://github.com/chenxizhang/openai-powershell/discussions/202)
 11. [Using local models](https://github.com/chenxizhang/openai-powershell/discussions/203)
 12. [Use environment variables](https://github.com/chenxizhang/openai-powershell/discussions/204)
+13. [Use AAD authentication](https://github.com/chenxizhang/openai-powershell/discussions/244)
 
 ## Telemetry Data Collection and Privacy
 
