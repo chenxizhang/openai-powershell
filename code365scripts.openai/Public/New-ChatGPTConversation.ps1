@@ -139,9 +139,13 @@ function New-ChatGPTConversation {
                 }
 
                 if ($parsed_env_config.auth -and ($parsed_env_config.auth.type -eq "aad") -and $parsed_env_config.auth.aad) {
+
                     Confirm-DependencyModule -ModuleName "MSAL.ps"
 
                     $aad = $parsed_env_config.auth.aad
+                    if($aad.clientsecret){
+                        $aad.clientsecret = ConvertTo-SecureString $aad.clientsecret -AsPlainText -Force
+                    }
                     $accesstoken = (Get-MsalToken @aad).AccessToken
                     $api_key = $accesstoken
                 }

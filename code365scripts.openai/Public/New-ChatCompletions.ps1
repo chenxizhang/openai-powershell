@@ -114,6 +114,9 @@ function New-ChatCompletions {
                     Confirm-DependencyModule -ModuleName "MSAL.ps"
 
                     $aad = $parsed_env_config.auth.aad
+                    if($aad.clientsecret){
+                        $aad.clientsecret = ConvertTo-SecureString $aad.clientsecret -AsPlainText -Force
+                    }
                     $accesstoken = (Get-MsalToken @aad).AccessToken
                     $api_key = $accesstoken
                 }
