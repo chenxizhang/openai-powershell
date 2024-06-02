@@ -63,6 +63,7 @@ You might want to run `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` if y
 11. [Using local models](https://github.com/chenxizhang/openai-powershell/discussions/203)
 12. [Use environment variables](https://github.com/chenxizhang/openai-powershell/discussions/204)
 13. [Use AAD authentication](https://github.com/chenxizhang/openai-powershell/discussions/244)
+14. [Use in Github Action](https://github.com/chenxizhang/openai-powershell/discussions/247)
 
 ## Telemetry Data Collection and Privacy
 
