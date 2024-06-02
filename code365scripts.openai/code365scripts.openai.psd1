@@ -12,7 +12,7 @@
     RootModule           = '.\code365scripts.openai.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '3.0.0.8'
+    ModuleVersion        = '3.0.0.9'
 
     # Supported PSEditions
     CompatiblePSEditions = @("Desktop")
@@ -69,10 +69,10 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport    = @("New-ChatGPTConversation", "New-ImageGeneration","New-ChatCompletions")
+    FunctionsToExport    = @("New-ChatGPTConversation", "New-ImageGeneration", "New-ChatCompletions")
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-    CmdletsToExport      = @("New-ChatGPTConversation", "New-ImageGeneration","New-ChatCompletions")
+    CmdletsToExport      = @("New-ChatGPTConversation", "New-ImageGeneration", "New-ChatCompletions")
 
     # Variables to export from this module
     VariablesToExport    = '*'
