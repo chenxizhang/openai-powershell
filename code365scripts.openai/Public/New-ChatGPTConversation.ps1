@@ -1,7 +1,5 @@
 function New-ChatGPTConversation {
     <#
-    .EXTERNALHELP
-        code365scripts.openai-help.xml
     .SYNOPSIS
         Create a new ChatGPT conversation or get a Chat Completion result if you specify the prompt parameter directly.
     .DESCRIPTION
