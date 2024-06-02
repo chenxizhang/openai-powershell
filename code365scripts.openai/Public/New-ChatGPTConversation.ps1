@@ -141,7 +141,7 @@ function New-ChatGPTConversation {
                     Confirm-DependencyModule -ModuleName "MSAL.ps"
 
                     $aad = $parsed_env_config.auth.aad
-                    if($aad.clientsecret){
+                    if ($aad.clientsecret) {
                         $aad.clientsecret = ConvertTo-SecureString $aad.clientsecret -AsPlainText -Force
                     }
                     $accesstoken = (Get-MsalToken @aad).AccessToken
@@ -308,6 +308,66 @@ function New-ChatGPTConversation {
                 Write-Verbose ($resources.verbose_chat_q_message -f $prompt)
                 break
             }
+
+            if ($prompt.StartsWith("save")) {
+                if ($prompt -match "^save\s+(\S+)((?:\s+/override))?$") {
+                    $profileName = $matches[1]
+                    $override = $null -ne $matches[2]
+                    $profile_to_save = @{
+                        name     = $profileName
+                        api_key  = $api_key
+                        model    = $model
+                        endpoint = $endpoint
+                        system   = $system
+                    }
+
+                    if ($config) {
+                        $profile_to_save.config = $config
+                    }
+                    if ($headers) {
+                        $profile_to_save.headers = $headers
+                    }
+                    if ($functions) {
+                        $profile_to_save.functions = $functions
+                    }
+
+                    # check the profile file in $userprofile directory, if not exist, then create it
+                    $profileFile = Join-Path $env:USERPROFILE ".openai-powershell/profile.json"
+                    if (!(Test-Path $profileFile)) {
+                        New-Item -Path $profileFile -ItemType File -Force | Out-Null
+                        @{profiles = @($profile_to_save) } | ConvertTo-Json -Depth 10 | Set-Content -Path $profileFile -Encoding UTF8
+                    }
+                    else {
+                        # load the profile file, and check if the profile name is already exist, if exist and not override, then return error message, if exist and override, then override the profile. if not exist, then add the profile to the profile file
+                        $existing_profiles = (Get-Content $profileFile -Raw -Encoding UTF8 | ConvertFrom-Json).profiles
+                        $existing_profile = $existing_profiles | Where-Object { $_.name -eq $profileName }
+
+                        if ($existing_profile) {
+                            if ($override) {
+                                # update the existing_profile with the new profile_to_save
+                                $existing_profile = $profile_to_save
+                                @{profiles = @($existing_profiles) } | ConvertTo-Json -Depth 10 | Set-Content -Path $profileFile -Encoding UTF8
+                                Write-Host "[$current] The profile '$profileName' is overridden successfully." -ForegroundColor Green
+                            }
+                            else {
+                                Write-Host "[$current] The profile '$profileName' is already exist, if you want to override it, please add the '/override' switch in the end of your command" -ForegroundColor Red
+                            }
+                        }
+                        else {
+                            $existing_profiles += $profile_to_save
+                            @{profiles = @($existing_profiles) } | ConvertTo-Json -Depth 10 | Set-Content -Path $profileFile -Encoding UTF8
+                            Write-Host "[$current] The profile '$profileName' is saved successfully." -ForegroundColor Green
+                        }
+                    }
+
+                }
+                else {
+                    Write-Host "[$current] You want to save the profile, but the syntext is incorrect. Please try 'save your-profile-name', if you want to override the exiting profile, please add the '/override' switch in the end of your command" -ForegroundColor Red 
+                }
+
+                continue
+            }
+
     
             if ($prompt -eq "m") {
 
