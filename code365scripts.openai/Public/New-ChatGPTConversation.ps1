@@ -454,7 +454,6 @@ function New-ChatGPTConversation {
                 if ($stream) {
                     Write-Verbose ($resources.verbose_chat_stream_mode)
                     $callapi = Invoke-StreamWebRequest -uri $params.Uri -body $params.Body -header $header
-
                     # if the status of callapi is not ok, then write the error message to host and continue
                     if ($callapi.status -ne "ok") {
                         Write-Host "`r[$current] $($callapi.message)" -NoNewline -ForegroundColor Red
@@ -468,7 +467,8 @@ function New-ChatGPTConversation {
                     $line = $reader.ReadLine()
                     $delta = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta
 
-                    while ($null -eq $delta.content) {
+
+                    while ($delta -and ($null -eq $delta.content)) {
                         $tool_calls = @()
 
                         while ($true) {
