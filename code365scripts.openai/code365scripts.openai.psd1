@@ -12,10 +12,10 @@
     RootModule           = '.\code365scripts.openai.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '3.0.1.1'
+    ModuleVersion        = '3.0.1.2'
 
     # Supported PSEditions
-    CompatiblePSEditions = @("Desktop","Core")
+    CompatiblePSEditions = @("Desktop", "Core")
 
     # ID used to uniquely identify this module
     GUID                 = '4948e170-d2aa-4f97-9cb2-fd0f0843e473'
@@ -52,7 +52,7 @@
 
     # Modules that must be imported into the global environment prior to importing this module
     # RequiredModules      = @(@{ ModuleName = 'MicrosoftTeams'; ModuleVersion = '2.0.0' }, @{ModuleName = 'AzureAD'; ModuleVersion = '2.0.2.130' })
-
+    RequiredModules      = @(@{ModuleName = "powershellextension"; RequiredVersion = "0.0.1"; Guid = "df717a00-1acf-45e8-a958-0c9bcb9af322" })
     # Assemblies that must be loaded prior to importing this module
     # RequiredAssemblies = @()
 
@@ -95,7 +95,7 @@
         PSData = @{
 
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags         = @("code365", "community", "china", "chenxizhang", "openai")
+            Tags         = @("code365", "community", "china", "chenxizhang", "openai","PSEdition_Desktop", "PSEdition_Core", "Windows", "Linux", "MacOS")
 
             # A URL to the license for this module.
             LicenseUri   = 'https://github.com/chenxizhang/openai-powershell/blob/master/LICENSE'
