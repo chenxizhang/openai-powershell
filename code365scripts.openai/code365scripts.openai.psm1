@@ -1,8 +1,13 @@
 ﻿Import-LocalizedData -FileName "resources.psd1" -BindingVariable "resources"
 
-foreach ($directory in @('Public', 'Private')) {
-    Get-ChildItem -Path "$PSScriptRoot\$directory\*.ps1" | ForEach-Object { . $_.FullName }
+foreach ($directory in @('Public', 'Private', '.')) {
+
+    $path = Join-Path -Path $PSScriptRoot -ChildPath $directory
+    if (Test-Path $path) {
+        Get-ChildItem -Path $path -Filter "*.ps1" | ForEach-Object { . $_.FullName }
+    }
 }
+
 
 # check if the "$home\.openai-powershell\profile.ps1" exists, if so, source it, otherwise create it and append some code
 # $profilePath = "$home\.openai-powershell\profile.ps1"
@@ -51,8 +56,8 @@ Start-Job -ScriptBlock {
     $latestVersion = (Find-Module $module).Version
     $currentVersion = (Get-Module $module -ListAvailable | Select-Object -First 1).Version
     if ($latestVersion -gt $currentVersion) {
-            $notification = "An update to the module ($module) is available. Current version: $currentVersion. Latest version: $latestVersion. Run 'Update-Module $module' to update the module."
-            $Host.UI.RawUI.WindowTitle = "Update Available - $module"
-            Write-Host $notification
+        $notification = "An update to the module ($module) is available. Current version: $currentVersion. Latest version: $latestVersion. Run 'Update-Module $module' to update the module."
+        $Host.UI.RawUI.WindowTitle = "Update Available - $module"
+        Write-Host $notification
     }
 } -Name "check_openai_UpdateNotification"

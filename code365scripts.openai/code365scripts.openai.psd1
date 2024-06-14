@@ -52,7 +52,7 @@
 
     # Modules that must be imported into the global environment prior to importing this module
     # RequiredModules      = @(@{ ModuleName = 'MicrosoftTeams'; ModuleVersion = '2.0.0' }, @{ModuleName = 'AzureAD'; ModuleVersion = '2.0.2.130' })
-    RequiredModules      = @(@{ModuleName = "powershellextension"; RequiredVersion = "0.0.1"; Guid = "df717a00-1acf-45e8-a958-0c9bcb9af322" })
+    RequiredModules      = @(@{ModuleName = "powershellextension"; RequiredVersion = "0.0.2"; Guid = "df717a00-1acf-45e8-a958-0c9bcb9af322" })
     # Assemblies that must be loaded prior to importing this module
     # RequiredAssemblies = @()
 
