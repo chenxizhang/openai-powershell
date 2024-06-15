@@ -69,10 +69,10 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport    = @("New-ChatGPTConversation", "New-ImageGeneration", "New-ChatCompletions")
+    FunctionsToExport    = @("New-ChatGPTConversation", "New-ImageGeneration", "New-ChatCompletions", "Get-AssistantResources", "Remove-AssistantResources", "New-Assistant", "Add-FileToOpenAI", "New-VectorStore", "New-Thread", "New-AssistantConversation")
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-    CmdletsToExport      = @("New-ChatGPTConversation", "New-ImageGeneration", "New-ChatCompletions")
+    CmdletsToExport      = @("New-ChatGPTConversation", "New-ImageGeneration", "New-ChatCompletions", "New-Assistant", "Get-AssistantResources", "Remove-AssistantResources", "Add-FileToOpenAI", "New-VectorStore", "New-Thread", "New-AssistantConversation")
 
     # Variables to export from this module
     VariablesToExport    = '*'
@@ -95,7 +95,7 @@
         PSData = @{
 
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags         = @("code365", "community", "china", "chenxizhang", "openai","PSEdition_Desktop", "PSEdition_Core", "Windows", "Linux", "MacOS")
+            Tags         = @("code365", "community", "china", "chenxizhang", "openai", "PSEdition_Desktop", "PSEdition_Core", "Windows", "Linux", "MacOS")
 
             # A URL to the license for this module.
             LicenseUri   = 'https://github.com/chenxizhang/openai-powershell/blob/master/LICENSE'

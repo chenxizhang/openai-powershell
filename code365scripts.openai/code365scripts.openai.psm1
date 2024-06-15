@@ -1,10 +1,10 @@
 ﻿Import-LocalizedData -FileName "resources.psd1" -BindingVariable "resources"
 
-foreach ($directory in @('Public', 'Private', '.')) {
+foreach ($directory in @('Public', 'Private')) {
 
     $path = Join-Path -Path $PSScriptRoot -ChildPath $directory
     if (Test-Path $path) {
-        Get-ChildItem -Path $path -Filter "*.ps1" | ForEach-Object { . $_.FullName }
+        Get-ChildItem -Path $path -Filter "*.ps1" -File -Recurse | ForEach-Object { . $_.FullName }
     }
 }
 
