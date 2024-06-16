@@ -59,7 +59,7 @@ class OpenAIClient {
             return Invoke-RestMethod -Method $method -Uri $url -Headers $this.headers
         }
         else {
-            return Invoke-RestMethod -Method $method -Uri $url -Headers $this.headers -Body ($body | ConvertTo-Json)
+            return Invoke-RestMethod -Method $method -Uri $url -Headers $this.headers -Body ($body | ConvertTo-Json -Depth 10)
         }
     }
 
@@ -73,16 +73,30 @@ class AssistantResource {
     [OpenAIClient]$Client
     [System.Management.Automation.HiddenAttribute()]
     [string]$urifragment
+    [System.Management.Automation.HiddenAttribute()]
+    [string]$objTypeName
 
-    AssistantResource([OpenAIClient]$client, [string]$urifragment) {
+    AssistantResource([OpenAIClient]$client, [string]$urifragment, [string]$objTypeName) {
         $this.Client = $client
         $this.urifragment = $urifragment
+        $this.objTypeName = $objTypeName
     }
     [psobject[]]list() {
+
+        if ($this.objTypeName) {
+            return $this.Client.web($this.urifragment).data | ForEach-Object {
+                New-Object -TypeName $this.objTypeName -ArgumentList $_
+            }
+        }
+
         return $this.Client.web($this.urifragment).data
     }
     
     [psobject]get([string]$id) {
+        if ($this.objTypeName) {
+            return New-Object -TypeName $this.objTypeName -ArgumentList $this.Client.web("$($this.urifragment)/$id")
+        }
+
         return $this.Client.web("$($this.urifragment)/$id")
     }
 
@@ -91,115 +105,32 @@ class AssistantResource {
     }
 
     [psobject]create([hashtable]$body) {
+        if ($this.objTypeName) {
+            return New-Object -TypeName $this.objTypeName -ArgumentList $this.Client.web("$($this.urifragment)", "POST", $body)
+        }
         return $this.Client.web("$($this.urifragment)", "POST", $body)
     }
-}
 
-class Assistant:AssistantResource {
-    Assistant([OpenAIClient]$client): base($client, "assistants") {}
+    [psobject]create() {
+        return $this.create(@{})
+    }
 
-    <#
-        .SYNOPSIS
-            Create a new assistant
-        .DESCRIPTION
-            Create a new assistant with the given name, model, and instructions.
-        .PARAMETER body
-            The body must contain 'name', 'model', and 'instructions' keys. But it can also contain 'config', 'vector_store_ids', 'functions', and 'files' keys.
-    #>
-    [psobject]create([hashtable]$body) {
-        if ($body.name -and $body.model -and $body.instructions) {
-            $vector_store_ids = $body.vector_store_ids
-            $functions = $body.functions
-            $files = $body.files
-            $config = $body.config
-
-            if ($files) {
-                # upload the files and create new vector store
-                $file_ids = $this.Client.files.create(@{ "files" = $files }) | Select-Object -ExpandProperty id
-                $body.Add("tools", @(
-                        @{
-                            "type" = "file_search"
-                        }))
-                        
-                $body.Add("tool_resources", @{
-                        "file_search" = @{
-                            "vector_stores" = @(@{
-                                    file_ids = @($file_ids)
-                                })
-                        }
-                    })
-            }
-
-            if ($vector_store_ids -and $vector_store_ids.Count -gt 0) {
-                $body.Add("tool_resources", @{
-                        "file_search" = @{
-                            "vector_store_ids" = @($vector_store_ids)
-                        }
-                    })
-                
-                $body.Add("tools", @(
-                        @{
-                            "type" = "file_search"
-                        }))
-            }
-
-            if ($functions -and $functions.Count -gt 0) {
-        
-                if ($null -eq $body.tools) {
-                    $body.Add("tools", @())
-                }
-
-                $functions | ForEach-Object {
-                    $func = Get-FunctionJson -functionName $_
-                    $body.tools += $func
-                }
-            }
-
-            if ($config) {
-                Merge-Hashtable -table1 $body -table2 $config
-            }
-
-            # remove files, vector_store_ids, functions, and config from the body
-            $body.Remove("files")
-            $body.Remove("vector_store_ids")
-            $body.Remove("functions")
-            $body.Remove("config")
-            
-            return $this.Client.web("$($this.urifragment)", "POST", $body)
+    
+    [void]clear() {
+        # warn user this is very dangerous action, it will remove all the instance, and ask for confirmation
+        $confirm = Read-Host "Are you sure you want to remove all the instances? (yes/no)"
+        if ($confirm -ne "yes" -and $confirm -ne "y") {
+            return
         }
-        
-        throw "The body must contain 'name' and 'model', 'instructions' keys."
+        # get all the instances and remove it
+        $this.list() | ForEach-Object {
+            $this.delete($_.id)
+        }
     }
 }
-class Vector_store:AssistantResource {
-    Vector_store([OpenAIClient]$client): base($client, "vector_stores") {}
 
-    [psobject]create([hashtable]$body) {
-        <#
-            .SYNOPSIS
-                Create a new vector store   
-            .DESCRIPTION
-                Create a new vector store with the given name, file_ids, and days_to_expire.
-            .PARAMETER body
-                The body must contain 'name', 'file_ids', and 'days_to_expire' keys.
-        #>
-
-        # check if the body contains name, file_ids, and days_to_expire
-        if ($body.name -and $body.file_ids -and $body.days_to_expire) {
-            #replace the days_to_expire with expires_after
-            $body.expires_after = @{
-                "days"   = $body.days_to_expire
-                "anchor" = "last_active_at"
-            }
-            $body.Remove("days_to_expire")
-            return $this.Client.web("$($this.urifragment)", "POST", $body)
-        }
-        
-        throw "The body must contain 'name', 'file_ids', and 'days_to_expire' keys."
-    }
-}
 class File:AssistantResource {
-    File([OpenAIClient]$client): base($client, "files") {}
+    File([OpenAIClient]$client): base($client, "files", $null) {}
 
     [psobject]create([hashtable]$body) {
         if ($body.files) {
@@ -287,6 +218,135 @@ $purpose
 
   
 }
+
+class Assistant:AssistantResource {
+    Assistant([OpenAIClient]$client): base($client, "assistants", "AssistantObject") {}
+
+
+    <#
+        .SYNOPSIS
+            Create a new assistant
+        .DESCRIPTION
+            Create a new assistant with the given name, model, and instructions.
+        .PARAMETER body
+            The body must contain 'name', 'model', and 'instructions' keys. But it can also contain 'config', 'vector_store_ids', 'functions', and 'files' keys.
+    #>
+    [AssistantObject]create([hashtable]$body) {
+        if ($body.name -and $body.model -and $body.instructions) {
+            $vector_store_ids = $body.vector_store_ids
+            $functions = $body.functions
+            $files = $body.files
+            $config = $body.config
+
+            if ($files) {
+                # upload the files and create new vector store
+                $file_ids = $this.Client.files.create(@{ "files" = $files }) | Select-Object -ExpandProperty id
+                $body.Add("tools", @(
+                        @{
+                            "type" = "file_search"
+                        }))
+                        
+                $body.Add("tool_resources", @{
+                        "file_search" = @{
+                            "vector_stores" = @(
+                                @{
+                                    file_ids = @($file_ids)
+                                })
+                        }
+                    })
+            }
+
+            if ($vector_store_ids -and $vector_store_ids.Count -gt 0) {
+                $body.Add("tool_resources", @{
+                        "file_search" = @{
+                            "vector_store_ids" = @($vector_store_ids)
+                        }
+                    })
+                
+                $body.Add("tools", @(
+                        @{
+                            "type" = "file_search"
+                        }))
+            }
+
+            if ($functions -and $functions.Count -gt 0) {
+        
+                if ($null -eq $body.tools) {
+                    $body.Add("tools", @())
+                }
+
+                $functions | ForEach-Object {
+                    $func = Get-FunctionJson -functionName $_
+                    $body.tools += $func
+                }
+            }
+
+            if ($config) {
+                Merge-Hashtable -table1 $body -table2 $config
+            }
+
+            # remove files, vector_store_ids, functions, and config from the body
+            $body.Remove("files")
+            $body.Remove("vector_store_ids")
+            $body.Remove("functions")
+            $body.Remove("config")
+            
+            return [AssistantObject]::new($this.Client.web("$($this.urifragment)", "POST", $body))
+        }
+        
+        throw "The body must contain 'name' and 'model', 'instructions' keys."
+    }
+}
+
+
+class AssistantResourceObject {
+    AssistantResourceObject([psobject]$data) {
+        # check all the properties and assign it to the object
+        $data.PSObject.Properties | ForEach-Object {
+            $this | Add-Member -MemberType NoteProperty -Name $_.Name -Value $_.Value
+        }
+    }
+}
+
+class AssistantObject:AssistantResourceObject {
+    AssistantObject([psobject]$data):base($data) {}
+    [void]chat() {
+        Write-Host "chat with the assistant : $($this.id)"
+    }
+}
+
+
+class ThreadObject:AssistantResourceObject {
+    ThreadObject([psobject]$data):base($data) {}
+}
 class Thread:AssistantResource {
-    Thread([OpenAIClient]$client): base($client, "threads") {}
+    Thread([OpenAIClient]$client): base($client, "threads", "ThreadObject") {}
+}
+
+class Vector_store:AssistantResource {
+    Vector_store([OpenAIClient]$client): base($client, "vector_stores", $null) {}
+
+    [psobject]create([hashtable]$body) {
+        <#
+            .SYNOPSIS
+                Create a new vector store   
+            .DESCRIPTION
+                Create a new vector store with the given name, file_ids, and days_to_expire.
+            .PARAMETER body
+                The body must contain 'name', 'file_ids', and 'days_to_expire' keys.
+        #>
+
+        # check if the body contains name, file_ids, and days_to_expire
+        if ($body.name -and $body.file_ids -and $body.days_to_expire) {
+            #replace the days_to_expire with expires_after
+            $body.expires_after = @{
+                "days"   = $body.days_to_expire
+                "anchor" = "last_active_at"
+            }
+            $body.Remove("days_to_expire")
+            return $this.Client.web("$($this.urifragment)", "POST", $body)
+        }
+        
+        throw "The body must contain 'name', 'file_ids', and 'days_to_expire' keys."
+    }
 }
