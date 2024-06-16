@@ -10,7 +10,10 @@ class OpenAIClient {
     [System.Management.Automation.HiddenAttribute()]
     [string]$apiVersion
 
-    [Assistant]$assistant
+    [Assistant]$assistants
+    [Vector_store]$vector_stores
+    [File]$files
+    [Thread]$threads
 
     OpenAIClient([string]$apiKey, [string]$baseUri, [string]$model, [string]$apiVersion = "2024-05-01-preview") {
         $this.apikey = $apiKey
@@ -47,7 +50,10 @@ class OpenAIClient {
             $this.apiVersion = ""
         }
 
-        $this.assistant = [Assistant]::new($this)
+        $this.assistants = [Assistant]::new($this)
+        $this.vector_stores = [Vector_store]::new($this)
+        $this.files = [File]::new($this)
+        $this.threads = [Thread]::new($this)
     }
 
     [psobject]web(
@@ -77,51 +83,39 @@ class AssistantResource {
     [System.Management.Automation.HiddenAttribute()]
     [OpenAIClient]$Client
     [System.Management.Automation.HiddenAttribute()]
-    [string]$urlfragment
+    [string]$urifragment
 
-    AssistantResource([OpenAIClient]$client) {
+    AssistantResource([OpenAIClient]$client, [string]$urifragment) {
         $this.Client = $client
+        $this.urifragment = $urifragment
     }
-
-    AssistantResource() {
-        $this.Client = [OpenAIClient]::new()
-    }
-
     [psobject[]]list() {
-        return $this.Client.web($this.urlfragment).data
+        return $this.Client.web($this.urifragment).data
     }
     
     [psobject]get([string]$id) {
-        return $this.Client.web("$($this.urlfragment)/$id")
+        return $this.Client.web("$($this.urifragment)/$id")
     }
 
     [psobject]delete([string]$id) {
         # remove all the assistants
-        return $this.Client.web("$($this.urlfragment)/$id", "DELETE", @{})
+        return $this.Client.web("$($this.urifragment)/$id", "DELETE", @{})
     }
 
-    [psobject]create([string]$name, [string]$model, [string]$instructions) {
-        $body = @{
-            "name"         = $name
-            "model"        = $model
-            "instructions" = $instructions
-        }
-
-        return $this.Client.web("$($this.urlfragment)", "POST", $body)
+    [psobject]create([hashtable]$body) {
+        return $this.Client.web("$($this.urifragment)", "POST", $body)
     }
 }
 
-class Assistant : AssistantResource {
-    [System.Management.Automation.HiddenAttribute()]
-    [string]$urlfragment = "assistants"
-
-    [psobject]create([string]$name, [string]$model, [string]$instructions) {
-        $body = @{
-            "name"         = $name
-            "model"        = $model
-            "instructions" = $instructions
-        }
-
-        return $this.Client.web("$($this.urlfragment)", "POST", $body)
-    }
+class Assistant:AssistantResource {
+    Assistant([OpenAIClient]$client): base($client, "assistants") {}
+}
+class Vector_store:AssistantResource {
+    Vector_store([OpenAIClient]$client): base($client, "vector_stores") {}
+}
+class File:AssistantResource {
+    File([OpenAIClient]$client): base($client, "files") {}
+}
+class Thread:AssistantResource {
+    Thread([OpenAIClient]$client): base($client, "threads") {}
 }
