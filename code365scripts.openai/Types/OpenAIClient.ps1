@@ -85,7 +85,9 @@ class AssistantResource {
 
         if ($this.objTypeName) {
             return $this.Client.web($this.urifragment).data | ForEach-Object {
-                New-Object -TypeName $this.objTypeName -ArgumentList $_
+                $result = New-Object -TypeName $this.objTypeName -ArgumentList $_
+                $result | Add-Member -MemberType NoteProperty -Name client -Value $this.Client
+                $result
             }
         }
 
@@ -94,7 +96,9 @@ class AssistantResource {
     
     [psobject]get([string]$id) {
         if ($this.objTypeName) {
-            return New-Object -TypeName $this.objTypeName -ArgumentList $this.Client.web("$($this.urifragment)/$id")
+            $result = New-Object -TypeName $this.objTypeName -ArgumentList $this.Client.web("$($this.urifragment)/$id")
+            $result | Add-Member -MemberType NoteProperty -Name client -Value $this.Client
+            return $result
         }
 
         return $this.Client.web("$($this.urifragment)/$id")
@@ -106,7 +110,9 @@ class AssistantResource {
 
     [psobject]create([hashtable]$body) {
         if ($this.objTypeName) {
-            return New-Object -TypeName $this.objTypeName -ArgumentList $this.Client.web("$($this.urifragment)", "POST", $body)
+            $result = New-Object -TypeName $this.objTypeName -ArgumentList $this.Client.web("$($this.urifragment)", "POST", $body)
+            $result | Add-Member -MemberType NoteProperty -Name client -Value $this.Client
+            return $result
         }
         return $this.Client.web("$($this.urifragment)", "POST", $body)
     }
@@ -318,9 +324,37 @@ class AssistantObject:AssistantResourceObject {
 
 class ThreadObject:AssistantResourceObject {
     ThreadObject([psobject]$data):base($data) {}
+
+    [psobject]send([string]$message) {
+        # send a message
+        $obj = [AssistantResource]::new($this.client, ("threads/{0}/messages" -f $this.id), $null ).create(@{
+                role    = "user"
+                content = $message
+            })
+        $this | Add-Member -MemberType NoteProperty -Name last_user_message -Value $obj.id
+        return $this
+    }
+
+    [psobject]run([string]$assistantId) {
+        $obj = [AssistantResource]::new($this.client, ("threads/{0}/runs" -f $this.id), $null ).create(@{assistant_id = $assistantId })
+        $this | Add-Member -MemberType NoteProperty -Name last_run -Value $obj.id
+        return $this
+    }
+
+    [psobject]get_last_message() {
+        return $null
+    }
 }
 class Thread:AssistantResource {
     Thread([OpenAIClient]$client): base($client, "threads", "ThreadObject") {}
+
+    [psobject[]]list() {
+        return @{
+            error = "It is not implement yet, you can't get all the thread information."
+        }
+    }
+
+
 }
 
 class Vector_store:AssistantResource {
