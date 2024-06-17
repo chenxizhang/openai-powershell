@@ -22,8 +22,6 @@ function New-ChatGPTConversation {
         You can read the prompt from a library (https://github.com/code365opensource/promptlibrary), by use "lib:xxxxx" as the prompt, for example, "lib:fitness".
     .PARAMETER config
         The dynamic settings for the API call, it can meet all the requirement for each model. please pass a custom object to this parameter, like @{temperature=1;max_tokens=1024}.
-    .PARAMETER outFile
-        If you want to save the result to a file, you can use this parameter to set the file path. You can also use "out" as the alias.
     .PARAMETER context
         If you want to pass some dymamic value to the prompt, you can use the context parameter here. It can be anything, you just specify a custom powershell object here. You define the variables in the system prompt or user prompt by using {{you_variable_name}} syntext, and then pass the data to the context parameter, like @{you_variable_name="your value"}. if there are multiple variables, you can use @{variable1="value1";variable2="value2"}.
     .PARAMETER headers
@@ -76,24 +74,45 @@ function New-ChatGPTConversation {
     [CmdletBinding()]
     [Alias("chatgpt")][Alias("chat")]
     param(
+        [Parameter(ParameterSetName = "default")]
+        [Parameter(ParameterSetName = "assistant_existing")]
+        [Parameter(ParameterSetName = "assistant_new")]
         [Alias("token", "access_token", "accesstoken", "key", "apikey")]
         [string]$api_key,
+        [Parameter(ParameterSetName = "default")]
+        [Parameter(ParameterSetName = "assistant_new")]
         [Alias("engine", "deployment")]
         [string]$model,
+        [Parameter(ParameterSetName = "default")]
+        [Parameter(ParameterSetName = "assistant_existing")]
+        [Parameter(ParameterSetName = "assistant_new")]
         [string]$endpoint,
+        [Parameter(ParameterSetName = "default")]
+        [Parameter(ParameterSetName = "assistant_new")]
         [string]$system = "You are a chatbot, please answer the user's question according to the user's language.",
+        [Parameter(ParameterSetName = "default")]
         [Alias("settings")]
-        [PSCustomObject]$config, 
-        [Alias("out")]   
-        [string]$outFile,
+        [PSCustomObject]$config,
+        [Parameter(ParameterSetName = "default")]
         [switch]$json,
+        [Parameter(ParameterSetName = "default")]
+        [Parameter(ParameterSetName = "assistant_new")]
         [Alias("variables")]
         [PSCustomObject]$context,
+        [Parameter(ParameterSetName = "default")]
         [PSCustomObject]$headers,
+        [Parameter(ParameterSetName = "default")]
+        [Parameter(ParameterSetName = "assistant_new")]
         [string[]]$functions,
+        [Parameter(ParameterSetName = "env", Mandatory = $true)]
         [Alias("profile", "env")]
         [string]$environment,
-        [string]$env_config = "$env:USERPROFILE/.openai-powershell/profile.json"
+        [Parameter(ParameterSetName = "env")]
+        [string]$env_config = "$env:USERPROFILE/.openai-powershell/profile.json",
+        [Parameter(Mandatory = $true, ParameterSetName = "assistant_existing")]
+        [string]$assistant_id,
+        [Parameter(mandatory = $true, ParameterSetName = "assistant_new")]
+        [string[]]$files
     )
     BEGIN {
 
@@ -162,18 +181,18 @@ function New-ChatGPTConversation {
 
 
         $api_key = ($api_key, [System.Environment]::GetEnvironmentVariable("OPENAI_API_KEY") | Where-Object { $_.Length -gt 0 } | Select-Object -First 1)
-        $model = ($model, [System.Environment]::GetEnvironmentVariable("OPENAI_API_MODEL"), "gpt-3.5-turbo" | Where-Object { $_.Length -gt 0 } | Select-Object -First 1)
-        $endpoint = ($endpoint, [System.Environment]::GetEnvironmentVariable("OPENAI_API_ENDPOINT"), "https://api.openai.com/v1/chat/completions" | Where-Object { $_.Length -gt 0 } | Select-Object -First 1)
+        $model = ($model, [System.Environment]::GetEnvironmentVariable("OPENAI_API_MODEL"), "gpt-4o" | Where-Object { $_.Length -gt 0 } | Select-Object -First 1)
+        $endpoint = ($endpoint, [System.Environment]::GetEnvironmentVariable("OPENAI_API_ENDPOINT"), "https://api.openai.com/v1/" | Where-Object { $_.Length -gt 0 } | Select-Object -First 1)
 
         $endpoint = switch ($endpoint) {
-            { $_ -in ("ollama", "local") } { "http://localhost:11434/v1/chat/completions" }
-            "kimi" { "https://api.moonshot.cn/v1/chat/completions" }
-            "zhipu" { "https://open.bigmodel.cn/api/paas/v4/chat/completions" }
+            { $_ -in ("ollama", "local") } { "http://localhost:11434/v1/" }
+            "kimi" { "https://api.moonshot.cn/v1/" }
+            "zhipu" { "https://open.bigmodel.cn/api/paas/v4/" }
             default { $endpoint }
         }
 
         # if use local model, and api_key is not specify, then generate a random key
-        if ($endpoint -eq "http://localhost:11434/v1/chat/completions" -and !$api_key) {
+        if ($endpoint -eq "http://localhost:11434/v1/" -and !$api_key) {
             $api_key = "local"
         }
 
@@ -186,7 +205,7 @@ function New-ChatGPTConversation {
             $hasError = $true
         }
 
-        if (!$model) {
+        if (!$model -and ($PSCmdlet.ParameterSetName -ne "assistant_existing")) {
             Write-Error $resources.error_missing_engine
             $hasError = $true
         }
@@ -199,14 +218,17 @@ function New-ChatGPTConversation {
             return
         }
 
+        $baseUrl = $endpoint
+        $chatEndpoint = $baseUrl + "chat/completions"
+
         # if endpoint contains ".openai.azure.com", then people wants to use azure openai service, try to concat the endpoint with the model
-        if ($endpoint.EndsWith("openai.azure.com/")) {
+        if ($baseUrl.EndsWith("openai.azure.com/")) {
             $version = Get-AzureAPIVersion
-            $endpoint += "openai/deployments/$model/chat/completions?api-version=$version"
+            $chatEndpoint = "$($baseUrl)openai/deployments/$model/chat/completions?api-version=$version"
         }
 
         # add databricks support, it will use the basic authorization method, not the bearer token
-        $azure = $endpoint.Contains("openai.azure.com")
+        $azure = $chatEndpoint.Contains("openai.azure.com")
 
         $header = if ($azure) { 
             # if the apikey is a jwt, then use the bearer token in authorization header
@@ -219,8 +241,23 @@ function New-ChatGPTConversation {
         }
         else { 
             # dbrx instruct use the basic authorization method
-            
             @{"Authorization" = "$(if($endpoint.Contains("databricks-dbrx-instruct")){"Basic"}else{"Bearer"}) $api_key" } 
+        }
+
+        $type = switch ($endpoint) {
+            { $_ -match "openai.azure.com" } { "azure" }
+            { $_ -match "localhost" } { "local" }
+            { $_ -match "databricks-dbrx" } { "dbrx" }
+            { $_ -match "api.openai.com" } { "openai" }
+            { $_ -match "platform.moonshot.cn" } { "kimi" }
+            { $_ -match "open.bigmodel.cn" } { "zhipu" }
+            default { $endpoint }
+        }
+
+        # we just support assistant in openai or azure
+        if ($PSCmdlet.ParameterSetName -match "assistant" -and $type -notin @("openai", "azure")) {
+            Write-Error "We only support assistant in openai or azure openai service, please check your endpoint."
+            return
         }
 
         # if user provide the headers, merge the headers to the default headers
@@ -243,23 +280,14 @@ function New-ChatGPTConversation {
             }
         }
 
-        $telemetries = @{
-            type = switch ($endpoint) {
-                { $_ -match "openai.azure.com" } { "azure" }
-                { $_ -match "localhost" } { "local" }
-                { $_ -match "databricks-dbrx" } { "dbrx" }
-                { $_ -match "api.openai.com" } { "openai" }
-                { $_ -match "platform.moonshot.cn" } { "kimi" }
-                { $_ -match "open.bigmodel.cn" } { "zhipu" }
-                default { $endpoint }
-            }
-        }
-
-
-
         # if system is not empty and it is a file, then read the file as the system prompt
         $parsedsystem = Get-PromptContent -prompt $system -context $context
         $system = $parsedsystem.content
+
+        $telemetries = @{
+            type             = $type
+            parameterSetName = $PSCmdlet.ParameterSetName
+        }
 
         $telemetries.Add("systemPromptType", $parsedsystem.type)
         $telemetries.Add("systemPromptLib", $parsedsystem.lib)
@@ -270,6 +298,28 @@ function New-ChatGPTConversation {
     }
 
     PROCESS {
+
+
+        # if the parameter set is assistant_existing, then get the assistant from the existing assistant id
+        if ($PSCmdlet.ParameterSetName -eq "assistant_existing") {
+            $client = Get-OpenAIClient -api_key $api_key -model $model -endpoint $baseUrl
+            $client.assistants.get($assistant_id).chat()
+            return
+        }
+
+        # if the parameter set is assistant_new, then create a new assistant from the files provided
+        if ($PSCmdlet.ParameterSetName -eq "assistant_new") {
+            $client = Get-OpenAIClient -api_key $api_key -model $model -endpoint $baseUrl
+            $client.assistants.create(@{
+                    name         = "assistant"
+                    files        = $files
+                    model        = $model
+                    instructions = $system
+                    functions    = $functions
+                }).chat()
+            return
+        }
+
 
         Receive-Job -Name "check_openai_UpdateNotification" -ErrorAction SilentlyContinue
 
@@ -432,7 +482,7 @@ function New-ChatGPTConversation {
     
             $body = @{model = "$model"; messages = $messages; stream = $stream } 
             $params = @{
-                Uri     = $endpoint
+                Uri     = $chatEndpoint
                 Method  = "POST"
                 Headers = $header
             }

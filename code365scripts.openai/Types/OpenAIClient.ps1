@@ -52,7 +52,12 @@ class OpenAIClient {
         [psobject]$body = $null) {
         $url = "{0}{1}" -f $this.baseUri, $urifragment
         if ($this.apiVersion -ne "") {
-            $url = "{0}?api-version={1}" -f $url, $this.apiVersion
+            if ($url -match "\?") {
+                $url = "{0}&api-version={1}" -f $url, $this.apiVersion
+            }
+            else {
+                $url = "{0}?api-version={1}" -f $url, $this.apiVersion
+            }
         }
 
         if ($method -eq "GET" -or $null -eq $body) {
@@ -70,51 +75,51 @@ class OpenAIClient {
 
 class AssistantResource {
     [System.Management.Automation.HiddenAttribute()]
-    [OpenAIClient]$Client
+    [OpenAIClient]$client
     [System.Management.Automation.HiddenAttribute()]
     [string]$urifragment
     [System.Management.Automation.HiddenAttribute()]
     [string]$objTypeName
 
     AssistantResource([OpenAIClient]$client, [string]$urifragment, [string]$objTypeName) {
-        $this.Client = $client
+        $this.client = $client
         $this.urifragment = $urifragment
         $this.objTypeName = $objTypeName
     }
     [psobject[]]list() {
 
         if ($this.objTypeName) {
-            return $this.Client.web($this.urifragment).data | ForEach-Object {
+            return $this.client.web($this.urifragment).data | ForEach-Object {
                 $result = New-Object -TypeName $this.objTypeName -ArgumentList $_
-                $result | Add-Member -MemberType NoteProperty -Name client -Value $this.Client
+                $result | Add-Member -MemberType NoteProperty -Name client -Value $this.client
                 $result
             }
         }
 
-        return $this.Client.web($this.urifragment).data
+        return $this.client.web($this.urifragment).data
     }
     
     [psobject]get([string]$id) {
         if ($this.objTypeName) {
-            $result = New-Object -TypeName $this.objTypeName -ArgumentList $this.Client.web("$($this.urifragment)/$id")
-            $result | Add-Member -MemberType NoteProperty -Name client -Value $this.Client
+            $result = New-Object -TypeName $this.objTypeName -ArgumentList $this.client.web("$($this.urifragment)/$id")
+            $result | Add-Member -MemberType NoteProperty -Name client -Value $this.client
             return $result
         }
 
-        return $this.Client.web("$($this.urifragment)/$id")
+        return $this.client.web("$($this.urifragment)/$id")
     }
 
     [psobject]delete([string]$id) {
-        return $this.Client.web("$($this.urifragment)/$id", "DELETE", @{})
+        return $this.client.web("$($this.urifragment)/$id", "DELETE", @{})
     }
 
     [psobject]create([hashtable]$body) {
         if ($this.objTypeName) {
-            $result = New-Object -TypeName $this.objTypeName -ArgumentList $this.Client.web("$($this.urifragment)", "POST", $body)
-            $result | Add-Member -MemberType NoteProperty -Name client -Value $this.Client
+            $result = New-Object -TypeName $this.objTypeName -ArgumentList $this.client.web("$($this.urifragment)", "POST", $body)
+            $result | Add-Member -MemberType NoteProperty -Name client -Value $this.client
             return $result
         }
-        return $this.Client.web("$($this.urifragment)", "POST", $body)
+        return $this.client.web("$($this.urifragment)", "POST", $body)
     }
 
     [psobject]create() {
@@ -150,8 +155,8 @@ class File:AssistantResource {
 
     [System.Management.Automation.HiddenAttribute()]
     [psobject]upload([string[]]$fullname) {
-        $url = "{0}{1}" -f $this.Client.baseUri, $this.urifragment
-        if ($this.Client.baseUri -match "azure") {
+        $url = "{0}{1}" -f $this.client.baseUri, $this.urifragment
+        if ($this.client.baseUri -match "azure") {
             $url = "{0}?api-version=2024-05-01-preview" -f $url
         }
 
@@ -166,7 +171,7 @@ class File:AssistantResource {
             $request.Method = "POST"
 
             # add the item of headers to request.Headers
-            $this.Client.headers.GetEnumerator() | Where-Object {
+            $this.client.headers.GetEnumerator() | Where-Object {
                 $_.Key -ne "Content-Type"
             }  | ForEach-Object {
                 $request.Headers.Add($_.Key, $_.Value)
@@ -246,7 +251,7 @@ class Assistant:AssistantResource {
 
             if ($files) {
                 # upload the files and create new vector store
-                $file_ids = $this.Client.files.create(@{ "files" = $files }) | Select-Object -ExpandProperty id
+                $file_ids = $this.client.files.create(@{ "files" = $files }) | Select-Object -ExpandProperty id
                 $body.Add("tools", @(
                         @{
                             "type" = "file_search"
@@ -297,7 +302,9 @@ class Assistant:AssistantResource {
             $body.Remove("functions")
             $body.Remove("config")
             
-            return [AssistantObject]::new($this.Client.web("$($this.urifragment)", "POST", $body))
+            $result =  [AssistantObject]::new($this.client.web("$($this.urifragment)", "POST", $body)) 
+            $result | Add-Member -MemberType NoteProperty -Name client -Value $this.client
+            return $result
         }
         
         throw "The body must contain 'name' and 'model', 'instructions' keys."
@@ -315,9 +322,30 @@ class AssistantResourceObject {
 }
 
 class AssistantObject:AssistantResourceObject {
+    [ThreadObject]$thread
+        
     AssistantObject([psobject]$data):base($data) {}
+
     [void]chat() {
-        Write-Host "chat with the assistant : $($this.id)"
+        if (-not $this.thread) {
+            # create a thread, and associate the assistant id
+            $this.thread = $this.client.threads.create($this.id)
+        }
+
+        while($true){
+            # ask use to input, until the user type 'q' or 'bye'
+            $prompt = Read-Host ">"
+            if ($prompt -eq "q" -or $prompt -eq "bye") {
+                break
+            }
+
+            # send the message to the thread
+            $response = $this.thread.send($prompt).run().get_last_message()
+
+            if ($response) {
+                Write-Host $response -ForegroundColor Green
+            }
+        }
     }
 }
 
@@ -325,23 +353,80 @@ class AssistantObject:AssistantResourceObject {
 class ThreadObject:AssistantResourceObject {
     ThreadObject([psobject]$data):base($data) {}
 
-    [psobject]send([string]$message) {
+    [ThreadObject]send([string]$message) {
         # send a message
         $obj = [AssistantResource]::new($this.client, ("threads/{0}/messages" -f $this.id), $null ).create(@{
                 role    = "user"
                 content = $message
             })
-        $this | Add-Member -MemberType NoteProperty -Name last_user_message -Value $obj.id
         return $this
     }
 
-    [psobject]run([string]$assistantId) {
+    [ThreadObject]run([string]$assistantId) {
         $obj = [AssistantResource]::new($this.client, ("threads/{0}/runs" -f $this.id), $null ).create(@{assistant_id = $assistantId })
-        $this | Add-Member -MemberType NoteProperty -Name last_run -Value $obj.id
+        if($null -eq $this.last_run_id){
+            $this | Add-Member -MemberType NoteProperty -Name last_run_id -Value $obj.id
+        }
+        else{
+            $this.last_run_id = $obj.id
+        }
         return $this
     }
 
-    [psobject]get_last_message() {
+    [ThreadObject]run() {
+        return $this.run($this.assistant_id)
+    }
+
+    [string]get_last_message() {
+        # check if the last_run is set, if not, then return null
+        if ($this.last_run_id) {
+            $run = [AssistantResource]::new($this.client, ("threads/{0}/runs" -f $this.id), $null ).get($this.last_run_id)
+            while ($run.status -ne "completed") {
+                Write-Verbose ("Run status: {0}" -f $run.status)
+
+                if ($run.status -eq "failed") {
+                    Write-Host ("Run failed: {0}" -f $run.last_error.message) -ForegroundColor Red
+                    break
+                }
+
+                # The status of the run, which can be either queued, in_progress, requires_action, cancelling, cancelled, failed, completed, incomplete, or expired.
+
+                if ($run.status -eq "requires_action") {
+                    $tool_calls = $run.required_action.submit_tool_outputs.tool_calls
+                    $tool_output = @()
+
+                    if ($tool_calls -and $tool_calls.Count -gt 0) {
+
+                        foreach ($tool_call in $tool_calls) {
+                            $call_id = $tool_call.id
+                            $function = $tool_call.function
+                            $function_args = $function.arguments | ConvertFrom-Json
+                            $exp = "{0} {1}" -f $function.name, (($function_args.PSObject.Properties | ForEach-Object {
+                                        "-{0} '{1}'" -f $_.Name, $_.Value
+                                    }) -join " ")
+                            Write-Verbose "calling function with arguments: $exp"
+                            $call_response = Invoke-Expression $exp
+
+                            $tool_output += @{
+                                tool_call_id = $call_id
+                                output       = $call_response
+                            }
+                        }
+                    }
+                    [AssistantResource]::new($this.client, ("threads/{0}/runs/{1}/submit_tool_outputs" -f $this.id, $this.last_run_id), $null ).create(@{tool_outputs = $tool_output })
+
+                }
+        
+                Start-Sleep -Seconds 1
+                $run = [AssistantResource]::new($this.client, ("threads/{0}/runs" -f $this.id), $null ).get($this.last_run_id)
+            }
+
+
+            $message = [AssistantResource]::new($this.client, ("threads/{0}/messages?limit=1" -f $this.id), $null).list() | Select-Object id, role, content -First 1
+
+            return $message.content.text.value
+        }
+
         return $null
     }
 }
@@ -350,11 +435,15 @@ class Thread:AssistantResource {
 
     [psobject[]]list() {
         return @{
-            error = "It is not implement yet, you can't get all the thread information."
+            error = "It is not implemented yet, you can't get all the thread information."
         }
     }
 
-
+    [ThreadObject]create([string]$assistantId) {
+        $result = $this.create()
+        $result | Add-Member -MemberType NoteProperty -Name assistant_id -Value $assistantId
+        return $result
+    }
 }
 
 class Vector_store:AssistantResource {
@@ -378,7 +467,7 @@ class Vector_store:AssistantResource {
                 "anchor" = "last_active_at"
             }
             $body.Remove("days_to_expire")
-            return $this.Client.web("$($this.urifragment)", "POST", $body)
+            return $this.client.web("$($this.urifragment)", "POST", $body)
         }
         
         throw "The body must contain 'name', 'file_ids', and 'days_to_expire' keys."
