@@ -280,7 +280,7 @@ class Assistant:AssistantResource {
 
             if ($files) {
                 # upload the files and create new vector store
-                $file_ids = $this.client.files.create(@{ "files" = $files }) | Select-Object -ExpandProperty id
+                $file_ids = $this.client.files.create(@{ "files" = $files }) | Select-Object -ExpandProperty id 
                 $body.Add("tools", @(
                         @{
                             "type" = "file_search"
@@ -294,6 +294,7 @@ class Assistant:AssistantResource {
                                 })
                         }
                     })
+                
             }
 
             if ($vector_store_ids -and $vector_store_ids.Count -gt 0) {
@@ -355,26 +356,39 @@ class AssistantObject:AssistantResourceObject {
         
     AssistantObject([psobject]$data):base($data) {}
 
-    [void]chat() {
+    [void]chat($clean = $false) {
         if (-not $this.thread) {
             # create a thread, and associate the assistant id
             $this.thread = $this.client.threads.create($this.id)
         }
 
-        while ($true) {
-            # ask use to input, until the user type 'q' or 'bye'
-            $prompt = Read-Host ">"
-            if ($prompt -eq "q" -or $prompt -eq "bye") {
-                break
-            }
+        try {
+            while ($true) {
+                # ask use to input, until the user type 'q' or 'bye'
+                $prompt = Read-Host ">"
+                if ($prompt -eq "q" -or $prompt -eq "bye") {
+                    break
+                }
 
-            # send the message to the thread
-            $response = $this.thread.send($prompt).run().get_last_message()
+                # send the message to the thread
+                $response = $this.thread.send($prompt).run().get_last_message()
 
-            if ($response) {
-                Write-Host $response -ForegroundColor Green
+                if ($response) {
+                    Write-Host $response -ForegroundColor Green
+                }
             }
         }
+        finally {
+            $this.client.threads.delete($this.thread.id)
+            if ($clean) {
+                Write-Host "clean up the thread, assistant, and vector_store..." -ForegroundColor Yellow
+                # clean up the thread, assistant, and vector_store
+                $vc_id = $this.tool_resources.file_search.vector_store_ids[0]
+                $this.client.vector_stores.delete($vc_id)
+                $this.client.assistants.delete($this.id)
+            }
+        }
+
     }
 }
 
@@ -476,8 +490,16 @@ class Thread:AssistantResource {
     }
 }
 
+class Vector_storeObject:AssistantResourceObject {
+    Vector_storeObject([psobject]$data):base($data) {}
+
+    [string[]]file_ids() {
+        return $this.client.web("vector_stores/$($this.id)/files").data | Select-Object -ExpandProperty id
+    }
+}
+
 class Vector_store:AssistantResource {
-    Vector_store([OpenAIClient]$client): base($client, "vector_stores", $null) {}
+    Vector_store([OpenAIClient]$client): base($client, "vector_stores", "Vector_storeObject") {}
 
     [psobject]create([hashtable]$body) {
         <#

@@ -303,7 +303,7 @@ function New-ChatGPTConversation {
         # if the parameter set is assistant_existing, then get the assistant from the existing assistant id
         if ($PSCmdlet.ParameterSetName -eq "assistant_existing") {
             $client = Get-OpenAIClient -api_key $api_key -model $model -endpoint $baseUrl
-            $client.assistants.get($assistant_id).chat()
+            $client.assistants.get($assistant_id).chat($false)
             return
         }
 
@@ -316,7 +316,7 @@ function New-ChatGPTConversation {
                     model        = $model
                     instructions = $system
                     functions    = $functions
-                }).chat()
+                }).chat($true)
             return
         }
 
