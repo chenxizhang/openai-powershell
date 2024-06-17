@@ -155,6 +155,17 @@ class File:AssistantResource {
 
     [System.Management.Automation.HiddenAttribute()]
     [psobject]upload([string[]]$fullname) {
+
+        # process the input, if it is a wildcard or a folder, then get all the files based on this pattern
+        $fullname = $fullname | Get-ChildItem | Select-Object -ExpandProperty FullName
+
+        # confirm if user want to upload those files to openai
+        $confirm = Read-Host "Are you sure you want to upload the $($fullname.Count) files? (yes/no)"
+        if ($confirm -ne "yes" -and $confirm -ne "y") {
+            throw "The user canceled the operation."
+        }
+
+
         $url = "{0}{1}" -f $this.client.baseUri, $this.urifragment
         if ($this.client.baseUri -match "azure") {
             $url = "{0}?api-version=2024-05-01-preview" -f $url
@@ -302,7 +313,7 @@ class Assistant:AssistantResource {
             $body.Remove("functions")
             $body.Remove("config")
             
-            $result =  [AssistantObject]::new($this.client.web("$($this.urifragment)", "POST", $body)) 
+            $result = [AssistantObject]::new($this.client.web("$($this.urifragment)", "POST", $body)) 
             $result | Add-Member -MemberType NoteProperty -Name client -Value $this.client
             return $result
         }
@@ -332,7 +343,7 @@ class AssistantObject:AssistantResourceObject {
             $this.thread = $this.client.threads.create($this.id)
         }
 
-        while($true){
+        while ($true) {
             # ask use to input, until the user type 'q' or 'bye'
             $prompt = Read-Host ">"
             if ($prompt -eq "q" -or $prompt -eq "bye") {
@@ -364,10 +375,10 @@ class ThreadObject:AssistantResourceObject {
 
     [ThreadObject]run([string]$assistantId) {
         $obj = [AssistantResource]::new($this.client, ("threads/{0}/runs" -f $this.id), $null ).create(@{assistant_id = $assistantId })
-        if($null -eq $this.last_run_id){
+        if ($null -eq $this.last_run_id) {
             $this | Add-Member -MemberType NoteProperty -Name last_run_id -Value $obj.id
         }
-        else{
+        else {
             $this.last_run_id = $obj.id
         }
         return $this
