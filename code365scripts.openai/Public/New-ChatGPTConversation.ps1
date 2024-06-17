@@ -34,6 +34,10 @@ function New-ChatGPTConversation {
         If you have multiple environment to use, you can specify the environment name here, and then define the environment in the profile.json file. You can also use "profile" or "env" as the alias.
     .PARAMETER env_config
         The profile.json file path, the default value is "$env:USERPROFILE/.openai-powershell/profile.json".
+    .PARAMETER assistant_id
+        The assistant id to use for this request.
+    .PARAMETER files
+        The files to use for this request, it should be an array of file path, or a folder. We will create a new assistant for you, files will updated to openai if you want, and we will create a vector_store for those files to support embedding and semantic search. (Don't worry, the assistant and vector_store will be deleted after the chat conversation.)
     .EXAMPLE
         New-ChatGPTConversation
 
