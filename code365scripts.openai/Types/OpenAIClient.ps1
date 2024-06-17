@@ -27,8 +27,7 @@ class OpenAIClient {
     [void]init() {
         # check the apikey, endpoint and model, if empty, then return error
         $this.headers = @{
-            "Content-Type" = "application/json"
-            "OpenAI-Beta"  = "assistants=v2"
+            "OpenAI-Beta" = "assistants=v2"
         }
 
         if ($this.baseUri -match "azure") {
@@ -61,10 +60,44 @@ class OpenAIClient {
         }
 
         if ($method -eq "GET" -or $null -eq $body) {
-            return Invoke-RestMethod -Method $method -Uri $url -Headers $this.headers
+            $params = @{
+                Method  = $method
+                Uri     = $url
+                Headers = $this.headers
+            }
+            return $this.unicodeiwr($params)
         }
         else {
-            return Invoke-RestMethod -Method $method -Uri $url -Headers $this.headers -Body ($body | ConvertTo-Json -Depth 10)
+
+            $params = @{
+                Method  = $method
+                Uri     = $url
+                Headers = $this.headers
+                Body    = ($body | ConvertTo-Json -Depth 10)
+            }
+            return $this.unicodeiwr($params)
+        }
+    }
+
+    [System.Management.Automation.HiddenAttribute()]
+    [psobject]unicodeiwr([hashtable]$params) {
+        $oldProgressPreference = Get-Variable -Name ProgressPreference -ValueOnly
+        Set-Variable -Name ProgressPreference -Value "SilentlyContinue" -Scope Script -Force
+        $response = Invoke-WebRequest @params -ContentType "application/json;charset=utf-8"
+        Set-Variable -Name ProgressPreference -Value $oldProgressPreference -Scope Script -Force
+
+        $contentType = $response.Headers["Content-Type"]
+        $version = Get-Variable -Name PSVersionTable -ValueOnly
+        if ($version.PSVersion.Major -gt 5 -or $contentType -match 'charset=utf-8') {
+            return $response.Content | ConvertFrom-Json
+        }
+        else {
+            $response = $response.Content
+            $charset = if ($contentType -match "charset=([^;]+)") { $matches[1] } else { "ISO-8859-1" } 
+            $dstEncoding = [System.Text.Encoding]::GetEncoding($charset)
+            $srcEncoding = [System.Text.Encoding]::UTF8
+            $result = $srcEncoding.GetString([System.Text.Encoding]::Convert($srcEncoding, $dstEncoding, $srcEncoding.GetBytes($response)))
+            return $result | ConvertFrom-Json
         }
     }
 
@@ -168,7 +201,7 @@ class File:AssistantResource {
         )
 
         $fullname = $localfiles | Where-Object {
-            $_.hash -notin $result.hash
+            $_.hash -notin $existing_files.hash
         } | Select-Object -ExpandProperty fullname
 
 
@@ -356,7 +389,7 @@ class AssistantObject:AssistantResourceObject {
         
     AssistantObject([psobject]$data):base($data) {}
 
-    [void]chat($clean = $false) {
+    [void]chat([bool]$clean = $false) {
         if (-not $this.thread) {
             # create a thread, and associate the assistant id
             $this.thread = $this.client.threads.create($this.id)
@@ -461,7 +494,7 @@ class ThreadObject:AssistantResourceObject {
 
                 }
         
-                Start-Sleep -Seconds 1
+                Start-Sleep -Milliseconds 500
                 $run = [AssistantResource]::new($this.client, ("threads/{0}/runs" -f $this.id), $null ).get($this.last_run_id)
             }
 
