@@ -158,46 +158,60 @@ class File:AssistantResource {
 
         # process the input, if it is a wildcard or a folder, then get all the files based on this pattern
         $fullname = $fullname | Get-ChildItem | Select-Object -ExpandProperty FullName
+        # read all the files and check the filename, compute 
+        $existing_files = $this.list() | Select-Object id, @{l = "hash"; e = { $_.filename.split("-")[0] } }
+        $localfiles = $fullname | Select-Object @{l = "fullname"; e = { $_ } }, @{l = "hash"; e = { (Get-FileHash $_).Hash } }
+        $result = @(
+            $existing_files | Where-Object {
+                $_.hash -in $localfiles.hash
+            }
+        )
 
-        # confirm if user want to upload those files to openai
-        $confirm = Read-Host "Are you sure you want to upload the $($fullname.Count) files? (yes/no)"
-        if ($confirm -ne "yes" -and $confirm -ne "y") {
-            throw "The user canceled the operation."
-        }
+        $fullname = $localfiles | Where-Object {
+            $_.hash -notin $result.hash
+        } | Select-Object -ExpandProperty fullname
 
 
-        $url = "{0}{1}" -f $this.client.baseUri, $this.urifragment
-        if ($this.client.baseUri -match "azure") {
-            $url = "{0}?api-version=2024-05-01-preview" -f $url
-        }
-
-        $result = @()
-
-        foreach ($file in $fullname) {
-            Write-Host "process file: $file"
-            # Define the purpose (e.g., "assistants", "vision", "batch", or "fine-tune")
-            $purpose = "assistants"
-            # Create a new web request
-            $request = [System.Net.WebRequest]::Create($url)
-            $request.Method = "POST"
-
-            # add the item of headers to request.Headers
-            $this.client.headers.GetEnumerator() | Where-Object {
-                $_.Key -ne "Content-Type"
-            }  | ForEach-Object {
-                $request.Headers.Add($_.Key, $_.Value)
+        if ($fullname.Count -gt 0) {
+            # confirm if user want to upload those files to openai
+            $confirm = Read-Host "Are you sure you want to upload the $($fullname.Count) files? (yes/no)"
+            if ($confirm -ne "yes" -and $confirm -ne "y") {
+                throw "The user canceled the operation."
             }
 
-            # Create a boundary for the multipart/form-data content
-            $boundary = [System.Guid]::NewGuid().ToString()
 
-            # Set the content type and boundary
-            $request.ContentType = "multipart/form-data; boundary=$boundary"
+            $url = "{0}{1}" -f $this.client.baseUri, $this.urifragment
+            if ($this.client.baseUri -match "azure") {
+                $url = "{0}?api-version=2024-05-01-preview" -f $url
+            }
 
-            $name = "{0}-{1}" -f (Get-FileHash $file).Hash, (Split-Path $file -Leaf)
+        
 
-            # Create the request body
-            $body = @"
+            foreach ($file in $fullname) {
+                Write-Host "process file: $file"
+                # Define the purpose (e.g., "assistants", "vision", "batch", or "fine-tune")
+                $purpose = "assistants"
+                # Create a new web request
+                $request = [System.Net.WebRequest]::Create($url)
+                $request.Method = "POST"
+
+                # add the item of headers to request.Headers
+                $this.client.headers.GetEnumerator() | Where-Object {
+                    $_.Key -ne "Content-Type"
+                }  | ForEach-Object {
+                    $request.Headers.Add($_.Key, $_.Value)
+                }
+
+                # Create a boundary for the multipart/form-data content
+                $boundary = [System.Guid]::NewGuid().ToString()
+
+                # Set the content type and boundary
+                $request.ContentType = "multipart/form-data; boundary=$boundary"
+
+                $name = "{0}-{1}" -f (Get-FileHash $file).Hash, (Split-Path $file -Leaf)
+
+                # Create the request body
+                $body = @"
 --$boundary
 Content-Disposition: form-data; name="file"; filename="$name"
 Content-Type: application/octet-stream
@@ -212,29 +226,33 @@ $purpose
 "@
 
 
-            # Convert the body to bytes
-            $bodyBytes = [System.Text.Encoding]::UTF8.GetBytes($body)
+                # Convert the body to bytes
+                $bodyBytes = [System.Text.Encoding]::UTF8.GetBytes($body)
 
-            # Set the content length
-            $request.ContentLength = $bodyBytes.Length
+                # Set the content length
+                $request.ContentLength = $bodyBytes.Length
 
-            # Get the request stream and write the body
-            $requestStream = $request.GetRequestStream()
-            $requestStream.Write($bodyBytes, 0, $bodyBytes.Length)
-            $requestStream.Close()
+                # Get the request stream and write the body
+                $requestStream = $request.GetRequestStream()
+                $requestStream.Write($bodyBytes, 0, $bodyBytes.Length)
+                $requestStream.Close()
 
-            # Get the response
-            $response = $request.GetResponse()
+                # Get the response
+                $response = $request.GetResponse()
 
-            # Read the response content
-            $responseStream = $response.GetResponseStream()
-            $reader = [System.IO.StreamReader]::new($responseStream)
-            $responseContent = $reader.ReadToEnd()
-            $reader.Close()
+                # Read the response content
+                $responseStream = $response.GetResponseStream()
+                $reader = [System.IO.StreamReader]::new($responseStream)
+                $responseContent = $reader.ReadToEnd()
+                $reader.Close()
 
-            # Print the response content
-            $result += ($responseContent | ConvertFrom-Json)
+                # Print the response content
+                $result += ($responseContent | ConvertFrom-Json)
+            }
         }
+
+
+
         return $result
     }
 
@@ -366,10 +384,11 @@ class ThreadObject:AssistantResourceObject {
 
     [ThreadObject]send([string]$message) {
         # send a message
-        $obj = [AssistantResource]::new($this.client, ("threads/{0}/messages" -f $this.id), $null ).create(@{
+        [AssistantResource]::new($this.client, ("threads/{0}/messages" -f $this.id), $null ).create(@{
                 role    = "user"
                 content = $message
-            })
+            }) | Out-Null
+            
         return $this
     }
 
