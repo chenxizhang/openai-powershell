@@ -123,8 +123,10 @@ class AssistantResource {
 
         if ($this.objTypeName) {
             return $this.client.web($this.urifragment).data | ForEach-Object {
+                $temp = "{0}/{1}" -f $this.urifragment, $_.id
                 $result = New-Object -TypeName $this.objTypeName -ArgumentList $_
                 $result | Add-Member -MemberType NoteProperty -Name client -Value $this.client
+                $result | Add-Member -MemberType NoteProperty -Name urifragment -Value $temp
                 $result
             }
         }
@@ -134,8 +136,10 @@ class AssistantResource {
     
     [psobject]get([string]$id) {
         if ($this.objTypeName) {
-            $result = New-Object -TypeName $this.objTypeName -ArgumentList $this.client.web("$($this.urifragment)/$id")
+            $temp = "{0}/{1}" -f $this.urifragment, $id
+            $result = New-Object -TypeName $this.objTypeName -ArgumentList $this.client.web($temp)
             $result | Add-Member -MemberType NoteProperty -Name client -Value $this.client
+            $result | Add-Member -MemberType NoteProperty -Name urifragment -Value $temp
             return $result
         }
 
@@ -150,6 +154,7 @@ class AssistantResource {
         if ($this.objTypeName) {
             $result = New-Object -TypeName $this.objTypeName -ArgumentList $this.client.web("$($this.urifragment)", "POST", $body)
             $result | Add-Member -MemberType NoteProperty -Name client -Value $this.client
+            $result | Add-Member -MemberType NoteProperty -Name urifragment -Value "$($this.urifragment)/$($result.id)"
             return $result
         }
         return $this.client.web("$($this.urifragment)", "POST", $body)
@@ -169,12 +174,37 @@ class AssistantResource {
         # get all the instances and remove it
         $this.list() | ForEach-Object {
             $this.delete($_.id)
+            Write-Host "remove the instance: $($_.id)"
         }
     }
 }
 
+class AssistantResourceObject {
+    AssistantResourceObject([psobject]$data) {
+        # check all the properties and assign it to the object
+        $data.PSObject.Properties | ForEach-Object {
+            $this | Add-Member -MemberType NoteProperty -Name $_.Name -Value $_.Value
+        }
+    }
+
+    [AssistantResourceObject]update([hashtable]$data) {
+        $this.client.web($this.urifragment, "PATCH", $data)
+        return $this
+    }
+}
+
+
+class FileObject:AssistantResourceObject {
+    FileObject([psobject]$data):base($data) {}
+    [AssistantResourceObject]update([hashtable]$data) {
+        Write-Host "You can't update the file object."
+        return $this
+    }
+
+}
+
 class File:AssistantResource {
-    File([OpenAIClient]$client): base($client, "files", $null) {}
+    File([OpenAIClient]$client): base($client, "files", "FileObject") {}
 
     [psobject]create([hashtable]$body) {
         if ($body.files) {
@@ -187,7 +217,12 @@ class File:AssistantResource {
 
 
     [System.Management.Automation.HiddenAttribute()]
-    [psobject]upload([string[]]$fullname) {
+    [FileObject[]]upload([string[]]$fullname) {
+
+        $PSVersion = Get-Variable -Name PSVersionTable -ValueOnly
+        if ($PSVersion.PSVersion.Major -lt 6) {
+            throw "The upload file feature is only supported in PowerShell 6 or later."
+        }
 
         # process the input, if it is a wildcard or a folder, then get all the files based on this pattern
         $fullname = $fullname | Get-ChildItem | Select-Object -ExpandProperty FullName
@@ -197,13 +232,14 @@ class File:AssistantResource {
         $result = @(
             $existing_files | Where-Object {
                 $_.hash -in $localfiles.hash
+            } | ForEach-Object {
+                [FileObject]::new($_)
             }
         )
 
         $fullname = $localfiles | Where-Object {
             $_.hash -notin $existing_files.hash
         } | Select-Object -ExpandProperty fullname
-
 
         if ($fullname.Count -gt 0) {
             # confirm if user want to upload those files to openai
@@ -218,73 +254,28 @@ class File:AssistantResource {
                 $url = "{0}?api-version=2024-05-01-preview" -f $url
             }
 
-        
 
             foreach ($file in $fullname) {
                 Write-Host "process file: $file"
-                # Define the purpose (e.g., "assistants", "vision", "batch", or "fine-tune")
-                $purpose = "assistants"
-                # Create a new web request
-                $request = [System.Net.WebRequest]::Create($url)
-                $request.Method = "POST"
-
-                # add the item of headers to request.Headers
-                $this.client.headers.GetEnumerator() | Where-Object {
-                    $_.Key -ne "Content-Type"
-                }  | ForEach-Object {
-                    $request.Headers.Add($_.Key, $_.Value)
-                }
-
-                # Create a boundary for the multipart/form-data content
-                $boundary = [System.Guid]::NewGuid().ToString()
-
-                # Set the content type and boundary
-                $request.ContentType = "multipart/form-data; boundary=$boundary"
-
                 $name = "{0}-{1}" -f (Get-FileHash $file).Hash, (Split-Path $file -Leaf)
+                # rename the file to the new name
+                Rename-Item -Path $file -NewName $name
+                $temppath = Join-Path -Path (Split-Path $file) -ChildPath $name
+                try{
+                    $form = @{
+                        file    = Get-Item -Path $temppath
+                        purpose = "assistants"
+                    }
 
-                # Create the request body
-                $body = @"
---$boundary
-Content-Disposition: form-data; name="file"; filename="$name"
-Content-Type: application/octet-stream
-
-$(Get-Content -Path $file)
-
---$boundary
-Content-Disposition: form-data; name="purpose"
-
-$purpose
---$boundary--
-"@
-
-
-                # Convert the body to bytes
-                $bodyBytes = [System.Text.Encoding]::UTF8.GetBytes($body)
-
-                # Set the content length
-                $request.ContentLength = $bodyBytes.Length
-
-                # Get the request stream and write the body
-                $requestStream = $request.GetRequestStream()
-                $requestStream.Write($bodyBytes, 0, $bodyBytes.Length)
-                $requestStream.Close()
-
-                # Get the response
-                $response = $request.GetResponse()
-
-                # Read the response content
-                $responseStream = $response.GetResponseStream()
-                $reader = [System.IO.StreamReader]::new($responseStream)
-                $responseContent = $reader.ReadToEnd()
-                $reader.Close()
-
-                # Print the response content
-                $result += ($responseContent | ConvertFrom-Json)
+                    $response = Invoke-RestMethod -Uri $url -Method Post -Headers $this.client.headers -Form $form
+                    $result += [FileObject]::new($response)
+                }
+                finally{
+                    # rename the file back to the original name
+                    Rename-Item -Path $temppath -NewName (Split-Path $file -Leaf)
+                }
             }
         }
-
-
 
         return $result
     }
@@ -375,14 +366,6 @@ class Assistant:AssistantResource {
 }
 
 
-class AssistantResourceObject {
-    AssistantResourceObject([psobject]$data) {
-        # check all the properties and assign it to the object
-        $data.PSObject.Properties | ForEach-Object {
-            $this | Add-Member -MemberType NoteProperty -Name $_.Name -Value $_.Value
-        }
-    }
-}
 
 class AssistantObject:AssistantResourceObject {
     [ThreadObject]$thread
