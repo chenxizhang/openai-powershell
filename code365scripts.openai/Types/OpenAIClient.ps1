@@ -189,8 +189,8 @@ class AssistantResourceObject {
     }
 
     [AssistantResourceObject]update([hashtable]$data) {
-        $this.client.web($this.urifragment, "POST", $data)
-        return $this
+        $result = $this.client.web($this.urifragment, "POST", $data)
+        return New-Object -TypeName $this.GetType().Name -ArgumentList $result
     }
 }
 
@@ -359,6 +359,7 @@ class Assistant:AssistantResource {
             
             $result = [AssistantObject]::new($this.client.web("$($this.urifragment)", "POST", $body)) 
             $result | Add-Member -MemberType NoteProperty -Name client -Value $this.client
+            $result | Add-Member -MemberType NoteProperty -Name urifragment -Value "$($this.urifragment)/$($result.id)"
             return $result
         }
         
