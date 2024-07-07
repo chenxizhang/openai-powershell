@@ -150,6 +150,7 @@ class AssistantResource {
         return $this.client.web("$($this.urifragment)/$id", "DELETE", @{})
     }
 
+
     [psobject]create([hashtable]$body) {
         if ($this.objTypeName) {
             $result = New-Object -TypeName $this.objTypeName -ArgumentList $this.client.web("$($this.urifragment)", "POST", $body)
@@ -188,7 +189,7 @@ class AssistantResourceObject {
     }
 
     [AssistantResourceObject]update([hashtable]$data) {
-        $this.client.web($this.urifragment, "PATCH", $data)
+        $this.client.web($this.urifragment, "POST", $data)
         return $this
     }
 }

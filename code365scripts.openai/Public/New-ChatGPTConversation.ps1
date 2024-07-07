@@ -471,7 +471,7 @@ function New-ChatGPTConversation {
                 }
             }
 
-            Write-Host -ForegroundColor ("blue", "red", "Green", "yellow", "gray", "black", "white" | Get-Random) ("`r$($resources.thinking) {0}" -f ("." * (Get-Random -Maximum 10 -Minimum 3))) -NoNewline
+            Write-Host -ForegroundColor Green ("`r$($resources.thinking) {0}" -f ("." * (Get-Random -Maximum 10 -Minimum 3))) -NoNewline
     
             $messages += [PSCustomObject]@{
                 role    = "user"
