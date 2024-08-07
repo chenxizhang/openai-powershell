@@ -136,6 +136,16 @@ function New-ChatGPTConversation {
                 if ($parsed_env_config.endpoint -and (!$endpoint)) { $endpoint = $parsed_env_config.endpoint }
                 if ($parsed_env_config.config) { 
                     if ($config) {
+                        # if config is not hashtable, then convert it to hashtable
+                        if ($config -isnot [hashtable]) {
+                            $config = ConvertTo-Hashtable $config
+                        }
+
+                        # if parsed_env_config.config is not hashtable, then convert it to hashtable
+                        if ($parsed_env_config.config -isnot [hashtable]) {
+                            $parsed_env_config.config = ConvertTo-Hashtable $parsed_env_config.config
+                        }
+
                         Merge-Hashtable -table1 $config -table2 $parsed_env_config.config
                     }
                     else {
@@ -152,6 +162,15 @@ function New-ChatGPTConversation {
                     }
 
                     if ($headers) {
+                        # if headers is not hashtable, then convert it to hashtable
+                        if ($headers -isnot [hashtable]) {
+                            $headers = ConvertTo-Hashtable $headers
+                        }
+
+                        # if parsed_env_config.headers is not hashtable, then convert it to hashtable
+                        if ($parsed_env_config.headers -isnot [hashtable]) {
+                            $parsed_env_config.headers = ConvertTo-Hashtable $parsed_env_config.headers
+                        }
                         Merge-Hashtable -table1 $headers -table2 $parsed_env_config.headers
                     }
                     else {
@@ -266,6 +285,10 @@ function New-ChatGPTConversation {
 
         # if user provide the headers, merge the headers to the default headers
         if ($headers) {
+            # if the headers is not hashtable, then convert it to hashtable
+            if ($headers -isnot [hashtable]) {
+                $headers = ConvertTo-Hashtable $headers
+            }
             Merge-Hashtable -table1 $header -table2 $headers
         }
 
@@ -497,6 +520,10 @@ function New-ChatGPTConversation {
 
 
             if ($config) {
+                #if the config is not hashtable, then convert it to hashtable
+                if ($config -isnot [hashtable]) {
+                    $config = ConvertTo-Hashtable $config
+                }
                 Merge-Hashtable -table1 $body -table2 $config
             }
             $params.Body = ($body | ConvertTo-Json -Depth 10)

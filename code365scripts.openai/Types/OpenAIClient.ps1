@@ -348,6 +348,10 @@ class Assistant:AssistantResource {
             }
 
             if ($config) {
+                #if config is not hashtable, then convert it to hashtable
+                if ($config -isnot [hashtable]) {
+                    $config = ConvertTo-Hashtable $config
+                }
                 Merge-Hashtable -table1 $body -table2 $config
             }
 
