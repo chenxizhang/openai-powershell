@@ -59,6 +59,10 @@ function Get-PromptContent {
     }
 
     #merge system variables with context
+    # if context is not hashtable, then convert it to hashtable
+    if ($context -isnot [hashtable]) {
+        $context = ConvertTo-Hashtable $context
+    }
     Merge-Hashtable -table1 $systemVariables -table2 $context
     $context = $systemVariables
     # if user provide the context, inject the data into the prompt by replace the context key with the context value
