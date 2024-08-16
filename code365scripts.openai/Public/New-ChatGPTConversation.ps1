@@ -534,6 +534,9 @@ function New-ChatGPTConversation {
     
                 if ($stream) {
                     Write-Verbose ($resources.verbose_chat_stream_mode)
+
+                    # new stopwatch
+                    $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
                     $callapi = Invoke-StreamWebRequest -uri $params.Uri -body $params.Body -header $header
                     # if the status of callapi is not ok, then write the error message to host and continue
                     if ($callapi.status -ne "ok") {
@@ -541,6 +544,11 @@ function New-ChatGPTConversation {
                         Write-Host ""
                         continue
                     }
+
+                    # print the verbose message include the stopwatch time
+                    Write-Verbose ("FCFR - {0} ms " -f ($stopwatch.ElapsedMilliseconds))
+                    $stopwatch.Stop()
+                    
                     
                     # otherwise, get the read of the result
                     $reader = $callapi.reader
@@ -633,7 +641,6 @@ function New-ChatGPTConversation {
                         $chunk = ($line -replace "data: ", "" | ConvertFrom-Json).choices.delta.content
                         Write-Host $chunk -NoNewline -ForegroundColor Green
                         $result += $chunk
-                        Start-Sleep -Milliseconds 5
                     }
 
                     Write-Host ""    
@@ -641,6 +648,8 @@ function New-ChatGPTConversation {
                         role    = "assistant"
                         content = $result
                     }
+
+
 
                     Write-Verbose ($resources.verbose_chat_message_combined -f ($messages | ConvertTo-Json -Depth 10))
                         
