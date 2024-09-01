@@ -3,6 +3,7 @@
 
 | Date       | Version  | Description                                                                 |
 |------------|----------|-----------------------------------------------------------------------------|
+| 2024-09-01 | v4.0.0.4 | Bug fixes! [#271](https://github.com/chenxizhang/openai-powershell/issues/271) [#272](https://github.com/chenxizhang/openai-powershell/issues/272)  |
 | 2024-08-07 | v4.0.0.3 | Bug fixes! [#265](https://github.com/chenxizhang/openai-powershell/issues/265) |
 | 2024-06-28 | v4.0.0.1 | Bug fixes! [#262](https://github.com/chenxizhang/openai-powershell/issues/262)  [#261](https://github.com/chenxizhang/openai-powershell/issues/261) |
 | 2024-06-17 | v4.0.0.0 | Assistant support! [#170](https://github.com/chenxizhang/openai-powershell/issues/170) |
