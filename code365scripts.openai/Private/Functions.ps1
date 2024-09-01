@@ -17,6 +17,19 @@ function Get-FunctionJson {
 
     # generate a json object based on the help content of the function
     $help = Get-Help $functionName
+
+    # if the help doesn't include description, return null
+    if (-not $help.description) {
+        Write-Warning "Function $functionName does not have a description."
+        return $null
+    }
+
+    # if any parameters don't include description, return null
+    if ($help.parameters.parameter | Where-Object { -not $_.description }) {
+        Write-Warning "Function $functionName has parameters without description."
+        return $null
+    }
+
     $json = [pscustomobject]@{
         type     = "function"
         function = @{

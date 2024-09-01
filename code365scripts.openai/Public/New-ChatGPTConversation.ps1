@@ -296,9 +296,8 @@ function New-ChatGPTConversation {
         if ($functions) {
             $tools = @(Get-PredefinedFunctions -names $functions)
 
-            Write-Verbose  ($tools | ConvertTo-Json -Depth 10)
-
             if ($tools.Count -gt 0) {
+                Write-Verbose  ($tools | ConvertTo-Json -Depth 10)
                 if ($null -eq $config) {
                     $config = @{}
                 }
