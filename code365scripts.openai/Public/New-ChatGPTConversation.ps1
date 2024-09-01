@@ -620,7 +620,7 @@ function New-ChatGPTConversation {
                                 $function_args = $tool.function.arguments | ConvertFrom-Json
                                 $tool_response = Invoke-Expression ("{0} {1}" -f $tool.function.name, (
                                         $function_args.PSObject.Properties | ForEach-Object {
-                                            "-{0} {1}" -f $_.Name, $_.Value
+                                            "-{0} '{1}'" -f $_.Name, $_.Value
                                         }
                                     ) -join " ")
 
@@ -672,7 +672,7 @@ function New-ChatGPTConversation {
                             $function_args = $tool.function.arguments | ConvertFrom-Json
                             $tool_response = Invoke-Expression ("{0} {1}" -f $tool.function.name, (
                                     $function_args.PSObject.Properties | ForEach-Object {
-                                        "-{0} {1}" -f $_.Name, $_.Value
+                                        "-{0} '{1}'" -f $_.Name, $_.Value
                                     }
                                 ) -join " ")
 
