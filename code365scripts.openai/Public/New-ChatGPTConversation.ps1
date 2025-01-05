@@ -242,12 +242,16 @@ function New-ChatGPTConversation {
         }
 
         $baseUrl = $endpoint
-        $chatEndpoint = $baseUrl + "chat/completions"
-
+        if(-not $baseUrl.EndsWith("/")) {
+            $baseUrl = $baseUrl + "/"
+        }
         # if endpoint contains ".openai.azure.com", then people wants to use azure openai service, try to concat the endpoint with the model
         if ($baseUrl.EndsWith("openai.azure.com/")) {
             $version = Get-AzureAPIVersion
             $chatEndpoint = "$($baseUrl)openai/deployments/$model/chat/completions?api-version=$version"
+        }
+        else{
+            $chatEndpoint = $baseUrl + "chat/completions"
         }
 
         # add databricks support, it will use the basic authorization method, not the bearer token
