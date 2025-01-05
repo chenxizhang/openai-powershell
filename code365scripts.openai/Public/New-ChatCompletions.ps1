@@ -132,7 +132,7 @@ function New-ChatCompletions {
                     Confirm-DependencyModule -ModuleName "MSAL.ps"
 
                     $aad = $parsed_env_config.auth.aad
-                    if($aad.clientsecret){
+                    if ($aad.clientsecret) {
                         $aad.clientsecret = ConvertTo-SecureString $aad.clientsecret -AsPlainText -Force
                     }
                     $accesstoken = (Get-MsalToken @aad).AccessToken
@@ -153,17 +153,17 @@ function New-ChatCompletions {
 
         $api_key = ($api_key, [System.Environment]::GetEnvironmentVariable("OPENAI_API_KEY") | Where-Object { $_.Length -gt 0 } | Select-Object -First 1)
         $model = ($model, [System.Environment]::GetEnvironmentVariable("OPENAI_API_MODEL"), "gpt-3.5-turbo" | Where-Object { $_.Length -gt 0 } | Select-Object -First 1)
-        $endpoint = ($endpoint, [System.Environment]::GetEnvironmentVariable("OPENAI_API_ENDPOINT"), "https://api.openai.com/v1/chat/completions" | Where-Object { $_.Length -gt 0 } | Select-Object -First 1)
+        $endpoint = ($endpoint, [System.Environment]::GetEnvironmentVariable("OPENAI_API_ENDPOINT"), "https://api.openai.com/v1/" | Where-Object { $_.Length -gt 0 } | Select-Object -First 1)
 
         $endpoint = switch ($endpoint) {
-            { $_ -in ("ollama", "local") } { "http://localhost:11434/v1/chat/completions" }
-            "kimi" { "https://api.moonshot.cn/v1/chat/completions" }
-            "zhipu" { "https://open.bigmodel.cn/api/paas/v4/chat/completions" }
+            { $_ -in ("ollama", "local") } { "http://localhost:11434/v1/" }
+            "kimi" { "https://api.moonshot.cn/v1/" }
+            "zhipu" { "https://open.bigmodel.cn/api/paas/v4/" }
             default { $endpoint }
         }
 
         # if use local model, and api_key is not specify, then generate a random key
-        if ($endpoint -eq "http://localhost:11434/v1/chat/completions" -and !$api_key) {
+        if ($endpoint -eq "http://localhost:11434/v1/" -and !$api_key) {
             $api_key = "local"
         }
 
@@ -191,9 +191,17 @@ function New-ChatCompletions {
         }
 
         # if endpoint contains ".openai.azure.com", then people wants to use azure openai service, try to concat the endpoint with the model
+
+        if(-not $endpoint.EndsWith("/")) {
+            $endpoint += "/"
+        }
+        
         if ($endpoint.EndsWith("openai.azure.com/")) {
             $version = Get-AzureAPIVersion
             $endpoint += "openai/deployments/$model/chat/completions?api-version=$version"
+        }
+        else {            
+            $endpoint += "chat/completions"
         }
 
         # add databricks support, it will use the basic authorization method, not the bearer token
@@ -348,11 +356,11 @@ function New-ChatCompletions {
             Write-Verbose ($resources.verbose_outfile_specified -f $outFile)
             $result | Out-File -FilePath $outFile -Encoding utf8
 
-            if($passthru){
+            if ($passthru) {
                 Write-Output $result
             }
         }
-        else{
+        else {
             # support passthru, even though user specify the outfile, we still return the result to the pipeline
             Write-Output $result
         }
