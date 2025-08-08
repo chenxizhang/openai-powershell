@@ -46,8 +46,9 @@ jobs:
           $manifest = Get-ChildItem -Path $moduleFolder -Filter *.psd1 | Select-Object -First 1
           if (-not $manifest) { throw "No module manifest (*.psd1) found under $moduleFolder" }
 
-          $mm = Test-ModuleManifest -Path $manifest.FullName
-          $localVersion = [version]$mm.Version
+          # Parse manifest without validating RequiredModules to avoid CI dependency failures
+          $data = Import-PowerShellDataFile -Path $manifest.FullName
+          $localVersion = [version]$data.ModuleVersion
           # Use manifest base name as module name (matches folder and PSGallery name)
           $moduleName = $manifest.BaseName
 
