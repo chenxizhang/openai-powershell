@@ -246,16 +246,20 @@ function New-ChatGPTConversation {
             $baseUrl = $baseUrl + "/"
         }
         # if endpoint contains ".openai.azure.com", then people wants to use azure openai service, try to concat the endpoint with the model
-        if ($baseUrl.EndsWith("openai.azure.com/")) {
+        $azure = $endpoint.Contains("azure.com")
+        if ($azure) {
             $version = Get-AzureAPIVersion
-            $chatEndpoint = "$($baseUrl)openai/deployments/$model/chat/completions?api-version=$version"
+
+            if (-not $endpoint.EndsWith("/")) {
+                $endpoint += "/"
+            }
+            $endpoint += "openai/deployments/$model/chat/completions?api-version=$version"
         }
-        else{
-            $chatEndpoint = $baseUrl + "chat/completions"
+        else {            
+            $endpoint += "chat/completions"
         }
 
-        # add databricks support, it will use the basic authorization method, not the bearer token
-        $azure = $chatEndpoint.Contains("openai.azure.com")
+        Write-Verbose ($resources.verbose_chat_endpoint -f $endpoint)
 
         $header = if ($azure) { 
             # if the apikey is a jwt, then use the bearer token in authorization header
@@ -272,7 +276,7 @@ function New-ChatGPTConversation {
         }
 
         $type = switch ($endpoint) {
-            { $_ -match "openai.azure.com" } { "azure" }
+            { $_ -match "azure.com" } { "azure" }
             { $_ -match "localhost" } { "local" }
             { $_ -match "databricks-dbrx" } { "dbrx" }
             { $_ -match "api.openai.com" } { "openai" }
@@ -512,7 +516,7 @@ function New-ChatGPTConversation {
     
             $body = @{model = "$model"; messages = $messages; stream = $stream } 
             $params = @{
-                Uri     = $chatEndpoint
+                Uri     = $endpoint
                 Method  = "POST"
                 Headers = $header
             }
@@ -706,7 +710,7 @@ function New-ChatGPTConversation {
                 }
             }
             catch {
-                Write-Error ($_.Exception.Message)
+                Write-Error $.ErrorDetails
             }
         }
     }
