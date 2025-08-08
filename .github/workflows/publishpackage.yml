@@ -26,14 +26,6 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
-      - uses: dlemstra/code-sign-action@v1
-        with:
-          certificate: '${{ secrets.CERTIFICATE }}'
-          password: '${{ secrets.CERTIFICATE_PASSWORD }}'
-          folder: 'code365scripts.openai'
-          recursive: true
-          files: |
-            *.ps1
       - name: Publish Module to PowerShell Gallery
         uses: pcgeek86/publish-powershell-module-action@v20
         id: publish-module
