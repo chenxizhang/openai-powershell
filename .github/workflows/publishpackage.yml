@@ -28,8 +28,9 @@ jobs:
           } else {
             Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
           }
-          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -ErrorAction Stop
-          Install-Module PowerShellGet -Scope CurrentUser -Force -AllowClobber -ErrorAction Stop
+          # Ensure NuGet package provider is available without interactive prompts
+          $null = Get-PackageProvider -Name NuGet -ForceBootstrap -ErrorAction Stop
+          Import-Module PowerShellGet -ErrorAction Stop
 
       - name: Publish module (skip if version exists)
         env:
