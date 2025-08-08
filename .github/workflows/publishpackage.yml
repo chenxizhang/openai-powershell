@@ -1,38 +1,62 @@
 # This is a basic workflow to help you get started with Actions
 
-name: publish to powershell gallery
+name: Publish to PowerShell Gallery
 
 # Controls when the action will run.
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
-  # release:
-  #   types: [created,published]
   push:
-    branches: [master]
+    branches: [ master ]
     paths:
-      - "**.psd1"
-
-  # Allows you to run this workflow manually from the Actions tab
+      - "**.psd1" # run when manifest changes (usually when version bumps)
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  publishmodule:
-    # The type of runner that the job will run on
+  publish:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
-      # run powershell script to install the powershellextension module, ensure it can install from powershell gallery
-      - name: Install PowerShell Extension
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PowerShellGet
+        shell: pwsh
         run: |
-          pwsh -Command "Install-Module -Name PowerShellGet -Force -AllowClobber"
-          pwsh -Command "Install-Module -Name PowerShellExtension -Force -AllowClobber"
-      - name: Publish Module to PowerShell Gallery
-        uses: pcgeek86/publish-powershell-module-action@v20
-        id: publish-module
-        with:
-          NuGetApiKey: ${{ secrets.NUGETKEY }}
+          $ErrorActionPreference = 'Stop'
+          # Avoid prompts and ensure we can install to the current user on hosted runners
+          if (-not (Get-PSRepository -Name 'PSGallery' -ErrorAction SilentlyContinue)) {
+            Register-PSRepository -Name 'PSGallery' -SourceLocation 'https://www.powershellgallery.com/api/v2' -InstallationPolicy Trusted
+          } else {
+            Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
+          }
+          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -ErrorAction Stop
+          Install-Module PowerShellGet -Scope CurrentUser -Force -AllowClobber -ErrorAction Stop
+
+      - name: Publish module (skip if version exists)
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGETKEY }}
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $moduleFolder = Join-Path $PWD 'code365scripts.openai'
+          if (-not (Test-Path $moduleFolder)) {
+            throw "Module folder not found: $moduleFolder"
+          }
+
+          $manifest = Get-ChildItem -Path $moduleFolder -Filter *.psd1 | Select-Object -First 1
+          if (-not $manifest) { throw "No module manifest (*.psd1) found under $moduleFolder" }
+
+          $mm = Test-ModuleManifest -Path $manifest.FullName
+          $localVersion = [version]$mm.Version
+          # Use manifest base name as module name (matches folder and PSGallery name)
+          $moduleName = $manifest.BaseName
+
+          Write-Host "Local module: $moduleName v$localVersion"
+          $published = Find-Module -Name $moduleName -Repository PSGallery -ErrorAction SilentlyContinue
+          if ($published -and ([version]$published.Version -ge $localVersion)) {
+            Write-Host "A version ($($published.Version)) already exists on PSGallery for $moduleName. Skipping publish."
+            exit 0
+          }
+
+          if (-not $env:NUGET_API_KEY) { throw 'NuGet API key is not set. Configure secrets.NUGETKEY in the repository settings.' }
+
+          Publish-Module -Path $moduleFolder -Repository 'PSGallery' -NuGetApiKey $env:NUGET_API_KEY -Verbose
