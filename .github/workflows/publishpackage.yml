@@ -34,9 +34,8 @@ jobs:
           recursive: true
           files: |
             *.ps1
-      - name: Publish PowerShell Module
-        uses: natescherer/publish-powershell-action@v1.1.1
+      - name: Publish Module to PowerShell Gallery
+        uses: pcgeek86/publish-powershell-module-action@v20
+        id: publish-module
         with:
-          token: ${{ secrets.NUGETKEY }}
-          target: gallery
-          path: code365scripts.openai/code365scripts.openai.psd1
+          NuGetApiKey: ${{ secrets.NUGETKEY }}
