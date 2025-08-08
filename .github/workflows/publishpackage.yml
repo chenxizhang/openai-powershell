@@ -26,9 +26,11 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
-      # run powershell script to install the powershellextension module
+      # run powershell script to install the powershellextension module, ensure it can install from powershell gallery
       - name: Install PowerShell Extension
-        run: pwsh -Command "Install-Module -Name PowerShellExtension -Force -AllowClobber"
+        run: |
+          pwsh -Command "Install-Module -Name PowerShellGet -Force -AllowClobber"
+          pwsh -Command "Install-Module -Name PowerShellExtension -Force -AllowClobber"
       - name: Publish Module to PowerShell Gallery
         uses: pcgeek86/publish-powershell-module-action@v20
         id: publish-module
