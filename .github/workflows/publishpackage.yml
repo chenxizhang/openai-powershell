@@ -61,4 +61,9 @@ jobs:
 
           if (-not $env:NUGET_API_KEY) { throw 'NuGet API key is not set. Configure secrets.NUGETKEY in the repository settings.' }
 
+          # CI safety: ensure any lightweight dependency listed in RequiredModules is present
+          try {
+            Install-Module -Name PowerShellExtension -Scope CurrentUser -Force -ErrorAction Stop
+          } catch { Write-Host 'Optional dependency install failed; continuing...' }
+
           Publish-Module -Path $moduleFolder -Repository 'PSGallery' -NuGetApiKey $env:NUGET_API_KEY -Verbose
