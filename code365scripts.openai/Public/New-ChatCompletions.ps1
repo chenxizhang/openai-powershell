@@ -195,9 +195,14 @@ function New-ChatCompletions {
         if(-not $endpoint.EndsWith("/")) {
             $endpoint += "/"
         }
-        
-        if ($endpoint.EndsWith("openai.azure.com/")) {
+
+        $azure = $endpoint.Contains("azure.com")
+        if ($azure) {
             $version = Get-AzureAPIVersion
+
+            if (-not $endpoint.EndsWith("/")) {
+                $endpoint += "/"
+            }
             $endpoint += "openai/deployments/$model/chat/completions?api-version=$version"
         }
         else {            
@@ -205,7 +210,7 @@ function New-ChatCompletions {
         }
 
         # add databricks support, it will use the basic authorization method, not the bearer token
-        $azure = $endpoint.Contains("openai.azure.com")
+
 
         $header = if ($azure) { 
             # if the apikey is a jwt, then use the bearer token in authorization header
