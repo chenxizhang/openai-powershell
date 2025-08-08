@@ -35,7 +35,7 @@ jobs:
           files: |
             *.ps1
       - name: Publish PowerShell Module
-        uses: natescherer/publish-powershell-action@v1
+        uses: natescherer/publish-powershell-action@v1.1.1
         with:
           token: ${{ secrets.NUGETKEY }}
           target: gallery
