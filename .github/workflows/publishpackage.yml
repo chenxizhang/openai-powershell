@@ -9,18 +9,18 @@ on:
 
 jobs:
   publishmodule:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: dlemstra/code-sign-action@v1
-        with:
-          certificate: ${{ secrets.CERTIFICATE }}
-          password: ${{ secrets.CERTIFICATE_PASSWORD }}
-          folder: .
-          recursive: true
-          files: |
-            *.ps1
-            *.psm1
+      # - uses: dlemstra/code-sign-action@v1
+      #   with:
+      #     certificate: ${{ secrets.CERTIFICATE }}
+      #     password: ${{ secrets.CERTIFICATE_PASSWORD }}
+      #     folder: .
+      #     recursive: true
+      #     files: |
+      #       *.ps1
+      #       *.psm1
       - name: Publish Module to PowerShell Gallery
         uses: pcgeek86/publish-powershell-module-action@v20
         id: publish-module
