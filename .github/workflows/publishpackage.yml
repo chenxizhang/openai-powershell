@@ -21,16 +21,8 @@ jobs:
           files: |
             *.ps1
             *.psm1
-      - name: publish to powershell gallery
-        shell: pwsh
-        env:
-          nugetkey: ${{secrets.NUGETKEY}}
-        run: |
-          $data = Import-PowerShellDataFile .\code365scripts.openai\code365scripts.openai.psd1
-          if($data.RequiredModules) {
-            $data.RequiredModules | Foreach-Object {Install-Module -Name $_.ModuleName -RequiredVersion $_.ModuleVersion }
-          }
-          Remove-Item -Path ".git" -Recurse -Force
-          Remove-Item -Path ".github" -Recurse -Force
-          Remove-Item -Path ".vscode" -Recurse -Force
-          Publish-Module -Path code365scripts.openai -NuGetApiKey $env:nugetkey
+      - name: Publish Module to PowerShell Gallery
+        uses: pcgeek86/publish-powershell-module-action@v20
+        id: publish-module
+        with:
+          NuGetApiKey: ${{ secrets.NUGETKEY }}
