@@ -23,6 +23,8 @@ jobs:
             *.psm1
       - name: Validate and publish module
         shell: pwsh
+        env: 
+          nugetkey: ${{secrets.NUGETKEY}}
         run: |
           # Module path and name
           $ModulePath = ".\code365scripts.openai"
@@ -112,7 +114,7 @@ jobs:
           # 6. Publish module
           Write-Host "🚀 Publishing module to PowerShell Gallery..." -ForegroundColor Yellow
           try {
-              Publish-Module -Path $ModulePath -NuGetApiKey "${{ secrets.NUGETKEY }}" -Verbose -Force
+              Publish-Module -Path $ModulePath -NuGetApiKey $nugetkey -Verbose -Force
               Write-Host "🎉 Module published successfully!" -ForegroundColor Green
               Write-Host "📦 Module link: https://www.powershellgallery.com/packages/$ModuleName" -ForegroundColor Cyan
           }
@@ -120,7 +122,7 @@ jobs:
               Write-Error "❌ Module publishing failed: $_"
               Write-Host "📋 Attempting to publish with SkipAutomaticTags..." -ForegroundColor Yellow
               try {
-                  Publish-Module -Path $ModulePath -NuGetApiKey "${{ secrets.NUGETKEY }}" -Verbose -Force -SkipAutomaticTags
+                  Publish-Module -Path $ModulePath -NuGetApiKey $nugetkey -Verbose -Force -SkipAutomaticTags
                   Write-Host "🎉 Module published successfully (with SkipAutomaticTags)!" -ForegroundColor Green
                   Write-Host "📦 Module link: https://www.powershellgallery.com/packages/$ModuleName" -ForegroundColor Cyan
               }
