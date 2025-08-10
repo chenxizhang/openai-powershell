@@ -26,7 +26,7 @@ jobs:
         env:
           nugetkey: ${{secrets.NUGETKEY}}
         run: |
-          Register-PSResourceRepository -PSGallery -Trusted
+          Install-Module PSResourceGet -Force -Scope CurrentUser
           $data = Import-PowerShellDataFile .\code365scripts.openai\code365scripts.openai.psd1
           if($data.RequiredModules) {
             $data.RequiredModules | Foreach-Object {Install-Module -Name $_.ModuleName -RequiredVersion $_.ModuleVersion }
