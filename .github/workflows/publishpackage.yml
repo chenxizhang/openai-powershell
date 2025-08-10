@@ -26,7 +26,7 @@ jobs:
         env:
           nugetkey: ${{secrets.NUGETKEY}}
         run: |
-          Register-PSResourceRepository -Name PSGallery -Uri "https://www.powershellgallery.com/api/v2" -Trusted
+          Register-PSResourceRepository -PSGallery -Trusted
           $data = Import-PowerShellDataFile .\code365scripts.openai\code365scripts.openai.psd1
           if($data.RequiredModules) {
             $data.RequiredModules | Foreach-Object {Install-Module -Name $_.ModuleName -RequiredVersion $_.ModuleVersion }
@@ -35,4 +35,3 @@ jobs:
           Remove-Item -Path ".github" -Recurse -Force
           Remove-Item -Path ".vscode" -Recurse -Force
           Publish-PSResource -ApiKey $env:nugetkey -Path code365scripts.openai -Repository PSGallery
-          
