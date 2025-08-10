@@ -1,69 +1,37 @@
-# This is a basic workflow to help you get started with Actions
-
-name: Publish to PowerShell Gallery
-
-# Controls when the action will run.
+name: publish to powershell gallery
 on:
   push:
-    branches: [ master ]
+    branches: [master]
     paths:
-      - "**.psd1" # run when manifest changes (usually when version bumps)
+      - "**.psd1"
+
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  publish:
-    runs-on: ubuntu-latest
+  publishmodule:
+    runs-on: windows-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up PowerShellGet
+      - uses: actions/checkout@v4
+      - uses: dlemstra/code-sign-action@v1
+        with:
+          certificate: ${{ secrets.CERTIFICATE }}
+          password: ${{ secrets.CERTIFICATE_PASSWORD }}
+          folder: .
+          recursive: true
+          files: |
+            *.ps1
+            *.psm1
+      - name: publish to powershell gallery
         shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          # Avoid prompts and ensure we can install to the current user on hosted runners
-          if (-not (Get-PSRepository -Name 'PSGallery' -ErrorAction SilentlyContinue)) {
-            Register-PSRepository -Name 'PSGallery' -SourceLocation 'https://www.powershellgallery.com/api/v2' -InstallationPolicy Trusted
-          } else {
-            Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
-          }
-          # Ensure NuGet package provider is available without interactive prompts
-          $null = Get-PackageProvider -Name NuGet -ForceBootstrap -ErrorAction Stop
-          Import-Module PowerShellGet -ErrorAction Stop
-
-      - name: Publish module (skip if version exists)
         env:
-          NUGET_API_KEY: ${{ secrets.NUGETKEY }}
-        shell: pwsh
+          nugetkey: ${{secrets.NUGETKEY}}
         run: |
-          $ErrorActionPreference = 'Stop'
-          $moduleFolder = Join-Path $PWD 'code365scripts.openai'
-          if (-not (Test-Path $moduleFolder)) {
-            throw "Module folder not found: $moduleFolder"
+          Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+          $data = Import-PowerShellDataFile .\code365scripts.openai\code365scripts.openai.psd1
+          if($data.RequiredModules) {
+            $data.RequiredModules | Foreach-Object {Install-Module -Name $_.ModuleName -RequiredVersion $_.ModuleVersion }
           }
-
-          $manifest = Get-ChildItem -Path $moduleFolder -Filter *.psd1 | Select-Object -First 1
-          if (-not $manifest) { throw "No module manifest (*.psd1) found under $moduleFolder" }
-
-          # Parse manifest without validating RequiredModules to avoid CI dependency failures
-          $data = Import-PowerShellDataFile -Path $manifest.FullName
-          $localVersion = [version]$data.ModuleVersion
-          # Use manifest base name as module name (matches folder and PSGallery name)
-          $moduleName = $manifest.BaseName
-
-          Write-Host "Local module: $moduleName v$localVersion"
-          $published = Find-Module -Name $moduleName -Repository PSGallery -ErrorAction SilentlyContinue
-          if ($published -and ([version]$published.Version -ge $localVersion)) {
-            Write-Host "A version ($($published.Version)) already exists on PSGallery for $moduleName. Skipping publish."
-            exit 0
-          }
-
-          if (-not $env:NUGET_API_KEY) { throw 'NuGet API key is not set. Configure secrets.NUGETKEY in the repository settings.' }
-
-          # CI safety: ensure any lightweight dependency listed in RequiredModules is present
-          try {
-            Install-Module -Name PowerShellExtension -Scope CurrentUser -Force -ErrorAction Stop
-          } catch { Write-Host 'Optional dependency install failed; continuing...' }
-
-          Publish-Module -Path $moduleFolder -Repository 'PSGallery' -NuGetApiKey $env:NUGET_API_KEY -Verbose
+          Remove-Item -Path ".git" -Recurse -Force
+          Remove-Item -Path ".github" -Recurse -Force
+          Remove-Item -Path ".vscode" -Recurse -Force
+          Publish-PSResource -ApiKey $env:nugetkey -Path .\code365scripts.openai\code365scripts.openai.psd1 -Repository PSGallery
