@@ -12,6 +12,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: prepare and publish module
+        shell: pwsh
+        run: |
+          Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+          $data = Import-PowerShellDataFile .\code365scripts.openai\code365scripts.openai.psd1
+          if($data.RequiredModules) {
+            $data.RequiredModules | Foreach-Object {Install-Module -Name $_.ModuleName -RequiredVersion $_.ModuleVersion }
+          }
+          Remove-Item -Path ".git" -Recurse -Force
+          Remove-Item -Path ".github" -Recurse -Force
+          Remove-Item -Path ".vscode" -Recurse -Force
       # - uses: dlemstra/code-sign-action@v1
       #   with:
       #     certificate: ${{ secrets.CERTIFICATE }}
