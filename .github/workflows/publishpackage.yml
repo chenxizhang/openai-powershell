@@ -26,7 +26,6 @@ jobs:
         env:
           nugetkey: ${{secrets.NUGETKEY}}
         run: |
-          Install-Module PSResourceGet -Force -Scope CurrentUser
           $data = Import-PowerShellDataFile .\code365scripts.openai\code365scripts.openai.psd1
           if($data.RequiredModules) {
             $data.RequiredModules | Foreach-Object {Install-Module -Name $_.ModuleName -RequiredVersion $_.ModuleVersion }
@@ -34,4 +33,4 @@ jobs:
           Remove-Item -Path ".git" -Recurse -Force
           Remove-Item -Path ".github" -Recurse -Force
           Remove-Item -Path ".vscode" -Recurse -Force
-          Publish-PSResource -ApiKey $env:nugetkey -Path code365scripts.openai -Repository PSGallery
+          Publish-Module -Path code365scripts.openai -NuGetApiKey $env:nugetkey
