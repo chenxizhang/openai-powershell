@@ -208,14 +208,16 @@ function New-ChatGPTConversation {
         $endpoint = ($endpoint, [System.Environment]::GetEnvironmentVariable("OPENAI_API_ENDPOINT"), "https://api.openai.com/v1/" | Where-Object { $_.Length -gt 0 } | Select-Object -First 1)
 
         $endpoint = switch ($endpoint) {
-            { $_ -in ("ollama", "local") } { "http://localhost:11434/v1/" }
+            "ollama" { "http://localhost:11434/v1/" }
+            "foundry" {"http://localhost:5273/v1/"}
+            "docker" {"http://localhost:12434/v1/"}
             "kimi" { "https://api.moonshot.cn/v1/" }
             "zhipu" { "https://open.bigmodel.cn/api/paas/v4/" }
             default { $endpoint }
         }
 
         # if use local model, and api_key is not specify, then generate a random key
-        if ($endpoint -eq "http://localhost:11434/v1/" -and !$api_key) {
+        if (($endpoint -match "localhost") -and !$api_key) {
             $api_key = "local"
         }
 
@@ -710,7 +712,7 @@ function New-ChatGPTConversation {
                 }
             }
             catch {
-                Write-Error $.ErrorDetails
+                Write-Error $_.Exception.Message
             }
         }
     }
