@@ -89,3 +89,4 @@ The module uses automated GitHub Actions for publishing:
 - Telemetry collection can be disabled with `DISABLE_TELEMETRY_OPENAI_POWERSHELL=true`
 - The module supports both interactive chat sessions and single-shot completions for automation scenarios
 - Make sure the OPENAI_API_ENDPOINT, OPENAI_API_MODEL, and OPENAI_API_KEY environment variables are set correctly
+- Remember running tests after you make any changes to those two core functions, and before you commit code and push
