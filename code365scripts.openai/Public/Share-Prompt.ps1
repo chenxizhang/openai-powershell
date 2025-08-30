@@ -48,7 +48,7 @@ function Submit-Prompt {
         $content = Get-Content $content -Raw -Encoding UTF8
     }
     else {
-        throw "The file path is invalid."
+        throw "The file path '$content' is invalid or the file does not exist. Please provide a valid file path."
     }
 
     # if the name parameter is not set, we will try to get it from environment variable
@@ -76,7 +76,7 @@ function Submit-Prompt {
 
     # if the content is empty or null, throw an exception
     if (-not $content) {
-        throw "content is not set, you can set it by the file parameter or the content parameter."
+        throw "Content is empty or null. Please provide content either by specifying a valid file path in the -content parameter or by providing the content directly."
     }
 
     try {
@@ -95,6 +95,13 @@ function Submit-Prompt {
     }
     catch {
         <#Do this if a terminating exception happens#>
-        Write-Error $.ErrorDetails
+        $errorMessage = if ($_.ErrorDetails) { 
+            $_.ErrorDetails 
+        } elseif ($_.Exception.Message) { 
+            $_.Exception.Message 
+        } else { 
+            "Unknown error occurred while sharing prompt" 
+        }
+        Write-Error "Failed to share prompt: $errorMessage"
     }
 }

@@ -37,14 +37,39 @@ function Invoke-StreamWebRequest {
         }
         else {
             $result.status = $response.StatusCode
-            $temp = $response.Content.ReadAsStringAsync().Result | ConvertFrom-Json
-            $result.message = "Got error message: $($temp.message), details: $($temp.details)"
+            try {
+                $temp = $response.Content.ReadAsStringAsync().Result | ConvertFrom-Json
+                if ($temp.error -and $temp.error.message) {
+                    $result.message = "API Error: $($temp.error.message)"
+                    if ($temp.error.type) {
+                        $result.message += " (Type: $($temp.error.type))"
+                    }
+                } elseif ($temp.message) {
+                    $result.message = "Error: $($temp.message)"
+                    if ($temp.details) {
+                        $result.message += " Details: $($temp.details)"
+                    }
+                } else {
+                    $result.message = "HTTP Error $($response.StatusCode): $($response.ReasonPhrase)"
+                }
+            }
+            catch {
+                $result.message = "HTTP Error $($response.StatusCode): $($response.ReasonPhrase). Unable to parse error details."
+            }
         }
     }
+    catch {
+        $result.status = "error"
+        $errorMessage = if ($_.Exception.Message) { 
+            $_.Exception.Message 
+        } else { 
+            "Unknown error occurred during streaming request" 
+        }
+        $result.message = "Stream request failed: $errorMessage"
+    }
     finally {
-        $client.Dispose()
-        $request.Dispose()
-
+        if ($client) { $client.Dispose() }
+        if ($request) { $request.Dispose() }
     }
 
     return $result

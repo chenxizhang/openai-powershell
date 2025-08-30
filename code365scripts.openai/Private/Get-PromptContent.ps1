@@ -38,6 +38,8 @@ function Get-PromptContent {
         }
         catch {
             <#Do this if a terminating exception happens#>
+            # Log the error for debugging but continue with original prompt
+            Write-Verbose "Failed to process prompt content: $($_.Exception.Message)"
             # ignore the error and just return the prompt
         }
     }

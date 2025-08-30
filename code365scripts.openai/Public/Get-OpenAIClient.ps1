@@ -7,11 +7,11 @@ function Get-OpenAIClient {
     )
 
     if (!$apikey) {
-        throw "OpenAI API Key is required"
+        throw "OpenAI API Key is required. Please set the OPENAI_API_KEY environment variable or provide the -apikey parameter."
     }
 
     if (!$endpoint) {
-        throw "OpenAI API Endpoint is required"
+        throw "OpenAI API Endpoint is required. Please set the OPENAI_API_ENDPOINT environment variable or provide the -endpoint parameter."
     }
 
     if (!$model) {

@@ -207,7 +207,24 @@ function New-OpenAICompletion {
             
         }
         catch {
-            Write-Error $_.ErrorDetails
+            $errorMessage = if ($_.ErrorDetails) { 
+                try {
+                    $errorObj = $_.ErrorDetails | ConvertFrom-Json
+                    if ($errorObj.error.message) {
+                        "API Error: $($errorObj.error.message)"
+                    } else {
+                        $_.ErrorDetails
+                    }
+                }
+                catch {
+                    $_.ErrorDetails
+                }
+            } elseif ($_.Exception.Message) { 
+                $_.Exception.Message 
+            } else { 
+                "Unknown error occurred during completion request" 
+            }
+            Write-Error "OpenAI completion failed: $errorMessage"
         }
     }
 

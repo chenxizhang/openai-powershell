@@ -289,7 +289,7 @@ function New-ChatGPTConversation {
 
         # we just support assistant in openai or azure
         if ($PSCmdlet.ParameterSetName -match "assistant" -and $type -notin @("openai", "azure")) {
-            Write-Error "We only support assistant in openai or azure openai service, please check your endpoint."
+            Write-Error "Assistant functionality is only supported with OpenAI or Azure OpenAI services. Current endpoint type '$type' does not support assistants. Please configure your endpoint to use OpenAI (https://api.openai.com) or Azure OpenAI service."
             return
         }
 
@@ -712,7 +712,24 @@ function New-ChatGPTConversation {
                 }
             }
             catch {
-                Write-Error $_.Exception.Message
+                $errorMessage = if ($_.ErrorDetails) { 
+                    try {
+                        $errorObj = $_.ErrorDetails | ConvertFrom-Json
+                        if ($errorObj.error.message) {
+                            "API Error: $($errorObj.error.message)"
+                        } else {
+                            $_.ErrorDetails
+                        }
+                    }
+                    catch {
+                        $_.ErrorDetails
+                    }
+                } elseif ($_.Exception.Message) { 
+                    $_.Exception.Message 
+                } else { 
+                    "Unknown error occurred during chat completion" 
+                }
+                Write-Error "ChatGPT conversation failed: $errorMessage"
             }
         }
     }

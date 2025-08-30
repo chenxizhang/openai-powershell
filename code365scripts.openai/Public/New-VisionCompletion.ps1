@@ -121,7 +121,7 @@ function New-VisionCompletion {
         $files | ForEach-Object {
             # if the file not startwith http/https and endwith jpg/png/gif, then we will treat it as a local file path and check if the file exists
             if ((Get-IsValidImage -path $_) -eq $false) {
-                Write-Error "File $_ is not a url and not a valid local image(jpg,png,gif)."
+                Write-Error "Invalid image file: '$_'. Please provide either a valid URL (http/https) or a local image file with supported extensions (jpg, jpeg, png, gif). Ensure the file exists and is accessible."
                 Set-Variable -Name "hasError" -Value $true
             }
         }
