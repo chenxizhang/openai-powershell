@@ -2,9 +2,19 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Working environment
+
+I am using Windows 11 as the development environment, please remember this unless I specify otherwise. Claude Code should consider using Windows PowerShell (pwsh) and paths in your plan.
+
 ## Project Overview
 
 This is the **code365scripts.openai** PowerShell module - an unofficial OpenAI PowerShell module that provides text completion, chat experiences, and image generation capabilities. The module supports multiple AI services including OpenAI, Azure OpenAI, local LLMs via Ollama, and various other GPT-compatible services.
+
+Now, we only focus on two capabilities in below code files.
+
+- New-ChatCompletions.ps1, function is New-ChatCompletions, alias is "gpt". user can use this function and interact with the OpenAI service just like chat with a human. user can specific the system prompt via `system` parameter, and the user prompt via `prompt` parameter. Please read the help content of this function carefully, to understand the functionalities.
+
+- New-ChatGPTConversation.ps1, function is New-ChatGPTConversation, alias is "chat". user can create a multi-turn conversation with OpenAI service, it also supports the `stream` mode if you use PowerShell 6+ version. 
 
 ## Development Commands
 
@@ -18,16 +28,9 @@ Import-Module .\code365scripts.openai\code365scripts.openai.psd1 -Force
 ```
 
 ### Publishing Workflow
-```powershell
-# Pre-publish validation (recommended before publishing)
-.\pre-publish-check.ps1
 
-# Publish to PowerShell Gallery (requires API key)
-.\publish.ps1 -NuGetApiKey "your-api-key"
+It will handled by the github action workflow, see 
 
-# Preview publish (dry run)
-.\publish.ps1 -NuGetApiKey "your-api-key" -WhatIf
-```
 
 ### Module Management
 ```powershell
@@ -35,7 +38,8 @@ Import-Module .\code365scripts.openai\code365scripts.openai.psd1 -Force
 Test-ModuleManifest .\code365scripts.openai\code365scripts.openai.psd1
 
 # Update module version in manifest before publishing
-# Edit ModuleVersion in code365scripts.openai.psd1
+- Edit ModuleVersion in code365scripts.openai.psd1
+- Add descriptive information in top of CHANGELOG.md, if you are working on a bug, link it in the description
 ```
 
 ## Architecture
@@ -49,8 +53,6 @@ Test-ModuleManifest .\code365scripts.openai\code365scripts.openai.psd1
 ### Core Functions
 - `New-ChatGPTConversation` (alias: `chat`, `chatgpt`) - Interactive chat or single completions
 - `New-ChatCompletions` (alias: `gpt`) - Text completions for automation
-- `New-ImageGeneration` (alias: `image`, `dall`) - DALL-E image generation
-- `Get-OpenAIClient` - Client configuration management
 
 ### Key Architecture Patterns
 - **Modular Loading**: Main module (psm1) dynamically loads all PS1 files from Types, Public, and Private directories
@@ -86,3 +88,4 @@ The module uses automated GitHub Actions for publishing:
 - All exported functions must be listed in both `FunctionsToExport` and `CmdletsToExport` arrays
 - Telemetry collection can be disabled with `DISABLE_TELEMETRY_OPENAI_POWERSHELL=true`
 - The module supports both interactive chat sessions and single-shot completions for automation scenarios
+- Make sure the OPENAI_API_ENDPOINT, OPENAI_API_MODEL, and OPENAI_API_KEY environment variables are set correctly

@@ -1,0 +1,29 @@
+# Test result files - exclude ALL files in this directory from version control
+# This folder is for storing test results only
+
+# All test result files
+*TestResults*.json
+*TestReport*.json
+*TestSession*.json
+*TestResults*.xml
+QuickTestResults*.json
+
+# Temporary test files
+*.tmp
+*.temp
+
+# Performance test outputs
+*Performance*.json
+*Benchmark*.json
+
+# Coverage reports
+*Coverage*.json
+*Coverage*.xml
+
+# Log files from test runs
+*.log
+test-*.log
+
+# Exclude everything except this .gitignore file
+*
+!.gitignore

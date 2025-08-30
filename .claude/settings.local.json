@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Remove-Item \"C:\\work\\openai-powershell\\code365scripts.openai\\_tests_\\mock-test-demo.ps1\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
